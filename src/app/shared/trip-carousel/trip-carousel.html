@@ -1,0 +1,20 @@
+<swiper
+  [slidesPerView]="1"
+  [spaceBetween]="20"
+  [pagination]="{ clickable: true }"
+  [navigation]="true"
+  class="carousel__container"
+>
+  <ng-template swiperSlide *ngFor="let trip of trips">
+    <div class="card">
+      <img [src]="trip.imageUrl" alt="Imagem da viagem">
+      <div class="details">
+        <h3>{{ trip.origin }} → {{ trip.destination }}</h3>
+        <p>🗓 Saída: {{ trip.departureDate }}</p>
+        <p>🏁 Chegada: {{ trip.arrivalDate }}</p>
+        <p>💰 Preço: R$ {{ trip.price | number:'1.2-2' }}</p>
+        <p>⭐ Avaliação: {{ trip.rating }} / 5</p>
+      </div>
+    </div>
+  </ng-template>
+</swiper>
