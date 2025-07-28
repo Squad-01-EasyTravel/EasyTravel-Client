@@ -1,7 +1,22 @@
-/* You can add global styles to this file, and also import other style files */
 /* Reset básico para consistência entre navegadores */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Garantir que dropdowns tenham z-index alto globalmente */
+.dropdown-menu {
+  z-index: 9999;
+}
+
+/* Garantir que navbar tenha stacking context adequado */
+.navbar {
+  z-index: 1030;
+  position: relative;
+}
+
+footer {
+  z-index: 1000;
+  position: relative;
 }

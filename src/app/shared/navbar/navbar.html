@@ -1,10 +1,16 @@
 <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid px-4">
         <!-- Logo -->
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="assets/Logo/discoPin-greenOrange-bg-grande 3.svg" alt="Easy Travel Logo" class="navbar-logo">
+        <a class="navbar-brand d-flex align-items-center" #logo href="#">
+            <img src="../../../assets/Logo/3-removebg-previeww-removebg-preview.png" alt="Easy Travel Logo"
+                class="navbar-logo">
             <span class="navbar-brand-text">Easy Travel</span>
         </a>
+
+        <!-- Botão de teste para alternar login (remover em produção) -->
+        <!-- <button class="btn btn-sm btn-outline-light ms-2" (click)="toggleLoginState()">
+            {{ isLoggedIn ? 'Simular Logout' : 'Simular Login' }}
+        </button> -->
 
         <!-- Botão do menu mobile -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -26,9 +32,47 @@
                 </li>
             </ul>
 
-            <!-- Botão de Login -->
-            <div class="d-flex">
-                <a href="#" class="btn btn-login" routerLink="/login">Fazer Login</a>
+            <!-- Botão de Login ou Avatar do Usuário -->
+            <div class="d-flex align-items-center">
+                <!-- Botão de Login (quando não logado) -->
+                <a href="#" class="btn btn-login" routerLink="/login" *ngIf="!isLoggedIn">Fazer Login</a>
+
+                <!-- Avatar do Usuário (quando logado) -->
+                <div class="dropdown" *ngIf="isLoggedIn">
+                    <button class="btn p-0 user-avatar-btn" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <img [src]="userImage" [alt]="userName" class="user-avatar"
+                            onerror="this.src='../../../assets/imgs/et_mascote.png'">
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end user-dropdown">
+                        <li>
+                            <div class="dropdown-header">
+                                <strong>{{userName}}</strong>
+                            </div>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" routerLink="/perfil">
+                                <i class="bi bi-person me-2"></i>Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" routerLink="/minhas-reservas">
+                                <i class="bi bi-calendar-check me-2"></i>Minhas Reservas
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="#" (click)="logout()">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
