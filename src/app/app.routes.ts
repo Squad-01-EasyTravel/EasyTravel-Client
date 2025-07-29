@@ -3,6 +3,7 @@ import { Home } from './features/client/pages/home/home';
 import { Bundle } from './features/client/pages/bundle/bundle';
 import { AUTH_ROUTES } from './features/client/pages/auth/auth.routes';
 import { MyBooking } from './features/client/pages/booking/my-booking/my-booking';
+import { Payment } from './features/client/pages/payment/payment';
 
 import { EmployeeLayoutComponent } from './features/employee/employee-layout';
 import { PackageManagementComponent } from './features/employee/pages/package-management/package-management';
@@ -13,6 +14,7 @@ export const routes: Routes = [
   { path: 'home', component: Home },
 
   { path: 'my-booking', component: MyBooking },
+
   {
     path: 'employee',
     component: EmployeeLayoutComponent,
@@ -21,6 +23,4 @@ export const routes: Routes = [
       { path: 'review-management', component: ReviewManagement }
     ]
   },
-  { path: 'auth', children: AUTH_ROUTES }
-
 ];
