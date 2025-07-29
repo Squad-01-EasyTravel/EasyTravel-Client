@@ -1,0 +1,66 @@
+.carousel__container {
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+}
+
+.carousel__content {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 1rem;
+  -webkit-overflow-scrolling: touch; /* melhora em dispositivos móveis */
+  scroll-behavior: smooth;
+}
+
+.card {
+  scroll-snap-align: start;
+  min-width: 280px;
+  flex: 0 0 auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.03);
+}
+
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.details {
+  padding: 1rem;
+  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.details h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #005080;
+}
+
+.details p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+.carousel__content::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel__content::before,
+.carousel__content::after {
+  content: "";
+  flex: 0 0 0.75rem;
+}
