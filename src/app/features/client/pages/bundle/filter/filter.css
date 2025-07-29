@@ -1,0 +1,52 @@
+.filtro-container {
+  display: flex;
+  gap: 1rem;
+  background: #f4f4f4;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+.filtro-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-icon {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+}
+
+.input-icon span {
+  margin-right: 8px;
+  color: #444;
+}
+
+.input-icon select {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 1rem;
+}
+
+.filtro-botao button {
+  background: #FF7900;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
