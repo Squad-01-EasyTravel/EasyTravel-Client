@@ -1,0 +1,28 @@
+/* Usando apenas Bootstrap - sem CSS customizado */
+
+.pagination .page-item.active .page-link {
+    background-color: #FF7900;
+    border-color: #FF7900;
+    color: rgb(0, 0, 0);
+  }
+
+  .pagination .page-link:hover {
+    background-color: #FF7900;
+    border-color: #FF7900;
+    color: rgb(0, 0, 0);
+  }
+
+  .pagination .page-link:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 121, 0, 0.25);
+  }
+
+  .pagination .page-link {
+    color: rgb(0, 0, 0);
+  }
+
+  /* Mudar cor do foco dos inputs para a cor primária */
+  .form-select:focus,
+  .form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(255, 121, 0, 0.25);
+  }

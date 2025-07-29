@@ -1,10 +1,18 @@
 footer {
     background-color: #ff8000 !important;
     font-family: Arial, sans-serif;
+    position: relative;
+    z-index: 1000;
 }
 
 /* Texto da logo com fundo escuro */
 
+.logo-icon
+{
+    height: 45px;
+    width: auto;
+    padding-right: 10px;
+}
 .logo-text {
     background: #7a4a00;
     border-radius: 20px;

@@ -1,0 +1,189 @@
+<app-navbar></app-navbar>
+<div class="container my-5">
+  <h2 class="mb-4">Meus Pacotes</h2>
+  <div class="row">
+    <div class="col-lg-8 mb-4">
+      <div class="d-flex flex-column gap-4">
+        <!-- Assim que tiver conexão com o back-end, irá se criado um componente do card que será replicado com ng for -->
+        <!-- De acordo com o status da viagem, o card deve ser diferente -->
+        <!-- Pacote 1 -->
+        <div class="card">
+          <div class="row g-0">
+            <!-- Imagem do destino -->
+            <div class="col-md-4">
+              <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=250&fit=crop"
+                class="img-fluid rounded-start h-100 object-fit-cover" alt="Recife - São Paulo">
+            </div>
+            <!-- Conteúdo do pacote -->
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold">Recife - São Paulo</h5>
+                <div class="row text-muted small mb-3">
+                  <div class="col-sm-6">
+                    <strong>Data Partida:</strong> 15/08/2025
+                  </div>
+                  <div class="col-sm-6">
+                    <strong>Data Volta:</strong> 22/08/2025
+                  </div>
+                </div>
+                <div class="row text-muted small mb-3">
+                  <div class="col-sm-6">
+                    <strong>Status: </strong> <span class="text-success">Finalizado</span>
+                  </div>
+                  <div class="col-sm-6">
+                    <strong>Pedido:</strong> #123456
+                  </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-warning btn-sm text-white">Ver Detalhes</button>
+                  <button class="btn btn-secondary btn-sm">Baixar Voucher</button>
+                  <button class="btn btn-info btn-sm text-white">Avaliação</button>
+                </div>
+                <div class="mt-2">
+                  <small class="text-muted">
+                    Para cancelar um pacote pago entre em contato com o Suporte
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pacote 2 -->
+        <div class="card">
+          <div class="row g-0">
+            <!-- Imagem do destino -->
+            <div class="col-md-4">
+              <img src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=400&h=250&fit=crop"
+                class="img-fluid rounded-start h-100 object-fit-cover" alt="Rio de Janeiro - Salvador">
+            </div>
+            <!-- Conteúdo do pacote -->
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold">Rio de Janeiro - Salvador</h5>
+                <div class="row text-muted small mb-3">
+                  <div class="col-sm-6">
+                    <strong>Data Partida:</strong> 10/09/2025
+                  </div>
+                  <div class="col-sm-6">
+                    <strong>Data Volta:</strong> 17/09/2025
+                  </div>
+                </div>
+                <div class="row text-muted small mb-3">
+                  <div class="col-sm-6">
+                    <strong>Status: </strong> <span class="text-primary">Confirmado</span>
+                  </div>
+                  <div class="col-sm-6">
+                    <strong>Pedido:</strong> #234567
+                  </div>
+                </div>
+                <!-- Botões de ação -->
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-warning btn-sm text-white">Ver Detalhes</button>
+                  <button class="btn btn-secondary btn-sm">Baixar Voucher</button>
+                  <button class="btn btn-outline-danger btn-sm">Cancelar</button>
+                </div>
+                <!-- Texto de cancelamento -->
+                <div class="mt-2">
+                  <small class="text-muted">
+                    Para cancelar um pacote pago entre em contato com o Suporte
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Pacote 3 -->
+        <div class="card">
+          <div class="row g-0">
+            <!-- Imagem do destino -->
+            <div class="col-md-4">
+              <img src="https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?w=400&h=250&fit=crop"
+                class="img-fluid rounded-start h-100 object-fit-cover" alt="São Paulo - Fortaleza">
+            </div>
+            <!-- Conteúdo do pacote -->
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title fw-bold">São Paulo - Fortaleza</h5>
+                <div class="row text-muted small mb-3">
+                  <div class="col-sm-6">
+                    <strong>Data Partida:</strong> 25/10/2025
+                  </div>
+                  <div class="col-sm-6">
+                    <strong>Data Volta:</strong> 01/11/2025
+                  </div>
+                </div>
+                <div class="row text-muted small mb-3">
+                  <div class="col-sm-6">
+                    <strong>Status: </strong> <span class="text-warning">Pendente</span>
+                  </div>
+                  <div class="col-sm-6">
+                    <strong>Pedido:</strong> #345678
+                  </div>
+                </div>
+                <!-- Botões de ação -->
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-warning btn-sm text-white">Ver Detalhes</button>
+                  <button class="btn btn-success btn-sm">Confirmar Pagamento</button>
+                  <button class="btn btn-outline-danger btn-sm">Cancelar</button>
+                </div>
+                <!-- Texto de cancelamento -->
+                <div class="mt-2">
+                  <small class="text-muted">
+                    Aguardando confirmação do pagamento
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Filtros -->
+    <aside class="col-lg-4">
+      <div class="card filter-card">
+        <div class="card-header">
+          <strong>Filtros</strong>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-select">
+              <option>Todos</option>
+              <option>Confirmado</option>
+              <option>Pendente</option>
+              <option>Cancelado</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Data de Ida</label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Data de Volta</label>
+            <input type="date" class="form-control">
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <!-- Paginação -->
+  <nav class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+      <li class="page-item">
+        <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item active"><a class="page-link" href="#">1</a></li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item">
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+<app-footer></app-footer>
