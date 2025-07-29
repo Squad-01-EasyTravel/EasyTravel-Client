@@ -1,8 +1,12 @@
 <div class="d-flex">
-  <app-sidebar></app-sidebar>
+  
   <div class="package-management-container flex-grow-1">
     <div class="header">
-      <h1>Gerenciamento de Pacotes</h1>
+      <div>
+        <h1>Gerenciamento de Pacotes</h1>
+        <app-filter-search-package></app-filter-search-package>
+      </div>
+      
       <button class="btn-primary" (click)="openCreateModal()">
         <i class="icon-plus"></i>
         Novo Pacote
@@ -12,49 +16,64 @@
     <div class="packages-grid">
       <div class="package-card" *ngFor="let package of packages">
         <div class="package-image">
-          <img [src]="package.imageUrl" [alt]="package.name" />
+          <img [src]="package.imageUrl" [alt]="package.bundleTitle" />
           <div class="package-status" [class.available]="package.available" [class.unavailable]="!package.available">
             {{ package.available ? 'Disponível' : 'Indisponível' }}
           </div>
         </div>
         
         <div class="package-content">
-          <h3>{{ package.name }}</h3>
-          <p class="destination">{{ package.destination }}</p>
-          <p class="description">{{ package.description }}</p>
-          
+          <h3>{{ package.bundleTitle }}</h3>
+          <p class="destination">{{ package.bundleRank }}</p>
+          <p class="description">{{ package.bundleDescription }}</p>
           <div class="package-details">
             <div class="detail">
               <span class="label">Preço:</span>
-              <span class="value">R$ {{ package.price | number:'1.2-2' }}</span>
+              <span class="value">R$ {{ package.initialPrice | number:'1.2-2' }}</span>
             </div>
             <div class="detail">
-              <span class="label">Duração:</span>
-              <span class="value">{{ package.duration }} dias</span>
+              <span class="label">Data Inicial:</span>
+              <span class="value">{{ package.initialDate | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="detail">
+              <span class="label">Data Final:</span>
+              <span class="value">{{ package.finalDate | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="detail">
+              <span class="label">Quantidade:</span>
+              <span class="value">{{ package.quantity }}</span>
+            </div>
+            <div class="detail">
+              <span class="label">Viajantes:</span>
+              <span class="value">{{ package.travelersNumber }}</span>
+            </div>
+            <div class="detail" *ngIf="package.videoUrl">
+              <span class="label">Vídeo:</span>
+              <a [href]="package.videoUrl" target="_blank">Ver vídeo</a>
             </div>
             <div class="detail">
               <span class="label">Criado em:</span>
-            <span class="value">{{ package.createdAt | date:'dd/MM/yyyy' }}</span>
+              <span class="value">{{ package.createdAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+          <div class="package-actions">
+            <button class="btn-secondary" (click)="openEditModal(package)">
+              <i class="icon-edit"></i>
+              Editar
+            </button>
+            <button 
+              class="btn-toggle" 
+              [class.btn-success]="!package.available"
+              [class.btn-warning]="package.available"
+              (click)="toggleAvailability(package)">
+              {{ package.available ? 'Desativar' : 'Ativar' }}
+            </button>
+            <button class="btn-danger" (click)="deletePackage(package.id)">
+              <i class="icon-delete"></i>
+              Excluir
+            </button>
           </div>
         </div>
-      </div>
-      
-      <div class="package-actions">
-        <button class="btn-secondary" (click)="openEditModal(package)">
-          <i class="icon-edit"></i>
-          Editar
-        </button>
-        <button 
-          class="btn-toggle" 
-          [class.btn-success]="!package.available"
-          [class.btn-warning]="package.available"
-          (click)="toggleAvailability(package)">
-          {{ package.available ? 'Desativar' : 'Ativar' }}
-        </button>
-        <button class="btn-danger" (click)="deletePackage(package.id)">
-          <i class="icon-delete"></i>
-          Excluir
-        </button>
       </div>
     </div>
   </div>
@@ -64,55 +83,107 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>{{ isEditMode ? 'Editar Pacote' : 'Novo Pacote' }}</h2>
-        <button class="close-btn" (click)="closeModal()">×</button>
+        <button class="close-btn" (click)="closeModal()"></button>
       </div>
       
       <form class="modal-body" (ngSubmit)="savePackage()">
         <div class="form-group">
-          <label for="name">Nome do Pacote *</label>
+          <label for="bundleTitle">Título do Pacote *</label>
           <input 
             type="text" 
-            id="name" 
-            [(ngModel)]="newPackage.name" 
-            name="name"
-            placeholder="Ex: Pacote Nordeste"
+            id="bundleTitle" 
+            [(ngModel)]="newPackage.bundleTitle" 
+            name="bundleTitle"
+            placeholder="Ex: Pacote Férias Nordeste"
             required>
         </div>
 
         <div class="form-group">
-          <label for="destination">Destino *</label>
-          <input 
-            type="text" 
-            id="destination" 
-            [(ngModel)]="newPackage.destination" 
-            name="destination"
-            placeholder="Ex: Fortaleza, CE"
-            required>
+          <label for="bundleDescription">Descrição *</label>
+          <textarea 
+            id="bundleDescription" 
+            [(ngModel)]="newPackage.bundleDescription" 
+            name="bundleDescription"
+            rows="4"
+            placeholder="Descreva o que o pacote inclui..."
+            required></textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="price">Preço (R$) *</label>
+            <label for="initialPrice">Preço Inicial (R$) *</label>
             <input 
               type="number" 
-              id="price" 
-              [(ngModel)]="newPackage.price" 
-              name="price"
+              id="initialPrice" 
+              [(ngModel)]="newPackage.initialPrice" 
+              name="initialPrice"
               min="0"
               step="0.01"
-              placeholder="0.00"
+              placeholder="1200.00"
               required>
           </div>
 
           <div class="form-group">
-            <label for="duration">Duração (dias) *</label>
+            <label for="bundleRank">Categoria *</label>
+            <select 
+              id="bundleRank" 
+              [(ngModel)]="newPackage.bundleRank" 
+              name="bundleRank"
+              required>
+            >
+              <option value="">Selecione a categoria</option>
+              <option value="BRONZE">Bronze</option>
+              <option value="PRATA">Prata</option>
+              <option value="OURO">Ouro</option>
+              <option value="PLATINA">Platina</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="initialDate">Data Inicial *</label>
+            <input 
+              type="datetime-local" 
+              id="initialDate" 
+              [(ngModel)]="newPackage.initialDate" 
+              name="initialDate"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="finalDate">Data Final *</label>
+            <input 
+              type="datetime-local" 
+              id="finalDate" 
+              [(ngModel)]="newPackage.finalDate" 
+              name="finalDate"
+              required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="quantity">Quantidade Disponível *</label>
             <input 
               type="number" 
-              id="duration" 
-              [(ngModel)]="newPackage.duration" 
-              name="duration"
+              id="quantity" 
+              [(ngModel)]="newPackage.quantity" 
+              name="quantity"
+              min="0"
+              placeholder="10"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="travelersNumber">Número de Viajantes *</label>
+            <input 
+              type="number" 
+              id="travelersNumber" 
+              [(ngModel)]="newPackage.travelersNumber" 
+              name="travelersNumber"
               min="1"
-              placeholder="5"
+              placeholder="2"
               required>
           </div>
         </div>
@@ -128,14 +199,13 @@
         </div>
 
         <div class="form-group">
-          <label for="description">Descrição *</label>
-          <textarea 
-            id="description" 
-            [(ngModel)]="newPackage.description" 
-            name="description"
-            rows="4"
-            placeholder="Descreva o que o pacote inclui..."
-            required></textarea>
+          <label for="videoUrl">URL do Vídeo</label>
+          <input 
+            type="url" 
+            id="videoUrl" 
+            [(ngModel)]="newPackage.videoUrl" 
+            name="videoUrl"
+            placeholder="https://exemplo.com/video.mp4">
         </div>
 
         <div class="form-group checkbox-group">

@@ -2,15 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sidebar } from '../../components/sidebar/sidebar';
+import { FilterSearchPackage } from '../../components/filter-search/filter-search-package';
 
 interface TravelPackage {
   id: number;
-  name: string;
-  destination: string;
-  price: number;
-  duration: number;
-  description: string;
+  bundleTitle: string;
+  bundleDescription: string;
+  initialPrice: number;
+  bundleRank: 'BRONZE' | 'PRATA' | 'OURO' | 'PLATINA';
+  initialDate: string;
+  finalDate: string;
+  quantity: number;
+  travelersNumber: number;
   imageUrl: string;
+  videoUrl?: string;
   available: boolean;
   createdAt: Date;
 }
@@ -18,7 +23,7 @@ interface TravelPackage {
 @Component({
   selector: 'app-package-management',
   standalone: true,
-imports: [CommonModule, FormsModule, Sidebar],
+  imports: [CommonModule, FormsModule, Sidebar, FilterSearchPackage],
   templateUrl: './package-management.html',
   styleUrl: './package-management.css'
 })
@@ -29,12 +34,16 @@ export class PackageManagementComponent implements OnInit {
   isModalOpen = false;
 
   newPackage: Partial<TravelPackage> = {
-    name: '',
-    destination: '',
-    price: 0,
-    duration: 0,
-    description: '',
+    bundleTitle: '',
+    bundleDescription: '',
+    initialPrice: 0,
+    bundleRank: undefined,
+    initialDate: '',
+    finalDate: '',
+    quantity: 0,
+    travelersNumber: 0,
     imageUrl: '',
+    videoUrl: '',
     available: true
   };
 
@@ -49,23 +58,31 @@ export class PackageManagementComponent implements OnInit {
     this.packages = [
       {
         id: 1,
-        name: 'Pacote Nordeste',
-        destination: 'Fortaleza',
-        price: 1200,
-        duration: 5,
-        description: 'Pacote completo para o Nordeste brasileiro',
+        bundleTitle: 'Pacote Férias Nordeste',
+        bundleDescription: 'Pacote para o nordeste com tudo incluso',
+        initialPrice: 1200,
+        bundleRank: 'BRONZE',
+        initialDate: '2025-07-29T18:12:22.171Z',
+        finalDate: '2025-07-29T18:12:22.171Z',
+        quantity: 10,
+        travelersNumber: 2,
         imageUrl: '/assets/imgs/fortaleza.jpg',
+        videoUrl: '',
         available: true,
         createdAt: new Date('2024-01-15')
       },
       {
         id: 2,
-        name: 'Pacote Sul',
-        destination: 'Gramado',
-        price: 980,
-        duration: 3,
-        description: 'Experiência única na Serra Gaúcha',
+        bundleTitle: 'Pacote Sul',
+        bundleDescription: 'Experiência única na Serra Gaúcha',
+        initialPrice: 980,
+        bundleRank: 'OURO',
+        initialDate: '2025-08-01T10:00:00.000Z',
+        finalDate: '2025-08-10T10:00:00.000Z',
+        quantity: 5,
+        travelersNumber: 4,
         imageUrl: '/assets/imgs/gramado.jpg',
+        videoUrl: '',
         available: true,
         createdAt: new Date('2024-02-10')
       }
@@ -94,12 +111,16 @@ export class PackageManagementComponent implements OnInit {
 
   resetForm(): void {
     this.newPackage = {
-      name: '',
-      destination: '',
-      price: 0,
-      duration: 0,
-      description: '',
+      bundleTitle: '',
+      bundleDescription: '',
+      initialPrice: 0,
+      bundleRank: undefined,
+      initialDate: '',
+      finalDate: '',
+      quantity: 0,
+      travelersNumber: 0,
       imageUrl: '',
+      videoUrl: '',
       available: true
     };
   }
@@ -143,13 +164,15 @@ export class PackageManagementComponent implements OnInit {
 
   isFormValid(): boolean {
     return !!(
-      this.newPackage.name &&
-      this.newPackage.destination &&
-      this.newPackage.price &&
-      this.newPackage.price > 0 &&
-      this.newPackage.duration &&
-      this.newPackage.duration > 0 &&
-      this.newPackage.description
+      this.newPackage.bundleTitle &&
+      this.newPackage.bundleDescription &&
+      this.newPackage.initialPrice &&
+      this.newPackage.initialPrice > 0 &&
+      this.newPackage.bundleRank &&
+      this.newPackage.initialDate &&
+      this.newPackage.finalDate &&
+      this.newPackage.quantity !== undefined && this.newPackage.quantity >= 0 &&
+      this.newPackage.travelersNumber !== undefined && this.newPackage.travelersNumber > 0
     );
   }
 }

@@ -23,11 +23,12 @@
 }
 .sidebar {
   width: 230px;
-  height: 1024px;
+  height: 100%;
   background: #1E1E1E;
   color: #fff;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  flex-grow: 1;
+  align-items: stretch;
   justify-content: flex-start;
 }
