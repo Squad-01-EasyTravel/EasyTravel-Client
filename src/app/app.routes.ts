@@ -8,5 +8,7 @@ import { MyBooking } from './features/client/pages/booking/my-booking/my-booking
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'home', component: Home },
-  { path: 'user', children: USER_ROUTES }
+  { path: 'bundles', component: Bundle }, // Adicionada rota para pacotes
+  { path: 'my-booking', component: MyBooking },
+  { path: 'auth', children: AUTH_ROUTES }
 ];
