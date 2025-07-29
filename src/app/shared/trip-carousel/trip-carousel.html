@@ -1,14 +1,52 @@
-<div class="carousel__container">
-  <div class="carousel__content">
-    <div *ngFor="let trip of trips" class="card">
-      <img [src]="trip.imageUrl" alt="Imagem da viagem">
-      <div class="details">
-        <h3>{{ trip.origin }}</h3>
-        <p>🗓 Saída: {{ trip.departureDate }}</p>
-        <p>🏁 Chegada: {{ trip.arrivalDate }}</p>
-        <p>💰 Preço: R$ {{ trip.price | number:'1.2-2' }}</p>
-        <p>⭐ Avaliação: {{ trip.rating }} / 5</p>
+<div id="tripCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+  <div class="carousel-inner">
+    <div *ngFor="let group of groupedTrips; let i = index" class="carousel-item" [class.active]="i === 0">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div *ngFor="let trip of group" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+              <img [src]="trip.imageUrl" class="card-img-top" alt="Imagem da viagem">
+              <span class="card-days">2 dias / 1 noite</span>
+              <div class="card-body">
+                <h5 class="card-title">Pacote de {{ trip.destination }}</h5>
+                <div class="card-rating">{{ trip.rating }}</div>
+                <div class="rating-stars">
+                  <ng-container *ngFor="let star of getStars(trip.rating)">
+                    <span [ngClass]="{
+                      'star': true,
+                      'full': star === 'full',
+                      'half': star === 'half',
+                      'empty': star === 'empty'
+                    }">★</span>
+                  </ng-container>
+                </div>
+                <br>
+                <span class="card-subtitle">Saindo de {{ trip.origin }}</span>
+                <hr>
+                <div class="card-promo">
+                <p class="card-promo-save">Economize R$ 100,00</p>
+
+                <div class="card-price-block">
+                  <p class="card-promo-people">Preço por pessoa</p>
+                  <p class="card-promo-old-price">R$ {{ trip.price | number:'1.2-2' }}</p>
+                  <p class="card-new-price">R$ {{ trip.price | number:'1.2-2' }}</p>
+                </div>
+              </div>
+                <span class="card-tax">Taxas e impostos não inclusos</span>
+                <hr>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#tripCarousel" data-bs-slide="prev">
+  <span class="carousel-control-prev-icon" style="color: var(--color-secondary); font-size: 2rem;">&#10094;</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#tripCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" style="color: var(--color-secondary); font-size: 2rem;">&#10095;</span>
+  </button>
+
 </div>

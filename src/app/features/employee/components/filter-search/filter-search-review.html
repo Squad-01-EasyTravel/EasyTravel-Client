@@ -1,0 +1,40 @@
+<div class="filter-search-container d-flex align-items-center gap-3">
+  <input 
+    type="text" 
+    class="form-control search-bar"
+    placeholder="Pesquisar"
+  />
+  <div 
+    class="icon-square d-flex align-items-center justify-content-center bg-light rounded"
+  >
+    <i class="bi bi-search"></i>
+  </div>
+  <div class="icon-square d-flex align-items-center justify-content-center bg-light rounded" (click)="toggleFilterModal()" style="cursor:pointer;">
+    <i class="bi bi-funnel"></i>
+  </div>
+</div>
+<div *ngIf="isFilterModalOpen" class="modal-overlay" (click)="closeFilterModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Filtrar Avaliações</h2>
+      </div>
+      <form class="modal-body">
+        <div class="form-group">
+          <label for="filterDate">Data da Avaliação</label>
+          <input type="date" id="filterDate" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="filterPackage">Pacote</label>
+          <input type="text" id="filterPackage" class="form-control" placeholder="Nome do pacote" />
+        </div>
+        <div class="form-group mb-4">
+          <label for="filterPackageId">ID do Pacote</label>
+          <input type="text" id="filterPackageId" class="form-control" placeholder="ID do pacote" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeFilterModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Filtrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
