@@ -1,17 +1,17 @@
 <div class="card-container">
-  <img [src]="pacote.imagem" class="card-img" alt="Imagem do destino">
+  <img [src]="pacote?.imagem" class="card-img" alt="Imagem do destino">
 
   <div class="card-body">
     <div class="linha cima">
-      <span class="preco"><strong>R$ 2400</strong></span>
-      <span class="data">12-01 | 12-01</span>
+      <span class="preco"><strong>R$ {{pacote?.preco}}</strong></span>
+      <span class="data">{{pacote?.dataInicio}} | {{pacote?.dataFim}}</span>
     </div>
 
     <div class="linha meio">
-      <span>Recife, São Paulo</span>
+      <span>{{pacote?.destino}}</span>
       <span class="avaliacao">
         <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="estrela" class="estrela">
-        <strong>4.9</strong>
+        <strong>{{pacote?.avaliacao}}</strong>
       </span>
     </div>
   </div>

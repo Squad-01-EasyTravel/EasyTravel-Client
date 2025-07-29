@@ -185,14 +185,14 @@
     color: #ffffff;
     padding: 0.75rem 1rem;
     transition: all 0.3s ease;
-    border-radius: 8px;
+    border-radius: 0px;
     margin: 0.25rem 0.5rem;
 }
 
 .user-dropdown .dropdown-item:hover {
     background-color: rgba(255, 140, 0, 0.2);
     color: #ff8c00;
-    transform: translateX(5px);
+    transform: translateX(-8px);
 }
 
 .user-dropdown .dropdown-item.text-danger {
