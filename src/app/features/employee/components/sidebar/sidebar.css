@@ -1,0 +1,33 @@
+.sidebar h1 {
+  margin-top: 30px;
+}
+.sidebar a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  margin: 12px 0;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+.sidebar a:hover {
+  color: #FF7900;
+}
+.highlight-bar {
+  width: 13px;
+  height: 48px;
+  background: #FF7900;
+  
+}
+.sidebar-highlight {
+  margin-top: 16px;
+}
+.sidebar {
+  width: 230px;
+  height: 1024px;
+  background: #1E1E1E;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}

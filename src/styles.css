@@ -20,6 +20,10 @@
   --color-gray: #666666;
 }
 
+*{
+  font-family: "Lato", sans-serif;
+}
+
 /* Garantir que dropdowns tenham z-index alto globalmente */
 .dropdown-menu {
   z-index: 9999;
