@@ -24,11 +24,43 @@
                 </div>
 
                 <div class="button-group">
-                    <button class="btn btn-primary"><i class="bi bi-plus"></i> Novo</button>
+                    <button class="btn btn-primary" (click)="addNewCard()"><i class="bi bi-plus"></i> Novo</button>
                 </div>
             </div>
 
             <hr class="profile-divider-smaller">
+
+            <div class="cards-section">
+                <h4>Cartões Salvos</h4>
+                
+                <div class="security-banner">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Utilizamos tecnologias de criptografia para garantir a proteção total dos seus dados.</span>
+                </div>
+
+                <div class="payment-cards">
+                    <div class="payment-card" *ngFor="let card of cards" (click)="setDefaultCard(card.id)">
+                        <div class="card-icon">
+                            <img src="assets/mastercard-icon.png" alt="Mastercard">
+                        </div>
+                        <div class="card-info">
+                            <h5>{{card.type}} que encerra em {{card.lastDigits}}</h5>
+                            <p>Expira {{card.expiry}}</p>
+                        </div>
+                        <div class="card-actions">
+                            <div class="default-toggle">
+                                <input type="checkbox" 
+                                       [id]="'default-' + card.id" 
+                                       class="default-checkbox"
+                                       [checked]="card.isDefault"
+                                       (click)="$event.stopPropagation()">
+                                <label [for]="'default-' + card.id">Default</label>
+                            </div>
+                            <button class="edit-btn" (click)="editCard(card.id); $event.stopPropagation()"><i class="bi bi-pencil"></i> Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             
         </div>
