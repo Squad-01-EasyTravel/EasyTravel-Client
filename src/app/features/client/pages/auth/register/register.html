@@ -6,18 +6,24 @@
       <h3 class="register-form__title">Crie uma conta</h3>
 
       <div class="register-form__container">
-        <form class="register-form">
+        <form class="register-form" (ngSubmit)="onSubmit($event)">
+          <label for="name" class="register-form__label"></label>
+          <input type="text" id="name" name="name" required class="register-form__input" placeholder="Nome" [(ngModel)]="name" />
+
           <label for="email" class="register-form__label"></label>
-          <input type="email" id="email" name="email" required class="register-form__input" placeholder="E-mail" />
+          <input type="email" id="email" name="email" required class="register-form__input" placeholder="E-mail" [(ngModel)]="email" />
 
           <label for="password" class="register-form__label"></label>
-          <input type="password" id="password" name="password" required class="register-form__input" placeholder="Senha" />
+          <input type="password" id="password" name="password" required class="register-form__input" placeholder="Senha" [(ngModel)]="password" />
 
           <label for="cpf" class="register-form__label"></label>
-          <input type="text" id="cpf" name="cpf" required class="register-form__input" placeholder="CPF" />
+          <input type="text" id="cpf" name="cpf" required class="register-form__input" placeholder="CPF" [(ngModel)]="cpf" />
+
+          <label for="telephone" class="register-form__label"></label>
+          <input type="text" id="telephone" name="telephone" required class="register-form__input" placeholder="Telefone" [(ngModel)]="telephone" />
 
           <label for="passport" class="register-form__label"></label>
-          <input type="text" id="passport" name="passport" class="register-form__input" placeholder="Passaporte (opcional)" />
+          <input type="text" id="passport" name="passport" class="register-form__input" placeholder="Passaporte (opcional)" [(ngModel)]="passport" />
 
           <button type="submit" class="register-form__button">Registrar</button>
         </form>
