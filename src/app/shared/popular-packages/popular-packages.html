@@ -1,19 +1,19 @@
-<div id="tripCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+<div id="popularPackagesCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
   <div class="carousel-inner">
-    <div *ngFor="let group of groupedTrips; let i = index" class="carousel-item" [class.active]="i === 0">
+    <div *ngFor="let group of groupedPackages; let i = index" class="carousel-item" [class.active]="i === 0">
       <div class="container">
         <div class="row justify-content-center">
           <div *ngFor="let trip of group" class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 mb-4 d-flex justify-content-center">
             <div class="card h-100" style="width: 100%; max-width: 300px;">
               <img [src]="trip.imageUrl" class="card-img-top" alt="Imagem da viagem">
 
-              <!-- Badge Custo-Benefício -->
-              <span class="package-benefit-badge">
-                <i class="fas fa-dollar-sign"></i>
-                Custo-Benefício
+              <!-- Badge Popular -->
+              <span class="package-popular-badge">
+                <i class="fas fa-fire"></i>
+                Popular
               </span>
 
-              <span class="card-days">{{ trip.duration || '2 dias / 1 noite' }}</span>
+              <span class="card-days">{{ trip.duration || '3 dias / 2 noites' }}</span>
 
               <div class="card-body">
                 <h5 class="card-title">Pacote de {{ trip.destination }}</h5>
@@ -59,20 +59,20 @@
     </div>
   </div>
 
-  <button class="carousel-control-prev" type="button" data-bs-target="#tripCarousel" data-bs-slide="prev">
+  <button class="carousel-control-prev" type="button" data-bs-target="#popularPackagesCarousel" data-bs-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
     <span class="visually-hidden">Anterior</span>
   </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#tripCarousel" data-bs-slide="next">
+  <button class="carousel-control-next" type="button" data-bs-target="#popularPackagesCarousel" data-bs-slide="next">
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="visually-hidden">Próximo</span>
   </button>
 
   <!-- Indicadores -->
   <div class="carousel-indicators">
-    <button *ngFor="let group of groupedTrips; let i = index"
+    <button *ngFor="let group of groupedPackages; let i = index"
             type="button"
-            data-bs-target="#tripCarousel"
+            data-bs-target="#popularPackagesCarousel"
             [attr.data-bs-slide-to]="i"
             [class.active]="i === 0"
             [attr.aria-current]="i === 0 ? 'true' : null"

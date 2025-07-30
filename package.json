@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "check-assets": "node src/scripts/check-assets.js",
+    "build:check": "npm run check-assets && ng build"
   },
   "prettier": {
     "overrides": [
@@ -28,7 +30,6 @@
     "@angular/router": "^20.1.0",
     "bootstrap": "^5.3.7",
     "rxjs": "~7.8.0",
-    "swiper": "^11.2.10",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TripCarousel } from './trip-carousel';
+import { DetailsBundle } from './details-bundle';
 
-describe('TripCarousel', () => {
-  let component: TripCarousel;
-  let fixture: ComponentFixture<TripCarousel>;
+describe('DetailsBundle', () => {
+  let component: DetailsBundle;
+  let fixture: ComponentFixture<DetailsBundle>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TripCarousel]
+      imports: [DetailsBundle]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TripCarousel);
+    fixture = TestBed.createComponent(DetailsBundle);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,59 +1,216 @@
-<div class="filtro-container">
-  <!-- Local -->
-  <div class="filtro-item">
-    <label>Local</label>
-    <div class="input-icon">
-      <span class="material-icons"></span>
-      <select>
-        <option>Recife, São Paulo</option>
-        <option>Rio de Janeiro</option>
-        <option>Salvador</option>
+<div class="filter-container">
+  <!-- Header do Filtro -->
+  <div class="filter-header">
+    <h3 class="filter-title">
+      <i class="fas fa-filter"></i>
+      Filtrar Viagens
+    </h3>
+    <button class="clear-all-btn" (click)="limparTodosFiltros()" title="Limpar todos os filtros">
+      <i class="fas fa-eraser"></i>
+    </button>
+  </div>
+
+  <!-- Seção de Ordenação -->
+  <div class="filter-section">
+    <h4 class="section-title">
+      <i class="fas fa-sort"></i>
+      Ordenar por
+    </h4>
+    <div class="sort-options">
+      <label class="sort-option" [class.active]="filtros.ordenacao === 'popular'">
+        <input 
+          type="radio" 
+          name="ordenacao" 
+          value="popular" 
+          [(ngModel)]="filtros.ordenacao"
+          (change)="aplicarFiltros()">
+        <span class="sort-icon"><i class="fas fa-fire"></i></span>
+        <span class="sort-text">Mais Popular</span>
+      </label>
+      
+      <label class="sort-option" [class.active]="filtros.ordenacao === 'preco'">
+        <input 
+          type="radio" 
+          name="ordenacao" 
+          value="preco" 
+          [(ngModel)]="filtros.ordenacao"
+          (change)="aplicarFiltros()">
+        <span class="sort-icon"><i class="fas fa-dollar-sign"></i></span>
+        <span class="sort-text">Menor Preço</span>
+      </label>
+      
+      <label class="sort-option" [class.active]="filtros.ordenacao === 'avaliacao'">
+        <input 
+          type="radio" 
+          name="ordenacao" 
+          value="avaliacao" 
+          [(ngModel)]="filtros.ordenacao"
+          (change)="aplicarFiltros()">
+        <span class="sort-icon"><i class="fas fa-star"></i></span>
+        <span class="sort-text">Melhor Avaliação</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Seção de Localização -->
+  <div class="filter-section">
+    <h4 class="section-title">
+      <i class="fas fa-map-marker-alt"></i>
+      Localização
+    </h4>
+    
+    <div class="form-group">
+      <label class="form-label">Origem:</label>
+      <select class="form-control" [(ngModel)]="filtros.origem" (change)="aplicarFiltros()">
+        <option value="">Selecione a origem</option>
+        <option value="sao-paulo">São Paulo</option>
+        <option value="rio-de-janeiro">Rio de Janeiro</option>
+        <option value="belo-horizonte">Belo Horizonte</option>
+        <option value="brasilia">Brasília</option>
+        <option value="salvador">Salvador</option>
+        <option value="recife">Recife</option>
+        <option value="fortaleza">Fortaleza</option>
+        <option value="porto-alegre">Porto Alegre</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Destino:</label>
+      <select class="form-control" [(ngModel)]="filtros.destino" (change)="aplicarFiltros()">
+        <option value="">Selecione o destino</option>
+        <option value="rio-de-janeiro">Rio de Janeiro</option>
+        <option value="sao-paulo">São Paulo</option>
+        <option value="fortaleza">Fortaleza</option>
+        <option value="gramado">Gramado</option>
+        <option value="salvador">Salvador</option>
+        <option value="recife">Recife</option>
+        <option value="florianopolis">Florianópolis</option>
+        <option value="foz-do-iguacu">Foz do Iguaçu</option>
+        <option value="brasilia">Brasília</option>
+        <option value="manaus">Manaus</option>
       </select>
     </div>
   </div>
 
-  <!-- Datas -->
-  <div class="filtro-item">
-    <label>Data Início - Data Fim</label>
-    <div class="input-icon">
-      <span class="material-icons"></span>
-      <select>
-        <option>12/01 | 18/01</option>
-        <option>20/02 | 25/02</option>
-      </select>
+  <!-- Seção de Datas -->
+  <div class="filter-section">
+    <h4 class="section-title">
+      <i class="fas fa-calendar-alt"></i>
+      Datas da Viagem
+    </h4>
+    
+    <div class="form-group">
+      <label class="form-label">Data de Ida:</label>
+      <input 
+        type="date" 
+        class="form-control" 
+        [(ngModel)]="filtros.dataIda"
+        (change)="aplicarFiltros()"
+        [min]="dataMinima">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Data de Volta:</label>
+      <input 
+        type="date" 
+        class="form-control" 
+        [(ngModel)]="filtros.dataVolta"
+        (change)="aplicarFiltros()"
+        [min]="filtros.dataIda || dataMinima">
     </div>
   </div>
 
-  <!-- Preço -->
-  <div class="filtro-item">
-    <label>Preço</label>
-    <div class="input-icon">
-      <span class="material-icons"></span>
-      <select>
-        <option>2000 - 4000</option>
-        <option>4001 - 6000</option>
-      </select>
+  <!-- Seção de Preço -->
+  <div class="filter-section">
+    <h4 class="section-title">
+      <i class="fas fa-money-bill-wave"></i>
+      Preço Máximo
+    </h4>
+    
+    <div class="price-slider-container">
+      <div class="price-display">
+        <span class="price-value">R$ {{formatarPreco(filtros.precoMaximo)}}</span>
+      </div>
+      
+      <input 
+        type="range" 
+        class="price-slider" 
+        min="100" 
+        max="10000" 
+        step="100"
+        [(ngModel)]="filtros.precoMaximo"
+        (input)="aplicarFiltros()">
+      
+      <div class="price-range">
+        <span>R$ 100</span>
+        <span>R$ 10.000+</span>
+      </div>
+    </div>
+
+    <div class="price-quick-options">
+      <button 
+        class="price-quick-btn" 
+        [class.active]="filtros.precoMaximo === 500"
+        (click)="definirPreco(500)">
+        Até R$ 500
+      </button>
+      <button 
+        class="price-quick-btn" 
+        [class.active]="filtros.precoMaximo === 1000"
+        (click)="definirPreco(1000)">
+        Até R$ 1.000
+      </button>
+      <button 
+        class="price-quick-btn" 
+        [class.active]="filtros.precoMaximo === 2000"
+        (click)="definirPreco(2000)">
+        Até R$ 2.000
+      </button>
+      <button 
+        class="price-quick-btn" 
+        [class.active]="filtros.precoMaximo === 5000"
+        (click)="definirPreco(5000)">
+        Até R$ 5.000
+      </button>
     </div>
   </div>
 
-  <!-- Viajantes -->
-  <div class="filtro-item">
-    <label>Viajantes</label>
-    <div class="input-icon">
-      <span class="material-icons"></span>
-      <select>
-        <option>1</option>
-        <option>2</option>
-        <option>3+</option>
-      </select>
+  <!-- Seção de Viajantes -->
+  <div class="filter-section">
+    <h4 class="section-title">
+      <i class="fas fa-users"></i>
+      Número de Viajantes
+    </h4>
+    
+    <div class="travelers-selector">
+      <button 
+        class="travelers-btn decrease" 
+        (click)="alterarViajantes(-1)"
+        [disabled]="filtros.viajantes <= 1">
+        <i class="fas fa-minus"></i>
+      </button>
+      
+      <div class="travelers-display">
+        <span class="travelers-count">{{filtros.viajantes}}</span>
+        <span class="travelers-text">
+          {{filtros.viajantes === 1 ? 'viajante' : 'viajantes'}}
+        </span>
+      </div>
+      
+      <button 
+        class="travelers-btn increase" 
+        (click)="alterarViajantes(1)"
+        [disabled]="filtros.viajantes >= 10">
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
   </div>
 
-  <!-- Botão -->
-  <div class="filtro-botao">
-    <button>
-      <span class="material-icons"></span>
-      <i class="bi bi-search"></i>Buscar
+  <!-- Botão Aplicar Filtros -->
+  <div class="filter-actions">
+    <button class="apply-filters-btn" (click)="aplicarFiltros()">
+      <i class="fas fa-search"></i>
+      Buscar Viagens
     </button>
   </div>
 </div>
