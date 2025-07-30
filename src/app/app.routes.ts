@@ -8,6 +8,8 @@ import { Payment } from './features/client/pages/payment/payment';
 import { EmployeeLayoutComponent } from './features/employee/employee-layout';
 import { PackageManagementComponent } from './features/employee/pages/package-management/package-management';
 import { ReviewManagement } from './features/employee/pages/review-management/review-management';
+import { Profile } from './features/client/pages/user/profile/profile';
+import { PayInfo } from './features/client/pages/user/pay-info/pay-info';
 
 
 export const routes: Routes = [
@@ -18,6 +20,8 @@ export const routes: Routes = [
   { path: 'details-bundle', component: DetailsBundle },
   { path: 'auth', children: AUTH_ROUTES },
   { path: 'my-booking', component: MyBooking },
+  { path: 'profile', component: Profile},
+  { path: 'profile/paymentinformation', component: PayInfo},
   {
     path: 'employee',
     component: EmployeeLayoutComponent,
