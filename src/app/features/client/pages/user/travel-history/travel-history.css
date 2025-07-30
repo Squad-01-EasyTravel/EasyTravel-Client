@@ -43,7 +43,7 @@
     margin-top: 56px;
 }
 
-.sidebar-menu p:nth-child(2) a {
+.sidebar-menu p:nth-child(3) a {
     color: #FF7900;
 }
 
@@ -79,7 +79,6 @@
     align-items: flex-start;
     margin-bottom: 32px;
     padding: 20px 0;
-    gap: 400px;
 }
 
 .upper-side-content {
@@ -97,15 +96,6 @@
     font-size: 15px;
     font-weight: 300;
     color: #6c757d;
-}
-
-.button-group {
-    display: flex;
-    align-items: center;
-}
-
-.button-group .btn {
-    margin: 0;
 }
 
 .btn-primary {
@@ -128,130 +118,78 @@
     box-shadow: 0 0 0 0.2rem rgba(255, 121, 0, 0.25) !important;
 }
 
-.cards-section {
+.travel-history-section {
     margin-top: 32px;
 }
 
-.cards-section h4 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.security-banner {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.security-banner i {
-    color: #155724;
+.travel-history-section h4 {
     font-size: 16px;
-}
-
-.security-banner span {
-    color: #155724;
-    font-size: 14px;
     font-weight: 400;
-}
-
-.payment-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.payment-card {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.payment-card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-    border-color: #FF7900;
-}
-
-.card-icon img {
-    width: 40px;
-    height: 25px;
-    object-fit: contain;
-}
-
-.card-info {
-    flex-grow: 1;
-}
-
-.card-info h5 {
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0 0 4px 0;
-    color: #333;
-}
-
-.card-info p {
-    font-size: 14px;
-    font-weight: 300;
-    margin: 0;
+    margin-bottom: 24px;
     color: #6c757d;
 }
 
-.card-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+.table-container {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.default-toggle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.default-toggle input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-}
-
-.default-toggle label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #FF7900;
+.travel-table {
+    width: 100%;
+    border-collapse: collapse;
     margin: 0;
-    cursor: pointer;
 }
 
-.edit-btn {
-    background: none;
-    border: none;
-    color: #FF7900;
+.travel-table thead {
+    background-color: #e9ecef;
+}
+
+.travel-table th {
+    padding: 16px 20px;
+    text-align: left;
     font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    font-weight: 600;
+    color: #333;
+    border: none;
 }
 
-.edit-btn:hover {
-    background-color: #fff3e0;
+.travel-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.travel-table tbody tr:hover {
+    background-color: #ffffff;
+}
+
+.travel-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.travel-table td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: #333;
+    border: none;
+}
+
+.date-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.date-column span {
+    font-size: 14px;
+    color: #333;
+}
+
+.total-column {
+    font-weight: 600;
+    color: #333;
 }
 
 @media (max-width: 1200px) {
@@ -274,19 +212,12 @@
         gap: 20px;
     }
     
-    .button-group {
-        align-self: flex-start;
+    .table-container {
+        overflow-x: auto;
     }
     
-    .payment-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-    
-    .card-actions {
-        width: 100%;
-        justify-content: space-between;
+    .travel-table {
+        min-width: 600px;
     }
 }
 
@@ -308,9 +239,14 @@
         padding: 10px 15px;
     }
     
-    .button-group .btn {
-        font-size: 14px;
-        padding: 8px 16px;
+    .travel-table th,
+    .travel-table td {
+        padding: 12px 16px;
+        font-size: 12px;
+    }
+    
+    .travel-table {
+        min-width: 500px;
     }
 }
 
@@ -322,10 +258,5 @@
     
     .upper-side h3 {
         margin: 30px 0 15px 0;
-    }
-    
-    .button-group .btn {
-        font-size: 12px;
-        padding: 6px 12px;
     }
 }
