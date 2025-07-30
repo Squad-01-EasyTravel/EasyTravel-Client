@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+/* Container principal da página */
+.payment-main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.payment-container {
+  font-family: 'Montserrat', sans-serif;
+  text-align: left;
+  margin: 0 auto 50px auto;
+  padding-top: 150px;
+  max-width: 900px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.payment-container h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  font-size: 2.5rem;
+}
+
+.payment-container p {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  margin: 0 0 30px 0;
+  font-size: 1.3rem;
+  color: #666;
+}
+
+/* Alinhamento das divs dos componentes */
+.payment-section {
+  max-width: 1200px;
+  margin: 0 auto 32px auto;
+  padding: 0 24px;
+}
