@@ -1,0 +1,19 @@
+.dotted-line {
+  border-top: 1px dotted #ccc;
+  margin-top: 0.5rem;
+}
+
+.text-orange {
+  color: #FF7900;
+}
+
+.btn-orange {
+  background-color: #FF7900;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+
+.btn-orange:hover {
+  background-color: #e06900;
+}
