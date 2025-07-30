@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { Selected } from "./selected/selected";
 
 @Component({
   selector: 'app-booking',
-  imports: [],
+  imports: [Selected],
   templateUrl: './booking.html',
   styleUrl: './booking.css'
 })
