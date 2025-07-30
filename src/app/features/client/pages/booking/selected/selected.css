@@ -30,7 +30,7 @@
 
 
 .custom-checkbox input:checked ~ .checkmark {
-  background-color: #FF7900; /* 🔵 Aqui você muda a cor */
+  background-color: #FF7900;
   border-color: #FF7900;
 }
 
