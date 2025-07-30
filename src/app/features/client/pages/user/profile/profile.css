@@ -43,6 +43,10 @@
     margin-top: 56px;
 }
 
+.sidebar-menu p:first-child a {
+    color: #FF7900;
+}
+
 .sidebar-menu p:last-child {
     margin-bottom: 0px;
 }
@@ -208,11 +212,13 @@
 .documents-fields {
     display: flex;
     gap: 25px;
-    flex-wrap: wrap;
 }
 
 .input-fields {
+    display: flex !important;
     flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 25px !important;
     margin-top: 12.5px;
 }
 
@@ -228,6 +234,8 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 0;
+    flex: 0 0 auto;
+    width: fit-content;
 }
 
 .input-label-text {
@@ -238,7 +246,7 @@
 }
 
 .input-custom {
-    width: 192px;
+    width: 192px !important;
     height: 40px;
     border-radius: 6px !important;
     border: 1px solid #ced4da;
@@ -300,7 +308,7 @@
     
     .input-fields {
         flex-direction: row;
-        gap: 15px;
+        gap: 2000px;
         margin-top: 15px;
     }
     
@@ -315,7 +323,7 @@
     }
     
     .input-custom {
-        width: 180px;
+        width: 180px !important;
         max-width: 300px;
     }
     
