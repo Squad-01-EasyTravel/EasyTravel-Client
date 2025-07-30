@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Sidebar } from '../../components/sidebar/sidebar';
 import { FilterSearchPackage } from '../../components/filter-search/filter-search-package';
 
 interface TravelPackage {
@@ -23,7 +22,7 @@ interface TravelPackage {
 @Component({
   selector: 'app-package-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, Sidebar, FilterSearchPackage],
+  imports: [CommonModule, FormsModule, FilterSearchPackage],
   templateUrl: './package-management.html',
   styleUrl: './package-management.css'
 })
@@ -130,8 +129,8 @@ export class PackageManagementComponent implements OnInit {
       // Atualizar pacote existente
       const index = this.packages.findIndex(p => p.id === this.selectedPackage!.id);
       if (index !== -1) {
-        this.packages[index] = { 
-          ...this.selectedPackage, 
+        this.packages[index] = {
+          ...this.selectedPackage,
           ...this.newPackage,
           id: this.selectedPackage.id,
           createdAt: this.selectedPackage.createdAt
@@ -145,10 +144,10 @@ export class PackageManagementComponent implements OnInit {
         id: newId,
         createdAt: new Date()
       } as TravelPackage;
-      
+
       this.packages.push(packageToAdd);
     }
-    
+
     this.closeModal();
   }
 
