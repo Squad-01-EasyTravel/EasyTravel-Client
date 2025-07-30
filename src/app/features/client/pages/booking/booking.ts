@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Navbar } from "../../../../shared/navbar/navbar";
 import { Footer } from "../../../../shared/footer/footer";
+import { AuthService, User } from "../../../../shared/services/auth.service";
 
 interface SelectedPackage {
   id: string;
@@ -52,14 +53,14 @@ interface TravelerInfo {
 })
 export class Booking implements OnInit {
 
-  // Dados do perfil do usuário (simulando dados já logados)
+  // Dados do perfil do usuário (carregados do serviço de auth)
   userProfile: UserProfile = {
-    fullName: 'João Silva Santos',
-    birthDate: '1990-05-15',
-    cpf: '123.456.789-00',
-    rg: '12.345.678-9',
-    email: 'joao.silva@email.com',
-    phone: '(11) 99999-9999'
+    fullName: '',
+    birthDate: '',
+    cpf: '',
+    rg: '',
+    email: '',
+    phone: ''
   };
 
   // Lista de pacotes no carrinho
@@ -119,12 +120,49 @@ export class Booking implements OnInit {
   travelersInfoByPackage: { [packageId: string]: TravelerInfo[] } = {};
   totalPrice: string = '0,00';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.loadUserProfile();
     this.initializeTravelersForAllPackages();
     this.calculateTotalPrice();
     this.loadBookingData();
+  }
+
+  loadUserProfile(): void {
+    // Tentar carregar do localStorage primeiro
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.userProfile = {
+        fullName: currentUser.name,
+        birthDate: '', // Este campo precisa ser adicionado ao User interface
+        cpf: currentUser.cpf,
+        rg: '', // Este campo precisa ser adicionado ao User interface  
+        email: currentUser.email,
+        phone: currentUser.telephone
+      };
+    }
+
+    // Opcionalmente, buscar dados atualizados do servidor
+    this.authService.getUserProfile().subscribe({
+      next: (user: User) => {
+        this.userProfile = {
+          fullName: user.name,
+          birthDate: '', // Mapear quando disponível
+          cpf: user.cpf,
+          rg: '', // Mapear quando disponível
+          email: user.email,
+          phone: user.telephone
+        };
+      },
+      error: (error) => {
+        console.error('Erro ao carregar perfil do usuário:', error);
+        // Manter dados do localStorage se falhar
+      }
+    });
   }
 
   initializeTravelersForAllPackages(): void {
