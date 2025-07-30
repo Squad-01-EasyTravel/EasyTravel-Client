@@ -69,7 +69,7 @@ export class DetailsBundle implements OnInit {
     {
       id: 1,
       nomeUsuario: 'Allan Reymond',
-      avatarUsuario: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face',
+      avatarUsuario: '/assets/imgs/fortaleza.jpg',
       nota: 4,
       comentario: '"Minha viagem de Recife para São Paulo foi incrível! O voo foi tranquilo e a chegada no Aeroporto de Guarulhos foi bem organizada. Fiquei hospedado em um hotel na região da Avenida Paulista — localização excelente, perto de metrô, restaurantes e pontos turísticos. O quarto era confortável, limpo e com um bom café da manhã incluso."',
       dataAvaliacao: new Date('2024-01-15')
@@ -77,7 +77,7 @@ export class DetailsBundle implements OnInit {
     {
       id: 2,
       nomeUsuario: 'Maria Silva',
-      avatarUsuario: 'https://images.unsplash.com/photo-1494790108755-2616b612b789?w=50&h=50&fit=crop&crop=face',
+      avatarUsuario: '/assets/imgs/fortaleza.jpg',
       nota: 5,
       comentario: '"Experiência fantástica! A organização do pacote foi impecável e o atendimento superou minhas expectativas. Recomendo para quem quer conhecer São Paulo com tranquilidade."',
       dataAvaliacao: new Date('2024-01-10')
@@ -85,7 +85,7 @@ export class DetailsBundle implements OnInit {
     {
       id: 3,
       nomeUsuario: 'João Santos',
-      avatarUsuario: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face',
+      avatarUsuario: '/assets/imgs/fortaleza.jpg',
       nota: 5,
       comentario: '"Viagem maravilhosa! O hotel era excelente e os passeios inclusos foram muito bem planejados. A equipe foi super prestativa em todos os momentos."',
       dataAvaliacao: new Date('2024-01-08')
@@ -93,7 +93,7 @@ export class DetailsBundle implements OnInit {
     {
       id: 4,
       nomeUsuario: 'Ana Paula',
-      avatarUsuario: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop&crop=face',
+      avatarUsuario: '/assets/imgs/fortaleza.jpg',
       nota: 4,
       comentario: '"Ótima experiência! São Paulo é uma cidade incrível e o pacote cobriu os principais pontos turísticos. O único ponto a melhorar seria o tempo livre para explorar por conta própria."',
       dataAvaliacao: new Date('2024-01-05')
@@ -101,7 +101,7 @@ export class DetailsBundle implements OnInit {
     {
       id: 5,
       nomeUsuario: 'Carlos Oliveira',
-      avatarUsuario: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face',
+      avatarUsuario: '/assets/imgs/fortaleza.jpg',
       nota: 5,
       comentario: '"Perfeito do início ao fim! A hospedagem era de primeira qualidade e as refeições incluídas estavam deliciosas. Já estou planejando a próxima viagem com vocês."',
       dataAvaliacao: new Date('2024-01-03')
@@ -109,7 +109,7 @@ export class DetailsBundle implements OnInit {
     {
       id: 6,
       nomeUsuario: 'Fernanda Costa',
-      avatarUsuario: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=50&h=50&fit=crop&crop=face',
+      avatarUsuario: '/assets/imgs/fortaleza.jpg',
       nota: 4,
       comentario: '"Adorei a viagem! O roteiro foi bem elaborado e conseguimos conhecer os principais pontos turísticos. O transporte foi pontual e confortável."',
       dataAvaliacao: new Date('2024-01-01')
@@ -117,7 +117,7 @@ export class DetailsBundle implements OnInit {
     {
       id: 7,
       nomeUsuario: 'Roberto Lima',
-      avatarUsuario: 'https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=50&h=50&fit=crop&crop=face',
+      avatarUsuario: '/assets/imgs/fortaleza.jpg',
       nota: 5,
       comentario: '"Superou todas as minhas expectativas! A cidade de São Paulo é fascinante e o pacote permitiu conhecê-la de forma completa e organizada."',
       dataAvaliacao: new Date('2023-12-28')
@@ -173,7 +173,7 @@ export class DetailsBundle implements OnInit {
     this.pacote = {
       id: 1,
       titulo: 'Recife - São Paulo',
-      imagemPrincipal: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop',
+      imagemPrincipal: '/assets/imgs/fortaleza.jpg',
       preco: 2500,
       avaliacao: 5.0,
       totalAvaliacoes: 1000,

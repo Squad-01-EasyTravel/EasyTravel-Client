@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "check-assets": "node src/scripts/check-assets.js",
+    "build:check": "npm run check-assets && ng build"
   },
   "prettier": {
     "overrides": [

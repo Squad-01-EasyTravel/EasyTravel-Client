@@ -9,6 +9,7 @@
   max-width: 440px;
   margin: auto;
   font-family: 'Montserrat', sans-serif;
+  position: relative;
 }
 
 .card:hover {
@@ -21,6 +22,47 @@
   height: 140px;
   object-fit: cover;
   border-bottom: 1px solid #eaeaea;
+}
+
+/* Badge Custo-Benefício */
+.package-benefit-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #7FC023 0%, #6ba01b 100%);
+  color: white;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(127, 192, 35, 0.3);
+  animation: pulse-badge 2s infinite;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.package-benefit-badge i {
+  margin-right: 0.3rem;
+  font-size: 0.7rem;
+}
+
+/* Informações adicionais */
+.card-highlights {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-highlights small {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
 }
 
 /* Texto com dias */
@@ -109,52 +151,52 @@
   font-family: 'Montserrat', sans-serif;
 }
 
-.card-promo-save {
-  background-color: var(--color-primary);
-  color: white;
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 0.35rem 0.8rem;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  width: fit-content;
-  margin-bottom: 1rem;
+/* Promoção */
+.card-promo {
+  margin-bottom: 0.5rem;
 }
 
-/* Bloco de preços agrupado */
+.card-promo-save {
+  color: #27ae60;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  background: rgba(39, 174, 96, 0.1);
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
 .card-price-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.2rem;
-  margin-top: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .card-promo-people {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   color: #666;
-  margin: 0;
+  margin-bottom: 0.2rem;
 }
 
 .card-promo-old-price {
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: #999;
   text-decoration: line-through;
-  font-weight: 500;
-  margin: 0;
+  margin-bottom: 0.1rem;
 }
 
 .card-new-price {
   font-size: 1.3rem;
-  font-weight: 700;
-  color: #007b5e;
-  margin: 0;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.5px;
 }
 
-/* Impostos */
 .card-tax {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: #888;
+  font-style: italic;
 }
 
 .card-fideliza {
@@ -193,16 +235,175 @@
   transition: transform 0.6s ease;
 }
 
+/* ===== CONTROLES DO CAROUSEL ===== */
+#tripCarousel .carousel-control-prev,
+#tripCarousel .carousel-control-next {
+  width: 50px;
+  height: 50px;
+  background: rgba(127, 192, 35, 0.9);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+#tripCarousel .carousel-control-prev {
+  left: 10px;
+}
+
+#tripCarousel .carousel-control-next {
+  right: 10px;
+}
+
+#tripCarousel .carousel-control-prev:hover,
+#tripCarousel .carousel-control-next:hover {
+  background: rgba(127, 192, 35, 1);
+  transform: translateY(-50%) scale(1.1);
+  border-color: #fff;
+}
+
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-  color: var(--color-secondary);
-  padding: 0.6rem;
-  width: 2.2rem;
-  height: 2.2rem;
-  transition: color 0.3s ease, transform 0.3s ease;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .carousel-control-prev-icon:hover,
 .carousel-control-next-icon:hover {
+  transform: scale(1.1);
+}
+
+/* ===== RESPONSIVIDADE MELHORADA ===== */
+
+/* Mobile (até 575px) - 1 card por slide */
+@media (max-width: 575.98px) {
+  .carousel-inner .row > div {
+    min-height: 420px;
+  }
+
+  .card {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .card img {
+    height: 160px;
+  }
+
+  .card-body {
+    padding: 0.8rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.8rem;
+  }
+
+  #tripCarousel .carousel-control-prev,
+  #tripCarousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+  }
+
+  #tripCarousel .carousel-control-prev {
+    left: 5px;
+  }
+
+  #tripCarousel .carousel-control-next {
+    right: 5px;
+  }
+}
+
+/* Tablet (576px a 767px) - 2 cards por slide */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .carousel-inner .row > div {
+    min-height: 400px;
+  }
+
+  .card {
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  .card img {
+    height: 150px;
+  }
+}
+
+/* Desktop pequeno (768px a 991px) - 3 cards por slide */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .carousel-inner .row > div {
+    min-height: 380px;
+  }
+
+  .card {
+    max-width: 240px;
+    margin: 0 auto;
+  }
+
+  .card img {
+    height: 140px;
+  }
+}
+
+/* Desktop grande (992px+) - 4 cards por slide */
+@media (min-width: 992px) {
+  .carousel-inner .row > div {
+    min-height: 400px;
+  }
+
+  .card {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .card img {
+    height: 140px;
+  }
+}
+
+/* Ajustes gerais para responsividade */
+.carousel-inner {
+  padding: 1rem 0.5rem;
+}
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+#tripCarousel .carousel-indicators {
+  bottom: -40px;
+  margin-bottom: 0;
+}
+
+#tripCarousel .carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 4px;
+  background-color: #ccc;
+  border: none;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+#tripCarousel .carousel-indicators button.active {
+  background-color: var(--color-secondary);
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+#tripCarousel .carousel-indicators button:hover {
+  background-color: var(--color-secondary);
+  opacity: 0.8;
   transform: scale(1.1);
 }

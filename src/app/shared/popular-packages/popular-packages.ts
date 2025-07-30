@@ -6,22 +6,22 @@ import { PackageService } from '../services/package.service';
 declare var bootstrap: any;
 
 @Component({
-  selector: 'app-trip-carousel',
+  selector: 'app-popular-packages',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './trip-carousel.html',
-  styleUrls: ['./trip-carousel.css']
+  templateUrl: './popular-packages.html',
+  styleUrl: './popular-packages.css'
 })
-export class TripCarousel implements OnInit, AfterViewInit {
-  trips: Trip[] = [];
-  groupedTrips: Trip[][] = [];
+export class PopularPackages implements OnInit, AfterViewInit {
+  popularPackages: Trip[] = [];
+  groupedPackages: Trip[][] = [];
   private currentCardsPerSlide = 4;
 
   constructor(private packageService: PackageService) {}
 
   ngOnInit(): void {
     this.setCardsPerSlide();
-    this.loadCostBenefitPackages();
+    this.loadPopularPackages();
   }
 
   ngAfterViewInit(): void {
@@ -36,8 +36,8 @@ export class TripCarousel implements OnInit, AfterViewInit {
     const newCardsPerSlide = this.getCardsPerSlide();
     if (newCardsPerSlide !== this.currentCardsPerSlide) {
       this.currentCardsPerSlide = newCardsPerSlide;
-      if (this.trips.length > 0) {
-        this.groupedTrips = this.groupTrips(this.trips, this.currentCardsPerSlide);
+      if (this.popularPackages.length > 0) {
+        this.groupedPackages = this.groupPackages(this.popularPackages, this.currentCardsPerSlide);
         setTimeout(() => {
           this.initializeCarousel();
         }, 100);
@@ -58,10 +58,10 @@ export class TripCarousel implements OnInit, AfterViewInit {
   }
 
   private initializeCarousel(): void {
-    const carouselElement = document.getElementById('tripCarousel');
-    if (carouselElement && typeof bootstrap !== 'undefined' && this.groupedTrips.length > 0) {
+    const carouselElement = document.getElementById('popularPackagesCarousel');
+    if (carouselElement && typeof bootstrap !== 'undefined' && this.groupedPackages.length > 0) {
       new bootstrap.Carousel(carouselElement, {
-        interval: 3000,
+        interval: 4000,
         ride: 'carousel',
         wrap: true,
         keyboard: true,
@@ -70,27 +70,27 @@ export class TripCarousel implements OnInit, AfterViewInit {
     }
   }
 
-  loadCostBenefitPackages(): void {
-    this.packageService.getCostBenefitPackages().subscribe({
+  loadPopularPackages(): void {
+    this.packageService.getPopularPackages().subscribe({
       next: (packages) => {
-        this.trips = packages;
-        this.groupedTrips = this.groupTrips(packages, this.currentCardsPerSlide);
-
+        this.popularPackages = packages;
+        this.groupedPackages = this.groupPackages(packages, this.currentCardsPerSlide);
+        
         // Reinicializar carousel após carregar dados
         setTimeout(() => {
           this.initializeCarousel();
         }, 100);
       },
       error: (error) => {
-        console.error('Erro ao carregar pacotes custo benefício:', error);
+        console.error('Erro ao carregar pacotes populares:', error);
       }
     });
   }
 
-  private groupTrips(trips: Trip[], size: number): Trip[][] {
+  private groupPackages(packages: Trip[], size: number): Trip[][] {
     const groups: Trip[][] = [];
-    for (let i = 0; i < trips.length; i += size) {
-      groups.push(trips.slice(i, i + size));
+    for (let i = 0; i < packages.length; i += size) {
+      groups.push(packages.slice(i, i + size));
     }
     return groups;
   }
@@ -98,8 +98,7 @@ export class TripCarousel implements OnInit, AfterViewInit {
   getStars(rating: number): string[] {
     const stars: string[] = [];
     const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    const maxStars = 5;
+    const hasHalfStar = rating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push('full');
@@ -109,7 +108,7 @@ export class TripCarousel implements OnInit, AfterViewInit {
       stars.push('half');
     }
 
-    while (stars.length < maxStars) {
+    while (stars.length < 5) {
       stars.push('empty');
     }
 
@@ -127,5 +126,4 @@ export class TripCarousel implements OnInit, AfterViewInit {
     if (!originalPrice || !currentPrice) return 0;
     return originalPrice - currentPrice;
   }
-
 }

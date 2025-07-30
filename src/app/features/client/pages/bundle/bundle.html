@@ -1,6 +1,103 @@
 <app-navbar></app-navbar>
-<app-filter class="filter-container"></app-filter>
-<div class="cards-container">
-  <app-card *ngFor="let pacote of pacotes" [pacote]="pacote"></app-card>
+
+<!-- Container principal com layout flexível -->
+<div class="bundle-main-container">
+  <div class="bundle-content">
+    <!-- Sidebar com Filtros -->
+    <aside class="filter-sidebar">
+      <app-filter></app-filter>
+    </aside>
+
+    <!-- Área principal de conteúdo -->
+    <main class="content-area">
+      <!-- Header dos resultados -->
+      <div class="results-header">
+        <div class="header-info">
+          <h1 class="page-title">Pacotes de Viagem</h1>
+          <p class="results-count">
+            <i class="fas fa-search"></i>
+            {{filteredPackages.length}} pacotes encontrados
+          </p>
+        </div>
+
+        <div class="view-options">
+          <span class="showing-text">
+            Mostrando {{getDisplayStart()}}-{{getDisplayEnd()}} de {{filteredPackages.length}}
+          </span>
+        </div>
+      </div>
+
+      <!-- Grid de Cards -->
+      <div class="cards-grid" *ngIf="filteredPackages.length > 0">
+        <app-card
+          *ngFor="let pacote of getPaginatedPackages()"
+          [pacote]="pacote">
+        </app-card>
+      </div>
+
+      <!-- Estado vazio -->
+      <div class="empty-state" *ngIf="filteredPackages.length === 0">
+        <div class="empty-content">
+          <div class="empty-icon">
+            <i class="fas fa-map-marked-alt"></i>
+          </div>
+          <h3>Nenhum pacote encontrado</h3>
+          <p>Tente ajustar os filtros para encontrar pacotes que atendam aos seus critérios.</p>
+          <button class="btn-clear-filters" (click)="clearAllFilters()">
+            <i class="fas fa-refresh"></i>
+            Limpar Filtros
+          </button>
+        </div>
+      </div>
+
+      <!-- Paginação centralizada abaixo dos cards -->
+      <div class="pagination-section" *ngIf="filteredPackages.length > 0 && getTotalPages() > 1">
+        <div class="pagination-wrapper">
+          <!-- Navegação de páginas -->
+          <div class="pagination-nav">
+            <button
+              class="pagination-btn prev-btn"
+              [disabled]="currentPage === 1"
+              (click)="changePage(currentPage - 1)">
+              <i class="fas fa-chevron-left"></i>
+              <span>Anterior</span>
+            </button>
+
+            <div class="pagination-numbers">
+              <button
+                *ngFor="let page of getVisiblePages()"
+                class="page-number"
+                [class.active]="page === currentPage"
+                [disabled]="page === '...'"
+                (click)="changePage(page)">
+                {{page}}
+              </button>
+            </div>
+
+            <button
+              class="pagination-btn next-btn"
+              [disabled]="currentPage === getTotalPages()"
+              (click)="changePage(currentPage + 1)">
+              <span>Próximo</span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- Seletor de itens por página -->
+          <div class="page-size-selector">
+            <label>Mostrar:</label>
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+              <option value="6">6 itens</option>
+              <option value="12">12 itens</option>
+              <option value="18">18 itens</option>
+              <option value="24">24 itens</option>
+            </select>
+            <span>por página</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 </div>
+
 <app-footer></app-footer>

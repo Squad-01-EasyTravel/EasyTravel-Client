@@ -1,0 +1,645 @@
+/* ===== CARD DE PACOTE POPULAR (mesmo padrão do trip-carousel) ===== */
+
+/* Card principal */
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #eaeaea;
+  max-width: 440px;
+  margin: auto;
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-bottom: 1px solid #eaeaea;
+}
+
+/* Badge Popular - diferencial dos pacotes populares */
+.package-popular-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+  animation: pulse-badge 2s infinite;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.package-popular-badge i {
+  margin-right: 0.3rem;
+  font-size: 0.7rem;
+  animation: fire-flicker 1.5s infinite alternate;
+}
+
+@keyframes fire-flicker {
+  0% { color: #ffdd44; }
+  100% { color: #ff8844; }
+}
+
+/* Texto com dias */
+.card-days {
+  position: absolute;
+  top: 125px;
+  right: 5px;
+  background-color: #323439;
+  border: 1px solid var(--color-primary);
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'Montserrat', sans-serif;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+/* Corpo do card */
+.card-body {
+  position: relative;
+  padding: 0.9rem;
+  color: #2a2a2a;
+}
+
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+  color: #d62d20;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+/* Avaliação */
+.card-rating {
+  display: inline-block;
+  background-color: var(--color-accent);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: bold;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 0.3rem;
+  width: fit-content;
+}
+
+.rating-stars {
+  display: inline-flex;
+  margin-left: 0.9rem;
+  gap: 3px;
+  margin-bottom: 0.5rem;
+}
+
+.star {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.star.full {
+  color: gold;
+}
+
+.star.half {
+  color: goldenrod;
+  opacity: 0.6;
+}
+
+.star.empty {
+  color: #ccc;
+}
+
+/* Informações adicionais para pacotes populares */
+.card-highlights {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-highlights small {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Promoção */
+.card-promo {
+  margin-bottom: 0.5rem;
+}
+
+.card-promo-save {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.card-price-block {
+  margin-bottom: 0.3rem;
+}
+
+.card-promo-people {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.2rem;
+}
+
+.card-promo-old-price {
+  font-size: 0.9rem;
+  color: #999;
+  text-decoration: line-through;
+  margin-bottom: 0.1rem;
+}
+
+.card-new-price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-bottom: 0;
+}
+
+.card-tax {
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* ===== CONTROLES DO CAROUSEL ===== */
+/* Regras específicas para o carousel de pacotes populares */
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .package-popular-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .card-days {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@keyframes fire-flicker {
+  0% { color: #ffdd44; }
+  100% { color: #ff8844; }
+}
+
+/* Texto com dias */
+.card-days {
+  position: absolute;
+  top: 125px;
+  right: 5px;
+  background-color: #323439;
+  border: 1px solid var(--color-primary);
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'Montserrat', sans-serif;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+/* ===== CORPO DO CARD ===== */
+.card-body {
+  position: relative;
+  padding: 0.9rem;
+  color: #2a2a2a;
+}
+
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+  color: #d62d20;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+/* ===== AVALIAÇÃO ===== */
+.card-rating {
+  display: inline-block;
+  background-color: var(--color-accent);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: bold;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 0.3rem;
+  width: fit-content;
+}
+
+.rating-stars {
+  display: inline-flex;
+  margin-left: 0.9rem;
+  gap: 3px;
+  margin-bottom: 0.5rem;
+}
+
+.star {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.star.full {
+  color: gold;
+}
+
+.star.half {
+  color: goldenrod;
+  opacity: 0.6;
+}
+
+.star.empty {
+  color: #ddd;
+}
+
+/* ===== DESTAQUES ===== */
+.package-highlights {
+  margin-bottom: 1rem;
+}
+
+.highlight-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.highlight-item i {
+  color: #ff6b35;
+  font-size: 0.7rem;
+}
+
+/* ===== PREÇOS E PROMOÇÃO ===== */
+.card-promo {
+  margin-bottom: 1rem;
+}
+
+.card-promo-save {
+  color: #27ae60;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  background: rgba(39, 174, 96, 0.1);
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.card-price-block {
+  margin-bottom: 0.5rem;
+}
+
+.card-promo-people {
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 0.2rem;
+}
+
+.card-promo-old-price {
+  font-size: 0.9rem;
+  color: #999;
+  text-decoration: line-through;
+  margin-bottom: 0.2rem;
+}
+
+.card-new-price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.card-tax {
+  font-size: 0.7rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* ===== INCLUSÕES ===== */
+.package-inclusions {
+  margin-top: 0.8rem;
+}
+
+.inclusions-title {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.inclusions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.inclusion-item {
+  font-size: 0.75rem;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inclusion-item i {
+  color: #27ae60;
+  font-size: 0.7rem;
+}
+
+/* ===== CONTROLES DO CAROUSEL ===== */
+#popularPackagesCarousel .carousel-control-prev,
+#popularPackagesCarousel .carousel-control-next {
+  width: 50px;
+  height: 50px;
+  background: rgba(127, 192, 35, 0.9);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+#popularPackagesCarousel .carousel-control-prev {
+  left: 10px;
+}
+
+#popularPackagesCarousel .carousel-control-next {
+  right: 10px;
+}
+
+#popularPackagesCarousel .carousel-control-prev:hover,
+#popularPackagesCarousel .carousel-control-next:hover {
+  background: rgba(127, 192, 35, 1);
+  transform: translateY(-50%) scale(1.1);
+  border-color: #fff;
+}
+
+#popularPackagesCarousel .carousel-control-prev-icon,
+#popularPackagesCarousel .carousel-control-next-icon {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#popularPackagesCarousel .carousel-control-prev-icon:hover,
+#popularPackagesCarousel .carousel-control-next-icon:hover {
+  transform: scale(1.1);
+}
+
+/* ===== INDICADORES ===== */
+#popularPackagesCarousel .carousel-indicators {
+  bottom: -50px;
+}
+
+#popularPackagesCarousel .carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 5px;
+  background-color: rgba(255, 107, 53, 0.4);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+#popularPackagesCarousel .carousel-indicators button.active {
+  background-color: #ff6b35;
+  transform: scale(1.3);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .package-card {
+    max-width: 100%;
+  }
+
+  .package-title {
+    font-size: 1.1rem;
+  }
+
+  .package-body {
+    padding: 1rem;
+  }
+
+  .package-days {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .package-card img {
+    height: 140px;
+  }
+
+  .package-popular-badge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .package-highlights {
+    display: none;
+  }
+
+  .package-inclusions {
+    display: none;
+  }
+}
+
+/* ===== RESPONSIVIDADE MELHORADA ===== */
+
+/* Mobile (até 575px) - 1 card por slide */
+@media (max-width: 575.98px) {
+  .carousel-inner .row > div {
+    min-height: 420px;
+  }
+
+  .card {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .card img {
+    height: 160px;
+  }
+
+  .card-body {
+    padding: 0.8rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .package-popular-badge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .card-highlights {
+    display: none; /* Ocultar highlights em mobile para economizar espaço */
+  }
+
+  #popularPackagesCarousel .carousel-control-prev,
+  #popularPackagesCarousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+  }
+
+  #popularPackagesCarousel .carousel-control-prev {
+    left: 5px;
+  }
+
+  #popularPackagesCarousel .carousel-control-next {
+    right: 5px;
+  }
+}
+
+/* Tablet (576px a 767px) - 2 cards por slide */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .carousel-inner .row > div {
+    min-height: 400px;
+  }
+
+  .card {
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  .card img {
+    height: 150px;
+  }
+
+  .package-popular-badge {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.6rem;
+  }
+}
+
+/* Desktop pequeno (768px a 991px) - 3 cards por slide */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .carousel-inner .row > div {
+    min-height: 380px;
+  }
+
+  .card {
+    max-width: 240px;
+    margin: 0 auto;
+  }
+
+  .card img {
+    height: 140px;
+  }
+}
+
+/* Desktop grande (992px+) - 4 cards por slide */
+@media (min-width: 992px) {
+  .carousel-inner .row > div {
+    min-height: 400px;
+  }
+
+  .card {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .card img {
+    height: 140px;
+  }
+}
+
+/* Ajustes gerais para responsividade */
+.carousel-inner {
+  padding: 1rem 0.5rem;
+}
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+#popularPackagesCarousel .carousel-indicators {
+  bottom: -40px;
+  margin-bottom: 0;
+}
+
+#popularPackagesCarousel .carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 4px;
+  background-color: #ccc;
+  border: none;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+#popularPackagesCarousel .carousel-indicators button.active {
+  background-color: var(--color-secondary);
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+#popularPackagesCarousel .carousel-indicators button:hover {
+  background-color: var(--color-secondary);
+  opacity: 0.8;
+  transform: scale(1.1);
+}

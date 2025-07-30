@@ -1,12 +1,32 @@
 <app-navbar></app-navbar>
 
-<div class="container my-5">
-  <!-- Header -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <h2 class="fw-bold text-dark">Detalhamento de Pacotes</h2>
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-decoration"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Detalhes do Pacote</span>
+      </div>
+      <h1 class="hero-title">{{ pacote?.titulo || 'Recife - São Paulo' }}</h1>
+      <p class="hero-description">
+        Descubra todos os detalhes da sua próxima aventura. Informações completas sobre destino,
+        hospedagem, atividades e muito mais para uma viagem inesquecível.
+      </p>
+      <div class="hero-price">
+        <span class="price-label">A partir de</span>
+        <span class="price-value">R$ {{ pacote?.preco || '2.500' }}</span>
+        <span class="price-note">por pessoa</span>
+      </div>
     </div>
   </div>
+</section>
+
+<div class="container my-5">
 
   <div class="row">
     <!-- Conteúdo Principal -->
