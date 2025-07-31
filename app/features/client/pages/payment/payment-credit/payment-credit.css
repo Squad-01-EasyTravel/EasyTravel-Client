@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #fff;
+  padding: 20px;
+}
+
+.formulario-pagamento {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+fieldset {
+  border: none;
+  margin-bottom: 20px;
+}
+
+legend {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 500;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Layout de duas colunas para as seções */
+.form-columns {
+  display: flex;
+  gap: 50px;
+  align-items: flex-start;
+}
+
+.form-column {
+  flex: 1;
+}
+
+.form-column fieldset {
+  margin-bottom: 0;
+}
+
+/* Layout para campos lado a lado dentro das seções */
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  flex: 1;
+}
+
+/* Alinhamento específico dos campos para que fiquem na mesma altura */
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-field label {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 4px;
+  font-weight: 500;
+  height: 20px;
+}
+
+.form-field input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+/* Mensagem informativa */
+.info-message {
+  margin-top: 20px; 
+}
+
+.info-message .info-icon {
+  margin-right: 8px;
+  font-size: 18px;
+}

@@ -1,0 +1,320 @@
+<app-navbar></app-navbar>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-decoration"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Detalhes do Pacote</span>
+      </div>
+      <h1 class="hero-title">{{ pacote?.titulo || 'Recife - São Paulo' }}</h1>
+      <p class="hero-description">
+        Descubra todos os detalhes da sua próxima aventura. Informações completas sobre destino,
+        hospedagem, atividades e muito mais para uma viagem inesquecível.
+      </p>
+      <div class="hero-price">
+        <span class="price-label">A partir de</span>
+        <span class="price-value">R$ {{ pacote?.preco || '2.500' }}</span>
+        <span class="price-note">por pessoa</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container my-5">
+
+  <div class="row">
+    <!-- Conteúdo Principal -->
+    <div class="col-lg-8">
+      <!-- Imagem Principal -->
+      <div class="mb-4">
+        <img
+          [src]="pacote?.imagemPrincipal || 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop'"
+          class="img-fluid w-100 rounded" style="height: 300px; object-fit: cover;" [alt]="pacote?.titulo">
+      </div>
+
+      <!-- Informações do Pacote -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h3 class="card-title fw-bold mb-3">{{ pacote?.titulo || 'Recife - São Paulo' }}</h3>
+          <h4 class="text-primary fw-bold mb-3">R$ {{ pacote?.preco || '2500' }}</h4>
+
+          <!-- Avaliação -->
+          <div class="d-flex align-items-center mb-4">
+            <div class="me-3">
+              <i class="bi bi-star-fill text-warning" *ngFor="let star of getStarsArray(pacote?.avaliacao || 5)"></i>
+              <span class="ms-2 fw-bold">{{ pacote?.avaliacao || '5.0' }}</span>
+            </div>
+          </div>
+
+          <!-- Detalhes com Ícones -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-calendar-date text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Data de Partida</small>
+                  <strong>{{ pacote?.dataIda || '12/01/2025' }}</strong>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-calendar-check text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Data de Retorno</small>
+                  <strong>{{ pacote?.dataVolta || '12/01/2025' }}</strong>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-clock text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Duração</small>
+                  <strong>{{ pacote?.duracao || '7 dias' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-airplane text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Local de Partida</small>
+                  <strong>{{ pacote?.localPartida || 'Aeroporto Internacional do Recife / Guararapes' }}</strong>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-geo-alt text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Local de Destino</small>
+                  <strong>{{ pacote?.localDestino || 'Aeroporto Internacional de Guarulhos (GRU)' }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- O que está incluso -->
+          <div class="incluso-section">
+            <h6 class="fw-bold mb-3">O que está incluso:</h6>
+            <div class="incluso-content">
+              <p class="text-muted mb-0">
+                {{ pacote?.descricaoIncluso || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                ullamco laboris nisi ut aliquip ex ea commodo consequat.' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Botão Reservar -->
+          <div class="mt-4">
+            <button type="button" class="btn btn-primary btn-lg px-4 py-2 fw-bold" (click)="realizarReserva()">
+              Reservar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localização no Mapa -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">Localização no Mapa</h5>
+        </div>
+        <div class="card-body">
+          <!-- Placeholder para mapa - substituir por Google Maps ou similar -->
+          <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
+            <div class="text-center">
+              <i class="bi bi-geo-alt-fill fs-1 text-primary"></i>
+              <p class="mt-2 text-muted">{{ pacote?.localizacao || 'Recife - São Paulo' }}</p>
+              <small class="text-muted">Mapa será carregado aqui</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descrição Completa -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">Descrição Completa</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">
+            {{ pacote?.descricaoCompleta || 'Descubra as maravilhas de Recife e São Paulo em uma viagem inesquecível.
+            Este pacote oferece uma experiência completa com hospedagem de qualidade, transfers inclusos e as principais
+            atrações de ambas as cidades. Explore a rica cultura nordestina em Recife e a vibrante metrópole paulista,
+            com guias especializados e roteiros personalizados.' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Avaliações dos Viajantes -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">Avaliações dos Viajantes</h5>
+        </div>
+        <div class="card-body">
+          <!-- Resumo das avaliações -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="fw-bold mb-3">Resumo de avaliações</h6>
+              <div class="avaliacoes-resumo">
+                <div class="mb-2" *ngFor="let item of avaliacoesSumarizado">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="avaliacao-numero">{{ item.numero }}</span>
+                    <div class="progress flex-grow-1 mx-3" style="height: 8px;">
+                      <div class="progress-bar" [style.width.%]="item.porcentagem"
+                        [class]="item.numero === 5 ? 'bg-warning' : 'bg-light-gray'">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comentários individuais -->
+          <div class="comentarios-lista">
+            <div class="comentario-item mb-4" *ngFor="let avaliacao of avaliacoesPaginadas; let last = last">
+              <div class="d-flex">
+                <img [src]="avaliacao.avatarUsuario" class="rounded-circle me-3 avatar-comentario" width="50"
+                  height="50" [alt]="avaliacao.nomeUsuario">
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0 fw-bold">{{ avaliacao.nomeUsuario }}</h6>
+                    <div class="avaliacao-nota">
+                      <i class="bi bi-star-fill text-warning" *ngFor="let star of getStarsArray(avaliacao.nota)"></i>
+                      <span class="ms-2 fw-bold">{{ avaliacao.nota }}.0</span>
+                    </div>
+                  </div>
+                  <p class="mb-0 comentario-texto">{{ avaliacao.comentario }}</p>
+                </div>
+              </div>
+              <hr *ngIf="!last" class="my-4">
+            </div>
+          </div>
+
+          <!-- Paginação -->
+          <nav aria-label="Paginação das avaliações" *ngIf="totalPaginas > 1">
+            <ul class="pagination justify-content-center mb-4">
+              <li class="page-item" [class.disabled]="paginaAtual === 1">
+                <button class="page-link" (click)="paginaAnterior()" [disabled]="paginaAtual === 1">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+              </li>
+              <li class="page-item" *ngFor="let pagina of getPaginas()" [class.active]="pagina === paginaAtual">
+                <button class="page-link" (click)="irParaPagina(pagina)">{{ pagina }}</button>
+              </li>
+              <li class="page-item" [class.disabled]="paginaAtual === totalPaginas">
+                <button class="page-link" (click)="proximaPagina()" [disabled]="paginaAtual === totalPaginas">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+
+          <!-- Nota geral do pacote -->
+          <div class="text-center border-top pt-4">
+            <div class="nota-geral">
+              <h3 class="display-5 fw-bold text-primary mb-2">{{ pacote?.avaliacao || '5.0' }}</h3>
+              <div class="mb-2">
+                <i class="bi bi-star-fill text-warning"
+                  *ngFor="let star of getStarsArray(pacote?.avaliacao || 5)"></i>
+              </div>
+              <p class="text-muted mb-0">{{ pacote?.totalAvaliacoes || '1000' }} COMENTÁRIOS</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar - Resumo e Reserva -->
+    <div class="col-lg-4">
+      <div class="card sticky-top" style="top: 100px;">
+        <div class="card-body">
+          <h5 class="card-title fw-bold mb-3">Resumo da Viagem</h5>
+
+          <!-- Preço -->
+          <div class="text-center mb-4">
+            <span class="text-muted">A partir de</span>
+            <h3 class="fw-bold text-primary">R$ {{ pacote?.preco || '2.400' }}</h3>
+            <small class="text-muted">por pessoa</small>
+          </div>
+
+          <!-- Informações resumidas -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Destino:</span>
+              <strong>{{ pacote?.destino || 'Recife - São Paulo' }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Duração:</span>
+              <strong>{{ pacote?.duracao || '7 dias' }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Saída:</span>
+              <strong>{{ pacote?.dataIda || '06/03/2024' }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Retorno:</span>
+              <strong>{{ pacote?.dataVolta || '13/03/2024' }}</strong>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Formulário de reserva -->
+          <form (ngSubmit)="realizarReserva()">
+            <div class="mb-3">
+              <label class="form-label">Número de pessoas</label>
+              <select class="form-select" [(ngModel)]="numeroPassageiros" name="numeroPassageiros">
+                <option value="1">1 pessoa</option>
+                <option value="2">2 pessoas</option>
+                <option value="3">3 pessoas</option>
+                <option value="4">4 pessoas</option>
+                <option value="5">5+ pessoas</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <span>Valor total:</span>
+                <strong class="text-primary">R$ {{ calcularValorTotal() }}</strong>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+              Reservar Agora
+            </button>
+          </form>
+
+          <hr>
+
+          <!-- Contato -->
+          <div class="text-center">
+            <p class="mb-2">Dúvidas? Fale conosco!</p>
+            <button class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-whatsapp me-2"></i>WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

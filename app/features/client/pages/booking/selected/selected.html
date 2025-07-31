@@ -1,0 +1,112 @@
+<div class="container mt-4 p-4 border rounded bg-white">
+
+  <h6 class="mb-3">Pacotes Selecionados</h6>
+
+ <!-- Pacote -->
+<div class="row align-items-center mb-3">
+  <div class="col-auto">
+    <label class="custom-checkbox">
+      <input type="checkbox" class="form-check-input" checked />
+      <span class="checkmark"></span>
+    </label>
+  </div>
+  <div class="col-md">
+    <strong style="line-height: 1; vertical-align: middle;">Recife - São Paulo</strong>
+  </div>
+  <div class="col-md-auto">
+    12/01 - 18/01
+  </div>
+  <div class="col-md-auto fw-bold text-end text-nowrap">
+    R$ 2.400
+  </div>
+</div>
+
+
+ 
+<!-- Checkbox para viajantes extras -->
+<div class="form-group mt-4">
+  <label class="custom-checkbox">
+  <input type="checkbox" [(ngModel)]="possuiViajantesExtras" />
+  <span class="checkmark"></span>
+  Possui viajantes extras?
+</label>
+</div>
+
+<!-- Campo para quantidade -->
+<div *ngIf="possuiViajantesExtras" class="form-group mt-3">
+  <label for="quantidade">Quantos viajantes extras?</label>
+  <input
+    id="quantidade"
+    type="number"
+    min="1"
+    class="form-control"
+    [(ngModel)]="quantidadeViajantesExtras"
+    (ngModelChange)="atualizarQuantidade()"
+    placeholder="Ex: 2"
+  />
+</div>
+
+<!-- Campos dos viajantes -->
+<div
+  *ngIf="possuiViajantesExtras && viajantesExtras.length > 0"
+  class="mt-4"
+>
+  <h5>Informações dos Viajantes Extras</h5>
+
+  <div
+    *ngFor="let viajante of viajantesExtras; let i = index"
+    class="border rounded p-3 mb-3"
+  >
+    <h6>Viajante {{ i + 1 }}</h6>
+
+    <div class="row">
+      <div class="col-md-6 mb-2">
+        <label>Nome</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="viajantesExtras[i].nome"
+          placeholder="Nome do viajante"
+        />
+      </div>
+      <div class="col-md-6 mb-2">
+        <label>E-mail</label>
+        <input
+          type="email"
+          class="form-control"
+          [(ngModel)]="viajantesExtras[i].email"
+          placeholder="email@exemplo.com"
+        />
+      </div>
+      <div class="col-md-4 mb-2">
+        <label>Telefone</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="viajantesExtras[i].telefone"
+          placeholder="(xx) xxxxx-xxxx"
+        />
+      </div>
+      <div class="col-md-4 mb-2">
+        <label>CPF</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="viajantesExtras[i].cpf"
+          placeholder="000.000.000-00"
+        />
+      </div>
+      <div class="col-md-4 mb-2">
+        <label>Passaporte</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="viajantesExtras[i].passaporte"
+          placeholder="Passaporte"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+

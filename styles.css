@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Bebas+Neue&display=swap');
+
+
+/* Reset básico para consistência entre navegadores */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  font-family: 'Lato', sans-serif;
+}
+/* Fonte Lato */
+
+/* Estilos globais */
+:root {
+  --color-primary: #FF7900;
+  --color-secondary: #7FC023;
+  --color-accent: #6AAE20;
+  --color-light-bg: rgba(255, 253, 253, 0.67);
+  --color-light-fill: rgba(255, 253, 253, 0.27);
+  --color-text-dark: #333;
+  --color-border: #A3A3A3;
+  --color-gray: #666666;
+}
+
+*{
+  font-family: "Lato", sans-serif;
+}
+
+/* Garantir que dropdowns tenham z-index alto globalmente */
+.dropdown-menu {
+  z-index: 9999;
+}
+
+/* Garantir que navbar tenha stacking context adequado */
+.navbar {
+  z-index: 1030;
+  position: relative;
+}
+
+footer {
+  z-index: 1000;
+  position: relative;
+}
+
+
