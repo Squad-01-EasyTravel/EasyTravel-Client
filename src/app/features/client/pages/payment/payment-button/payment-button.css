@@ -1,38 +1,52 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
-body {
+/* Button styling */
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
   font-family: 'Montserrat', sans-serif;
-  background-color: #fff;
-  margin: 0;
-  padding: 0;
 }
 
-.info-container {
-  max-width: 500px;
-  margin: 5px auto 100px auto;
-  text-align: center;
-  padding: 5px;
-}
-
-.info-icon {
-  margin-right: 8px;
-  font-size: 18px;
-  vertical-align: middle;
-}
-
-.proceed-button {
-  margin-top: 5px;
-  background-color: #ff6600;
+.prosseguir-button {
+  background-color: #FF8C00;
   color: white;
   border: none;
-  padding: 16px 40px;
-  font-size: 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  padding: 15px 40px;
+  font-size: 16px;
   font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 25px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  min-width: 200px;
 }
 
-.proceed-button:hover {
-  background-color: #e65c00;
+.prosseguir-button:hover {
+  background-color: #e67e00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+}
+
+.prosseguir-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(255, 140, 0, 0.2);
+}
+
+.prosseguir-button.disabled,
+.prosseguir-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.prosseguir-button.disabled:hover,
+.prosseguir-button:disabled:hover {
+  background-color: #ccc;
+  transform: none;
+  box-shadow: none;
 }

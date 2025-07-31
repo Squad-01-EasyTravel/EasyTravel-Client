@@ -18,10 +18,11 @@ export const routes: Routes = [
   { path: 'bundles', component: Bundle },
   { path: 'my-booking', component: MyBooking },
   { path: 'details-bundle', component: DetailsBundle },
+  { path: 'payment', component: Payment },
   { path: 'auth', children: AUTH_ROUTES },
-  { path: 'my-booking', component: MyBooking },
   { path: 'profile', component: Profile},
   { path: 'profile/paymentinformation', component: PayInfo},
+
   {
     path: 'employee',
     component: EmployeeLayoutComponent,
