@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-payment-card',
@@ -8,7 +8,9 @@ import { Component } from '@angular/core';
   styleUrl: './payment-card.css'
 })
 export class PaymentCard {
-  selectedCard: string = '';
+  selectedCard: string = 'credito';
+  
+  @Output() paymentMethodSelected = new EventEmitter<string>();
   
   selectCard(cardType: string) {
     this.selectedCard = cardType;
@@ -22,5 +24,8 @@ export class PaymentCard {
     if (selectedCard) {
       selectedCard.classList.add('selecionado');
     }
+    
+    // Emite o evento para o componente pai
+    this.paymentMethodSelected.emit(cardType);
   }
 }
