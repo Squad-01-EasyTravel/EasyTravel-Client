@@ -737,6 +737,7 @@
 }
 
 /* ===== RESPONSIVIDADE ===== */
+
 @media (max-width: 1200px) {
     .upper-side {
         margin: 2rem 1rem;
@@ -773,6 +774,17 @@
 
     .main-content {
         padding: 2rem;
+    }
+    
+    .payment-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .card-actions {
+        width: 100%;
+        justify-content: space-between;
     }
 }
 

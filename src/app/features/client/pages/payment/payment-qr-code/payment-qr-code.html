@@ -1,0 +1,73 @@
+<div class="qr-code-container">
+  <div class="qr-code-content">
+    <h2 class="title">Aguardando pagamento.</h2>
+    <p class="subtitle">Pedido realizado em <span class="timestamp">{{ generatedDateTime }}</span></p>
+    
+    <div class="confirmation-info">
+      <p class="confirmation-text">
+        Um e-mail de confirmação com detalhes do seu pedido foi enviado para o e-mail
+      </p>
+      <p class="email-address">exemplo&#64;exemplo.com.</p>
+    </div>
+    
+    <div class="order-status">
+      <p class="order-info">
+        <span class="order-label">Pedido :</span> 
+        <span class="order-number">#456</span> - 
+        <span class="status-text">Status aguardando pagamento do pix</span>
+      </p>
+    </div>
+    
+    <div class="qr-code-section">
+      <div class="qr-code-box">
+        <div class="qr-code-placeholder">
+          <img src="assets/imgs/qr-code.png" alt="QR Code PIX" class="qr-code-image">
+        </div>
+      </div>
+      
+      <div class="instructions">
+        <ol class="instruction-list">
+          <li>1. Acesse o app ou site do seu banco.</li>
+          <li>2. Escolha a opção de pagar com QR Code e escaneie o código.</li>
+          <li>3. Confirme as informações e finalize o pagamento.</li>
+        </ol>
+      </div>
+    </div>
+    
+    <div class="copy-paste-section">
+      <button class="copy-paste-button">
+        <span class="copy-icon">📋</span>
+        Pagar com PIX copia e cola
+      </button>
+    </div>
+    
+    <div class="footer-info">
+      <p class="footer-text">
+        Após o pagamento, podemos levar alguns segundos para a confirmação do seu pedido.<br>
+        Você será avisado assim que confirmado!
+      </p>
+    </div>
+  </div>
+
+  <!-- Modal de Sucesso -->
+  <div class="modal-overlay" *ngIf="showSuccessModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="success-header">
+        <div class="success-icon">
+          <span class="checkmark">✓</span>
+        </div>
+        <h3 class="success-title">Seu pagamento foi efetuado com sucesso</h3>
+      </div>
+      
+      <div class="order-details">
+        <p class="order-number">Número do Pedido: <span class="number-highlight">#456</span></p>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="voltar-inicio-button" (click)="onVoltarInicio()">
+          Voltar ao início
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

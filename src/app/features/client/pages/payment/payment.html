@@ -1,17 +1,77 @@
 
 
 <div class="payment-main-container">
-    <div class="payment-container">
-      <h1>Pagamento</h1>
-      <p>Escolha o método de pagamento abaixo</p>
+    <!-- Tela de seleção de pagamento -->
+    <div *ngIf="!showQrCode">
+        <div class="payment-container">
+          <h1>Pagamento</h1>
+          <p>Escolha o método de pagamento abaixo</p>
+        </div>
+        <div class="payment-section">
+           <app-payment-card (paymentMethodSelected)="onPaymentMethodSelected($event)"></app-payment-card>
+        </div>
+        <div class="payment-section">
+           <app-payment-credit *ngIf="selectedPaymentMethod === 'credito'" (formValidation)="onCreditFormValidation($event)"></app-payment-credit>
+           <app-payment-pix *ngIf="selectedPaymentMethod === 'pix'" (formValidation)="onPixFormValidation($event)"></app-payment-pix>
+           <app-payment-boleto *ngIf="selectedPaymentMethod === 'boleto'" (formValidation)="onBoletoFormValidation($event)"></app-payment-boleto>
+        </div>
+        <div class="payment-section">
+           <app-payment-button 
+             [paymentMethod]="selectedPaymentMethod" 
+             [isFormValid]="selectedPaymentMethod === 'pix' ? isPixFormValid : selectedPaymentMethod === 'credito' ? isCreditFormValid : selectedPaymentMethod === 'boleto' ? isBoletoFormValid : true"
+             (buttonClicked)="onGenerateQrCode()">
+           </app-payment-button>
+        </div>
     </div>
-    <div class="payment-section">
-       <app-payment-card></app-payment-card>
+    
+    <!-- Tela do QR Code -->
+    <div *ngIf="showQrCode">
+        <app-payment-qr-code></app-payment-qr-code>
     </div>
-    <div class="payment-section">
-       <app-payment-credit></app-payment-credit>
+
+    <!-- Modal de Sucesso -->
+    <div class="modal-overlay" *ngIf="showSuccessModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="success-header">
+            <div class="success-icon">
+              <span class="checkmark">✓</span>
+            </div>
+            <h3 class="success-title">Seu pagamento foi efetuado com sucesso</h3>
+          </div>
+          
+          <div class="order-details">
+            <p class="order-number">Número do Pedido: <span class="number-highlight">#456</span></p>
+          </div>
+          
+          <div class="modal-actions">
+            <button class="voltar-inicio-button" (click)="onVoltarInicio()">
+              Voltar ao início
+            </button>
+          </div>
+        </div>
     </div>
-    <div class="payment-section">
-       <app-payment-button></app-payment-button>
+
+    <!-- Modal de Boleto -->
+    <div class="modal-overlay" *ngIf="showBoletoModal" (click)="closeBoletoModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="boleto-header">
+            <div class="boleto-icon">
+              <span class="checkmark">✓</span>
+            </div>
+            <h3 class="boleto-title">Boleto gerado com sucesso</h3>
+          </div>
+          
+          <div class="boleto-details">
+            <p class="boleto-info">O boleto gerado foi enviado para o seu email.</p>
+            <p class="boleto-warning">O pagamento pode levar até 3 dias úteis para ser contabilizado.</p>
+            <p class="order-number">Número do Pedido: <span class="number-highlight">#456</span></p>
+          </div>
+          
+          <div class="modal-actions">
+            <button class="voltar-inicio-button" (click)="onVoltarInicio()">
+              Voltar ao início
+            </button>
+          </div>
+        </div>
     </div>
 </div>
