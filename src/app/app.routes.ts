@@ -9,6 +9,7 @@ import { PackageManagementComponent } from './features/employee/pages/package-ma
 import { ReviewManagement } from './features/employee/pages/review-management/review-management';
 import { Profile } from './features/client/pages/user/profile/profile';
 import { PayInfo } from './features/client/pages/user/pay-info/pay-info';
+import { Booking } from './features/client/pages/booking/booking';
 import { TravelHistory } from './features/client/pages/user/travel-history/travel-history';
 
 
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: '', component: Home },
   { path: 'home', component: Home },
   { path: 'bundles', component: Bundle },
+  { path: 'booking', component: Booking },
   { path: 'my-booking', component: MyBooking },
   { path: 'details-bundle', component: DetailsBundle },
   { path: 'payment', component: Payment },
