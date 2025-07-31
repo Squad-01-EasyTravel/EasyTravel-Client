@@ -11,6 +11,7 @@ import { Profile } from './features/client/pages/user/profile/profile';
 import { PayInfo } from './features/client/pages/user/pay-info/pay-info';
 import { Booking } from './features/client/pages/booking/booking';
 import { TravelHistory } from './features/client/pages/user/travel-history/travel-history';
+import { Payment } from './features/client/pages/payment/payment';
 
 
 export const routes: Routes = [
