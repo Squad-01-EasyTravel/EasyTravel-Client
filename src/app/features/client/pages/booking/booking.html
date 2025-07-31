@@ -81,11 +81,11 @@
                       <i class="fas fa-users"></i>
                       <span>{{currentPackage.travelers || 1}} viajantes</span>
                       <div class="traveler-controls">
-                        <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.id, currentPackage.travelers - 1)">
+                        <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.travelers - 1)">
                           <i class="fas fa-minus"></i>
                         </button>
                         <span class="traveler-count">{{currentPackage.travelers}}</span>
-                        <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.id, currentPackage.travelers + 1)">
+                        <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.travelers + 1)">
                           <i class="fas fa-plus"></i>
                         </button>
                       </div>
@@ -160,7 +160,7 @@
                         <i class="fas fa-user"></i>
                         Viajante Extra {{i + 1}}
                       </h5>
-                      <button class="btn-edit-traveler" (click)="editTraveler(currentPackage.id, i)">
+                      <button class="btn-edit-traveler" (click)="editTraveler(i)">
                         <i class="fas fa-edit"></i>
                         Editar
                       </button>
@@ -195,7 +195,7 @@
 
                     <!-- Formulário de Edição -->
                     <div class="traveler-form" *ngIf="traveler.editing">
-                      <form (ngSubmit)="saveTraveler(currentPackage.id, i)" #travelerForm="ngForm">
+                      <form (ngSubmit)="saveTraveler(i)" #travelerForm="ngForm">
                         <div class="form-row">
                           <div class="form-group">
                             <label for="fullName{{currentPackage.id}}{{i}}">Nome Completo *</label>
@@ -268,7 +268,7 @@
                         </div>
 
                         <div class="form-actions">
-                          <button type="button" class="btn-cancel" (click)="cancelEdit(currentPackage.id, i)">
+                          <button type="button" class="btn-cancel" (click)="cancelEdit(i)">
                             <i class="fas fa-times"></i>
                             Cancelar
                           </button>

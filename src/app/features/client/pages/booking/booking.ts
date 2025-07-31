@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Navbar } from "../../../../shared/navbar/navbar";
 import { Footer } from "../../../../shared/footer/footer";
-import { AuthService, User } from "../../../../shared/services/auth.service";
 
 interface SelectedPackage {
   id: string;
@@ -102,8 +101,7 @@ export class Booking implements OnInit {
   }
 
   constructor(
-    private router: Router,
-    private authService: AuthService
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -114,36 +112,15 @@ export class Booking implements OnInit {
   }
 
   loadUserProfile(): void {
-    // Tentar carregar do localStorage primeiro
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      this.userProfile = {
-        fullName: currentUser.name,
-        birthDate: '', // Este campo precisa ser adicionado ao User interface
-        cpf: currentUser.cpf,
-        rg: '', // Este campo precisa ser adicionado ao User interface  
-        email: currentUser.email,
-        phone: currentUser.telephone
-      };
-    }
-
-    // Opcionalmente, buscar dados atualizados do servidor
-    this.authService.getUserProfile().subscribe({
-      next: (user: User) => {
-        this.userProfile = {
-          fullName: user.name,
-          birthDate: '', // Mapear quando disponível
-          cpf: user.cpf,
-          rg: '', // Mapear quando disponível
-          email: user.email,
-          phone: user.telephone
-        };
-      },
-      error: (error) => {
-        console.error('Erro ao carregar perfil do usuário:', error);
-        // Manter dados do localStorage se falhar
-      }
-    });
+    // Dados mockados para teste
+    this.userProfile = {
+      fullName: 'João Silva Santos',
+      birthDate: '1990-05-15',
+      cpf: '123.456.789-00',
+      rg: '12.345.678-9',
+      email: 'joao.silva@email.com',
+      phone: '(11) 99999-9999'
+    };
   }
 
   initializeTravelersForCurrentPackage(): void {
@@ -178,17 +155,17 @@ export class Booking implements OnInit {
     }
   }
 
-  editTraveler(packageId: string, index: number): void {
-    this.travelersInfoByPackage[packageId][index].editing = true;
+  editTraveler(index: number): void {
+    this.travelersInfoByPackage[this.currentPackage.id][index].editing = true;
   }
 
-  saveTraveler(packageId: string, index: number): void {
-    this.travelersInfoByPackage[packageId][index].editing = false;
-    console.log('Traveler saved:', this.travelersInfoByPackage[packageId][index]);
+  saveTraveler(index: number): void {
+    this.travelersInfoByPackage[this.currentPackage.id][index].editing = false;
+    console.log('Traveler saved:', this.travelersInfoByPackage[this.currentPackage.id][index]);
   }
 
-  cancelEdit(packageId: string, index: number): void {
-    this.travelersInfoByPackage[packageId][index].editing = false;
+  cancelEdit(index: number): void {
+    this.travelersInfoByPackage[this.currentPackage.id][index].editing = false;
     // Restaurar dados originais se necessário
   }
 
@@ -212,16 +189,13 @@ export class Booking implements OnInit {
     });
   }
 
-  updateTravelerCount(packageId: string, newCount: number): void {
+  updateTravelerCount(newCount: number): void {
     if (newCount < 1) newCount = 1;
     if (newCount > 10) newCount = 10; // Limite máximo
 
-    const pkg = this.packageList.find(p => p.id === packageId);
-    if (pkg) {
-      pkg.travelers = newCount;
-      this.initializeTravelersForPackage(packageId, newCount);
-      this.calculateTotalPrice();
-    }
+    this.currentPackage.travelers = newCount;
+    this.initializeTravelersForCurrentPackage();
+    this.calculateTotalPrice();
   }
 
   // Função removida já que não trabalhamos mais com seleção múltipla
