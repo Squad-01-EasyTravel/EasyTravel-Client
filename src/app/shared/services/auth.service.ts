@@ -75,13 +75,26 @@ export class AuthService {
   }
 
   setCurrentUser(user: User): void {
-    localStorage.setItem('user', JSON.stringify(user));
-    this.currentUserSubject.next(user);
+    if (user && user.id) {
+      localStorage.setItem('user', JSON.stringify(user));
+      this.currentUserSubject.next(user);
+    }
+  //    setCurrentUser(user: User): void {
+  //   localStorage.setItem('user', JSON.stringify(user));
+  //   this.currentUserSubject.next(user);
+  // }
   }
 
   getCurrentUser(): User | null {
     const userJson = localStorage.getItem('user');
-    return userJson ? JSON.parse(userJson) : null;
+    if (!userJson || userJson === 'undefined') {
+      return null;
+    }
+    try {
+      return JSON.parse(userJson);
+    } catch (error) {
+      return null;
+    }
   }
 
   isAuthenticated(): boolean {
