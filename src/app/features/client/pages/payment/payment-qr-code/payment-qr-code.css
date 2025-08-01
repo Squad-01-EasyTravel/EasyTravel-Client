@@ -2,7 +2,7 @@
 
 .qr-code-container {
   font-family: 'Montserrat', sans-serif;
-  background-color: #fff;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.03) 0%, rgba(247, 147, 30, 0.02) 100%);
   padding: 20px;
   display: flex;
   justify-content: center;
@@ -21,6 +21,10 @@
   font-weight: 700;
   color: #333;
   margin: 0 0 10px 0;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
@@ -53,10 +57,12 @@
 }
 
 .order-status {
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+  border: 1px solid rgba(255, 107, 53, 0.1);
+  border-radius: 12px;
+  padding: 20px;
   margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .order-info {
@@ -71,7 +77,7 @@
 
 .order-number {
   font-weight: 700;
-  color: #FF8C00;
+  color: #ff6b35;
 }
 
 .status-text {
@@ -87,11 +93,11 @@
 }
 
 .qr-code-box {
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 107, 53, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .qr-code-placeholder {
@@ -133,26 +139,27 @@
 }
 
 .copy-paste-button {
-  background-color: #FF8C00;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   color: white;
   border: none;
   padding: 15px 30px;
   font-size: 16px;
   font-weight: 600;
   font-family: 'Montserrat', sans-serif;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
   transition: all 0.3s ease;
   margin: 0 auto;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
 }
 
 .copy-paste-button:hover {
-  background-color: #e67e00;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
+  filter: brightness(1.1);
 }
 
 .copy-icon {
@@ -175,25 +182,25 @@
   .qr-code-content {
     padding: 20px 10px;
   }
-  
+
   .title {
     font-size: 24px;
   }
-  
+
   .qr-code-section {
     flex-direction: column;
   }
-  
+
   .qr-code-placeholder {
     width: 160px;
     height: 160px;
   }
-  
+
   .qr-code-image {
     width: 140px;
     height: 140px;
   }
-  
+
   .instructions {
     max-width: 100%;
   }
@@ -327,11 +334,11 @@
     max-width: 350px;
     margin: 20px;
   }
-  
+
   .success-title {
     font-size: 16px;
   }
-  
+
   .order-number {
     font-size: 14px;
   }
