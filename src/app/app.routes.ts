@@ -12,6 +12,8 @@ import { PayInfo } from './features/client/pages/user/pay-info/pay-info';
 import { Booking } from './features/client/pages/booking/booking';
 import { TravelHistory } from './features/client/pages/user/travel-history/travel-history';
 import { Payment } from './features/client/pages/payment/payment';
+import { AdminDashboardContent } from './features/admin/pages/admin-dashboard-content/admin-dashboard-content';
+import { AdminDashboard } from './features/admin/pages/admin-dashboard/admin-dashboard';
 
 
 export const routes: Routes = [
@@ -32,6 +34,13 @@ export const routes: Routes = [
     children: [
       { path: 'package-management', component: PackageManagementComponent },
       { path: 'review-management', component: ReviewManagement }
+    ]
+  },
+  {
+    path: 'admin',
+    component: AdminDashboard, // layout com sidebar e router-outlet
+    children: [
+      { path: 'dashboard', component: AdminDashboardContent } // conteúdo do dashboard
     ]
   },
 ];

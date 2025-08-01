@@ -1,7 +1,14 @@
+import {jwtDecode} from 'jwt-decode';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+
+
+// export interface RoleClient{
+//   
+// }
 
 export interface LoginDto {
   email: string;
@@ -15,6 +22,8 @@ export interface RegisterClientDto {
   passport?: string;
   password: string;
   telephone: string;
+  role? : string;
+  
 }
 
 export interface User {
@@ -37,16 +46,44 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     // Verificar se há token salvo no localStorage ao inicializar
     this.checkAuthStatus();
+
+
+
+    
   }
+
+   getUserRoleFromToken(): string | null {
+    const token = localStorage.getItem('jwt');
+    if (!token) return null;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      
+      return decoded.id || null;
+    } catch (error) {
+      console.error('Erro ao decodificar o token:', error);
+      return null;
+    }
+  }
+
+ 
 
   login(data: LoginDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
       tap(response => {
         this.setToken(response.token);
         this.setCurrentUser(response.user);
+        localStorage.setItem('jwt', response.token);
+        // Decodifica o token e mostra apenas o campo 'role' no console
+        try {
+          const decoded: any = jwtDecode(response.token);
+          console.log('Role do usuário autenticado:', decoded.role);
+        } catch (error) {
+          console.error('Erro ao decodificar o token:', error);
+        }
       })
     );
   }
@@ -54,16 +91,21 @@ export class AuthService {
   registerClient(data: RegisterClientDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register/client`, data).pipe(
       tap(response => {
-        this.setToken(response.token);
-        this.setCurrentUser(response.user);
+        if (response && response.token && response.user) {
+          this.setToken(response.token);
+          this.setCurrentUser(response.user);
+          localStorage.setItem('jwt', response.token);
+          
+        } else {
+          throw new Error('Resposta de registro inválida.');
+        }
       })
     );
   }
 
   logout(): void {
     localStorage.removeItem('jwt');
-    localStorage.removeItem('user');
-    this.currentUserSubject.next(null);
+    this.router.navigate(['/home']);
   }
 
   setToken(token: string): void {
@@ -79,6 +121,7 @@ export class AuthService {
       localStorage.setItem('user', JSON.stringify(user));
       this.currentUserSubject.next(user);
     }
+
   //    setCurrentUser(user: User): void {
   //   localStorage.setItem('user', JSON.stringify(user));
   //   this.currentUserSubject.next(user);
@@ -112,15 +155,13 @@ export class AuthService {
   }
 
   checkAuthStatus(): void {
-    const user = this.getCurrentUser();
+    
     const token = this.getToken();
-
-    if (user && token && this.isAuthenticated()) {
-      this.currentUserSubject.next(user);
-    } else {
-      this.logout();
-    }
+    (!token && !this.isAuthenticated()) ?? this.logout(); 
   }
+
+    
+ 
 
   // Método para obter informações do perfil do usuário (para o booking)
   getUserProfile(): Observable<User> {

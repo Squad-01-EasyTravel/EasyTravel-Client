@@ -169,10 +169,67 @@
 
 .pagination-wrapper {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
+}
+
+/* ===== CONTROLES PRINCIPAIS CENTRALIZADOS ===== */
+.pagination-main-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
   flex-wrap: wrap;
+}
+
+/* ===== LAYOUT PARA PÁGINA ÚNICA ===== */
+.single-page-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* ===== INFORMAÇÕES DA PAGINAÇÃO ===== */
+.pagination-info {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.page-info {
+  color: #2c3e50;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.items-info {
+  color: #5a6c7d;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ===== MENSAGEM PÁGINA ÚNICA ===== */
+.single-page-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #5a6c7d;
+  font-size: 0.8rem;
+  background: #e8f5e8;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #d4edda;
+  margin-bottom: 0.25rem;
+}
+
+.single-page-info i {
+  color: #28a745;
+  font-size: 0.75rem;
 }
 
 /* ===== NAVEGAÇÃO DE PÁGINAS ===== */
@@ -182,6 +239,7 @@
   gap: 1rem;
 }
 
+/* ===== PAGINAÇÃO NUMÉRICA ===== */
 .pagination-btn {
   display: flex;
   align-items: center;
@@ -271,7 +329,21 @@
   border-color: #ff6b35;
 }
 
-/* ===== RESPONSIVIDADE ===== */
+.page-size-selector.centered {
+  justify-self: center;
+  margin: 0 auto;
+}
+
+/* Quando há apenas o seletor, centralizar o wrapper */
+.pagination-wrapper:not(:has(.pagination-nav)) {
+  justify-content: center;
+}
+
+/* Fallback para navegadores que não suportam :has() */
+.pagination-wrapper.single-element {
+  justify-content: center;
+}
+
 @media (max-width: 1200px) {
   .bundle-content {
     max-width: 1200px;
@@ -311,12 +383,31 @@
 
   .pagination-wrapper {
     flex-direction: column;
+    gap: 1rem;
+  }
+
+  .pagination-controls {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .pagination-controls-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .single-page-message {
     gap: 1.5rem;
   }
 
   .pagination-nav {
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  .pagination-main-controls {
+    flex-direction: column;
+    gap: 1.5rem;
   }
 }
 
@@ -347,18 +438,21 @@
     padding: 1.5rem;
   }
 
-  .pagination-btn {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
+  .pagination-main-controls {
+    gap: 1rem;
   }
 
-  .page-number {
-    width: 40px;
-    height: 40px;
+  .page-info {
+    font-size: 0.8rem;
   }
 
-  .pagination-numbers {
-    gap: 0.3rem;
+  .items-info {
+    font-size: 0.7rem;
+  }
+
+  .single-page-info {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
   }
 }
 
@@ -375,6 +469,11 @@
     padding: 1rem;
   }
 
+  .pagination-main-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
   .pagination-nav {
     gap: 0.5rem;
   }
@@ -389,6 +488,13 @@
 
   .page-size-selector {
     font-size: 0.8rem;
-    text-align: center;
+  }
+
+  .page-info {
+    font-size: 0.75rem;
+  }
+
+  .items-info {
+    font-size: 0.65rem;
   }
 }

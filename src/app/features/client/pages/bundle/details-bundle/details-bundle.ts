@@ -174,7 +174,7 @@ export class DetailsBundle implements OnInit {
       id: 1,
       titulo: 'Recife - São Paulo',
       imagemPrincipal: '/assets/imgs/fortaleza.jpg',
-      preco: 2500,
+      preco: 2400, // Ajustado para corresponder ao hero
       avaliacao: 5.0,
       totalAvaliacoes: 1000,
       dataIda: '12/01/2025',
