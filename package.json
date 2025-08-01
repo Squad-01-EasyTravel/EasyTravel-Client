@@ -28,6 +28,7 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@auth0/angular-jwt": "^5.2.0",
     "bootstrap": "^5.3.7",
     "chart.js": "^4.5.0",
     "jwt-decode": "^4.0.0",
