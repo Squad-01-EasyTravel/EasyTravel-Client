@@ -22,13 +22,11 @@ export class Navbar implements OnInit {
 
   ngOnInit() {
     this.currentRoute = this.router.url;
-    console.log('Rota inicial detectada:', this.currentRoute);
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       this.currentRoute = event.url;
-      console.log('Mudança de rota detectada:', this.currentRoute);
       // Fechar menu quando navegar
       this.closeMenu();
     });
@@ -39,12 +37,10 @@ export class Navbar implements OnInit {
 
   isRouteActive(route: string): boolean {
     if (route === '/home' && (this.currentRoute === '/' || this.currentRoute === '/home')) {
-      console.log(`Rota ${route} está ativa (home)`, true);
       return true;
     }
 
     const isActive = this.currentRoute === route || this.currentRoute.startsWith(route + '/');
-    console.log(`Verificando ${route} contra ${this.currentRoute}:`, isActive);
     return isActive;
   }
 
@@ -59,7 +55,7 @@ export class Navbar implements OnInit {
     this.isMenuOpen = !this.isMenuOpen;
     const navbarCollapse = document.getElementById('navbarNav');
     const toggler = document.querySelector('.navbar-toggler') as HTMLElement;
-    
+
     if (navbarCollapse && toggler) {
       if (this.isMenuOpen) {
         navbarCollapse.classList.add('show');
@@ -84,11 +80,11 @@ export class Navbar implements OnInit {
     this.isMenuOpen = false;
     const navbarCollapse = document.getElementById('navbarNav');
     const toggler = document.querySelector('.navbar-toggler') as HTMLElement;
-    
+
     if (navbarCollapse) {
       navbarCollapse.classList.remove('show');
     }
-    
+
     if (toggler) {
       toggler.setAttribute('aria-expanded', 'false');
       toggler.classList.add('collapsed');
@@ -102,7 +98,6 @@ export class Navbar implements OnInit {
   logout() {
     this.isLoggedIn = false;
     this.closeMenu();
-    console.log('Usuário deslogado');
   }
 
   login() {
@@ -113,7 +108,6 @@ export class Navbar implements OnInit {
   // Método para lidar com erro de carregamento de imagem
   onImageError(event: any) {
     event.target.src = 'assets/imgs/et_mascote.png';
-    console.log('Erro ao carregar imagem, usando fallback');
   }
 
   toggleLoginState() {
@@ -126,7 +120,7 @@ export class Navbar implements OnInit {
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
     const navbar = this.elementRef.nativeElement.querySelector('.navbar-custom');
-    
+
     // Se clicou fora do navbar e o menu está aberto, fecha o menu
     if (this.isMenuOpen && navbar && !navbar.contains(target)) {
       this.closeMenu();
@@ -142,7 +136,7 @@ export class Navbar implements OnInit {
   // Verificar se estamos em desktop e resetar menu se necessário
   checkScreenSize() {
     const isDesktop = window.innerWidth >= 992; // lg breakpoint do Bootstrap
-    
+
     if (isDesktop && this.isMenuOpen) {
       // Se estamos em desktop e o menu mobile está aberto, resetar
       this.resetMenuState();
@@ -154,12 +148,12 @@ export class Navbar implements OnInit {
     this.isMenuOpen = false;
     const navbarCollapse = document.getElementById('navbarNav');
     const toggler = document.querySelector('.navbar-toggler') as HTMLElement;
-    
+
     if (navbarCollapse) {
       navbarCollapse.classList.remove('show');
       navbarCollapse.style.display = '';
     }
-    
+
     if (toggler) {
       toggler.setAttribute('aria-expanded', 'false');
       toggler.classList.add('collapsed');
