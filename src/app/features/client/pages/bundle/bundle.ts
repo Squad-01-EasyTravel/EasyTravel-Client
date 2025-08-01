@@ -376,6 +376,8 @@ export class Bundle implements OnInit {
   pageSize = 6;
 
   ngOnInit() {
+    // Adicionar pacotes extras para demonstrar paginação
+    this.allPackages = [...this.allPackages, ...this.generateAdditionalPackages()];
     this.filteredPackages = [...this.allPackages];
     this.applySorting('popular');
   }
@@ -527,7 +529,41 @@ export class Bundle implements OnInit {
   }
 
   onPageSizeChange() {
-    this.currentPage = 1;
+    const previousPageSize = this.pageSize;
+    this.pageSize = Number(this.pageSize);
+
+    // Garantir que o pageSize não ultrapasse 24
+    if (this.pageSize > 24) {
+      this.pageSize = 24;
+    }
+
+    console.log(`Mudança de tamanho da página: ${previousPageSize} → ${this.pageSize}`);
+    console.log(`Total de pacotes: ${this.filteredPackages.length}`);
+    console.log(`Total de páginas antes: ${Math.ceil(this.filteredPackages.length / previousPageSize)}`);
+    console.log(`Total de páginas depois: ${this.getTotalPages()}`);
+
+    // Calcular o índice do primeiro item da página atual
+    const currentFirstItem = (this.currentPage - 1) * previousPageSize;
+
+    // Recalcular a página baseada no novo tamanho
+    this.currentPage = Math.floor(currentFirstItem / this.pageSize) + 1;
+
+    // Garantir que a página esteja dentro dos limites válidos
+    const totalPages = this.getTotalPages();
+    this.currentPage = Math.max(1, Math.min(this.currentPage, totalPages));
+
+    console.log(`Página atual após mudança: ${this.currentPage}`);
+  }
+
+  // Método adicional para debug
+  logPaginationState() {
+    console.log('=== Estado da Paginação ===');
+    console.log(`Total de pacotes: ${this.filteredPackages.length}`);
+    console.log(`Itens por página: ${this.pageSize}`);
+    console.log(`Página atual: ${this.currentPage}`);
+    console.log(`Total de páginas: ${this.getTotalPages()}`);
+    console.log(`Exibindo: ${this.getDisplayStart()}-${this.getDisplayEnd()}`);
+    console.log('===========================');
   }
 
   clearAllFilters() {
@@ -679,5 +715,35 @@ export class Bundle implements OnInit {
     } catch (error) {
       console.error('Erro ao remover pacote:', error);
     }
+  }
+
+  // Adicionar mais pacotes para teste
+  private generateAdditionalPackages(): TravelPackage[] {
+    const additionalPackages: TravelPackage[] = [];
+    const baseDestinations = ['Campos do Jordão', 'Bonito', 'Jericoacoara', 'Arraial do Cabo', 'Paraty'];
+    const baseCategories = ['Aventura', 'Romântico', 'Família', 'Ecoturismo', 'Gastronômico'];
+
+    for (let i = 19; i <= 35; i++) {
+      additionalPackages.push({
+        id: i.toString(),
+        imagem: i % 2 === 0 ? '/assets/imgs/fortaleza.jpg' : '/assets/imgs/gramado.jpg',
+        preco: Math.floor(Math.random() * 3000) + 1500,
+        dataInicio: `2025-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+        dataFim: `2025-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+        destino: baseDestinations[Math.floor(Math.random() * baseDestinations.length)],
+        localOrigem: ['sao-paulo', 'rio-janeiro', 'brasilia'][Math.floor(Math.random() * 3)],
+        localDestino: baseDestinations[Math.floor(Math.random() * baseDestinations.length)].toLowerCase().replace(/\s+/g, '-'),
+        avaliacao: Math.round((Math.random() * 2 + 3) * 10) / 10,
+        categoria: baseCategories[Math.floor(Math.random() * baseCategories.length)],
+        descricao: `Pacote completo para ${baseDestinations[Math.floor(Math.random() * baseDestinations.length)]}`,
+        incluso: ['Hospedagem', 'Café da manhã', 'Transfer'],
+        maxViajantes: Math.floor(Math.random() * 6) + 2,
+        popularidade: Math.floor(Math.random() * 40) + 60,
+        relevancia: Math.floor(Math.random() * 30) + 70,
+        dataPublicacao: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1)
+      });
+    }
+
+    return additionalPackages;
   }
 }
