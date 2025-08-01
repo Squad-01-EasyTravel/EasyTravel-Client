@@ -20,7 +20,6 @@ export const routes: Routes = [
   { path: '', component: Home },
   { path: 'home', component: Home },
   { path: 'bundles', component: Bundle },
-  { path: 'bundle', component: Bundle },
   { path: 'booking', component: Booking },
   { path: 'my-booking', component: MyBooking },
   { path: 'details-bundle', component: DetailsBundle },

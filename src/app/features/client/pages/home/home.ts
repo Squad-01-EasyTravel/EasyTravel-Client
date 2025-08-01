@@ -28,7 +28,7 @@ export class Home implements OnInit {
     }
     localStorage.setItem('origem', this.origemSelecionada);
     localStorage.setItem('destino', this.destinoSelecionada);
-    this.router.navigate(['/bundle']);
+    this.router.navigate(['/bundles']);
   }
 
 
