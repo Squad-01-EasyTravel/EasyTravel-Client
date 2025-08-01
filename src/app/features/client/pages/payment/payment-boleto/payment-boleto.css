@@ -9,10 +9,11 @@
 .formulario-boleto {
   max-width: 580px;
   margin: 0 auto;
-  background-color: #fff;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 107, 53, 0.1);
 }
 
 .form-section {
@@ -32,9 +33,13 @@
 
 .section-title {
   font-size: 1.2em;
-  font-weight: bold;
+  font-weight: 600;
   color: #333;
   margin: 0;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .form-content {
@@ -59,20 +64,20 @@
   width: 100%;
   padding: 12px;
   margin-top: 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  height: 44px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  height: 48px;
   box-sizing: border-box;
   font-size: 14px;
   font-family: 'Montserrat', sans-serif;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
   background-color: #fff;
 }
 
 .form-field input:focus {
   outline: none;
-  border-color: #FF8C00;
-  box-shadow: 0 0 0 2px rgba(255, 140, 0, 0.1);
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
 /* Layout para campos lado a lado dentro das seções */
@@ -115,11 +120,11 @@
     flex-direction: column;
     gap: 0;
   }
-  
+
   .form-content {
     margin-left: 0;
   }
-  
+
   .section-header {
     flex-direction: column;
     align-items: flex-start;
