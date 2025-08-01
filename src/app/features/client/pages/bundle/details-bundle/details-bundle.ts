@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Navbar } from '../../../../../shared/navbar/navbar';
 import { Footer } from '../../../../../shared/footer/footer';
+import { BundleService } from '@/app/shared/services/bundle-service';
+import { BundleClass } from '../class/bundle-class';
 
 // Interface para tipagem do pacote
 interface Pacote {
@@ -44,6 +46,12 @@ interface Avaliacao {
   styleUrl: './details-bundle.css'
 })
 export class DetailsBundle implements OnInit {
+
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private service: BundleService
+  ) {}
 
   // Dados do pacote (virão do back-end)
   pacote: Pacote | null = null;
@@ -124,14 +132,13 @@ export class DetailsBundle implements OnInit {
     }
   ];
 
-  constructor(private route: ActivatedRoute) {}
+  id!: string;
+  bundleClass: BundleClass = new BundleClass();
 
-  ngOnInit() {
-    // Obter ID do pacote da rota
-    const pacoteId = this.route.snapshot.params['id'];
-
-    // Simular carregamento dos dados (substituir por chamada HTTP real)
-    this.carregarPacote(pacoteId);
+  ngOnInit():void {
+    this.id = this.route.snapshot.paramMap.get('id') as string;
+    this.service.getBundleById(this.id)
+    .subscribe(res => this.bundleClass = res);
   }
 
   // Métodos de paginação

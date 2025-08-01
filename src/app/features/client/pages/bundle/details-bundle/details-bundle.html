@@ -1,6 +1,5 @@
 <app-navbar></app-navbar>
 
-<!-- Hero Section -->
 <section class="hero-section">
   <div class="hero-background">
     <div class="hero-overlay"></div>
@@ -13,7 +12,7 @@
         <span>Detalhes do Pacote</span>
       </div>
       <div class="hero-title-container">
-        <h1 class="hero-title">{{ pacote?.titulo || 'Recife - São Paulo' }}</h1>
+        <h1 class="hero-title">{{bundleClass.bundleTitle}}</h1>
       </div>
       <p class="hero-description">
         Descubra todos os detalhes da sua próxima aventura. Informações completas sobre destino,
@@ -21,7 +20,7 @@
       </p>
       <div class="hero-price">
         <span class="price-label">A partir de</span>
-        <span class="price-value">R$ {{ pacote?.preco || '2.500' }}</span>
+        <span class="price-value">R$ {{bundleClass.initialPrice}}</span>
         <span class="price-note">por pessoa</span>
       </div>
     </div>
@@ -44,7 +43,7 @@
       <div class="card mb-4">
         <div class="card-body">
           <h3 class="card-title fw-bold mb-3">{{ pacote?.titulo || 'Recife - São Paulo' }}</h3>
-          <h4 class="text-primary fw-bold mb-3">R$ {{ pacote?.preco || '2500' }}</h4>
+          <h4 class="text-primary fw-bold mb-3">R$ {{bundleClass.initialPrice}}</h4>
 
           <!-- Avaliação -->
           <div class="d-flex align-items-center mb-4">
@@ -63,7 +62,7 @@
                 </div>
                 <div>
                   <small class="text-muted d-block">Data de Partida</small>
-                  <strong>{{ pacote?.dataIda || '12/01/2025' }}</strong>
+                  <strong>{{bundleClass.initialDate}}</strong>
                 </div>
               </div>
 
@@ -73,7 +72,7 @@
                 </div>
                 <div>
                   <small class="text-muted d-block">Data de Retorno</small>
-                  <strong>{{ pacote?.dataVolta || '12/01/2025' }}</strong>
+                  <strong>{{bundleClass.finalDate}}</strong>
                 </div>
               </div>
 
@@ -156,10 +155,7 @@
         </div>
         <div class="card-body">
           <p class="text-muted">
-            {{ pacote?.descricaoCompleta || 'Descubra as maravilhas de Recife e São Paulo em uma viagem inesquecível.
-            Este pacote oferece uma experiência completa com hospedagem de qualidade, transfers inclusos e as principais
-            atrações de ambas as cidades. Explore a rica cultura nordestina em Recife e a vibrante metrópole paulista,
-            com guias especializados e roteiros personalizados.' }}
+            {{bundleClass.descricao}}
           </p>
         </div>
       </div>

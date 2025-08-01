@@ -22,7 +22,7 @@ export const routes: Routes = [
   { path: 'bundles', component: Bundle },
   { path: 'booking', component: Booking },
   { path: 'my-booking', component: MyBooking },
-  { path: 'details-bundle', component: DetailsBundle },
+  { path: 'bundles/details-bundle/:id', component: DetailsBundle },
   { path: 'payment', component: Payment },
   { path: 'auth', children: AUTH_ROUTES },
   { path: 'profile', component: Profile},
