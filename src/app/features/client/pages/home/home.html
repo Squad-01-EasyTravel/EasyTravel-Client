@@ -39,7 +39,7 @@
                 <div class="search-row">
                   <div class="search-field">
                     <label class="search-label">Local de Partida</label>
-                    <select class="search-select">
+                    <select class="search-select" [(ngModel)]="origemSelecionada">
                       <option value="">Selecione sua cidade</option>
                       <option value="sao-paulo">São Paulo, SP</option>
                       <option value="rio-janeiro">Rio de Janeiro, RJ</option>
@@ -53,10 +53,9 @@
                       <option value="manaus">Manaus, AM</option>
                     </select>
                   </div>
-
                   <div class="search-field">
                     <label class="search-label">Local de Destino</label>
-                    <select class="search-select">
+                    <select class="search-select" [(ngModel)]="destinoSelecionada">
                       <option value="">Para onde você quer ir?</option>
                       <option value="lisboa">Lisboa, Portugal</option>
                       <option value="paris">Paris, França</option>
@@ -72,29 +71,11 @@
                   </div>
                 </div>
 
-                <div class="search-row">
-                  <div class="search-field">
-                    <label class="search-label">Convidados</label>
-                    <select class="search-select">
-                      <option value="1">1 Pessoa</option>
-                      <option value="2" selected>2 Pessoas</option>
-                      <option value="3">3 Pessoas</option>
-                      <option value="4">4 Pessoas</option>
-                      <option value="5">5 Pessoas</option>
-                      <option value="6">6 Pessoas</option>
-                      <option value="7">7 Pessoas</option>
-                      <option value="8">8 Pessoas</option>
-                      <option value="9">9+ Pessoas</option>
-                    </select>
-                  </div>
+                
 
-                  <div class="search-field">
-                    <label class="search-label">Data de Partida</label>
-                    <input type="date" class="search-input" value="2025-08-15">
-                  </div>
-                </div>
+                  
 
-                <button class="search-btn">
+                <button class="search-btn" (click)="buscarViagens()">
                   <i class="fas fa-search"></i>
                   Buscar Viagens
                 </button>
