@@ -57,34 +57,34 @@
             <div class="package-card">
               <div class="selected-package-card">
                 <div class="package-image-container">
-                  <img [src]="currentPackage.imageUrl || '/assets/imgs/fortaleza.jpg'"
+                  <img [src]=" '/assets/imgs/fortaleza.jpg'"
                        class="package-image"
-                       [alt]="currentPackage.title">
+                       [alt]="currentBundle.bundleTitle">
                   <div class="package-badge">
                     <i class="fas fa-star"></i>
-                    {{currentPackage.rating || '4.8'}}
+                    {{currentBundle.bundleRank}}
                   </div>
                 </div>
 
                 <div class="package-details">
                   <div class="package-header">
-                    <h3 class="package-title">{{currentPackage.title || 'Pacote de Viagem'}}</h3>
-                    <div class="package-category">{{currentPackage.category || 'PADRÃO'}}</div>
+                    <h3 class="package-title">{{currentBundle.bundleTitle}}</h3>
+                    <div class="package-category">{{currentBundle.bundleRank}}</div>
                   </div>
 
                   <div class="package-info">
                     <div class="info-item">
                       <i class="fas fa-calendar-alt"></i>
-                      <span>{{currentPackage.startDate || '15/08/2024'}} - {{currentPackage.endDate || '22/08/2024'}}</span>
+                      <span>{{currentBundle.initialDate}} - {{currentBundle.finalDate}}</span>
                     </div>
                     <div class="info-item">
                       <i class="fas fa-users"></i>
-                      <span>{{currentPackage.travelers || 1}} viajantes</span>
+                      <span>{{currentBundle.travelersNumber}} viajantes</span>
                       <div class="traveler-controls">
                         <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.travelers - 1)">
                           <i class="fas fa-minus"></i>
                         </button>
-                        <span class="traveler-count">{{currentPackage.travelers}}</span>
+                        <span class="traveler-count">{{currentBundle.travelersNumber}}</span>
                         <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.travelers + 1)">
                           <i class="fas fa-plus"></i>
                         </button>
@@ -97,7 +97,7 @@
                   </div>
 
                   <div class="package-description">
-                    <p>{{currentPackage.description || 'Explore destinos incríveis com todo conforto e segurança.'}}</p>
+                    <p>{{currentBundle.bundleDescription}}</p>
                   </div>
 
                   <div class="package-includes">
@@ -112,7 +112,7 @@
 
                   <div class="package-price-summary">
                     <div class="price-item">
-                      <span class="price-label">Preço total ({{currentPackage.travelers}} pessoas)</span>
+                      <span class="price-label">Preço total ({{currentBundle.travelersNumber}} pessoas)</span>
                       <span class="price-value">R$ {{getFormattedBasePrice(currentPackage)}}</span>
                     </div>
                   </div>

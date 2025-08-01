@@ -4,6 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Navbar } from "../../../../shared/navbar/navbar";
 import { Footer } from "../../../../shared/footer/footer";
+import { CurrentUser } from './classe/current-user';
+import { BookingService } from '@/app/shared/services/booking.service';
+import { BundleService } from '@/app/shared/services/bundle-service';
+import { BundleClass } from '../bundle/class/bundle-class';
 
 interface SelectedPackage {
   id: string;
@@ -101,26 +105,33 @@ export class Booking implements OnInit {
   }
 
   constructor(
-    private router: Router
+    private router: Router,
+    private service: BookingService,
+    private bundleService: BundleService
   ) {}
 
+  currentUser: CurrentUser = new CurrentUser();
+  currentBundle: BundleClass = new BundleClass();
+
   ngOnInit(): void {
-    this.loadUserProfile();
+    this.getLoggedUser();
+    console.log(this.currentUser);
     this.initializeTravelersForCurrentPackage();
     this.calculateTotalPrice();
     this.loadBookingData();
   }
 
-  loadUserProfile(): void {
-    // Dados mockados para teste
-    this.userProfile = {
-      fullName: 'João Silva Santos',
-      birthDate: '1990-05-15',
-      cpf: '123.456.789-00',
-      rg: '12.345.678-9',
-      email: 'joao.silva@email.com',
-      phone: '(11) 99999-9999'
-    };
+  getLoggedUser() {
+    this.service.getCurrentUser().subscribe(res => {
+      this.currentUser = res;
+      this.getLoggedBundle();
+    });
+  }
+
+  getLoggedBundle() {
+    const id = this.currentUser.bundleId;
+    this.bundleService.getBundleById(id)
+    .subscribe(res => this.currentBundle = res)
   }
 
   initializeTravelersForCurrentPackage(): void {
@@ -235,7 +246,9 @@ export class Booking implements OnInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
-  }  loadBookingData(): void {
+  }  
+
+  loadBookingData(): void {
     // Simular carregamento de dados do backend
     console.log('Loading booking data from backend...');
 
