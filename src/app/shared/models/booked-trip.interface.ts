@@ -5,9 +5,13 @@ export interface BookedTrip {
   destination: string;
   departureDate: string;
   returnDate: string;
-  status: 'Finalizado' | 'Confirmado' | 'Pendente' | 'Cancelado';
+  status: 'Confirmado' | 'Pendente' | 'Cancelado';
   orderId: string;
   price: number;
+  duration?: number; // duração em dias
+  paymentMethod?: string; // forma de pagamento
+  rating?: number; // média de avaliação
+  description?: string; // descrição da viagem
 }
 
-export type BookingStatus = 'Finalizado' | 'Confirmado' | 'Pendente' | 'Cancelado';
+export type BookingStatus = 'Confirmado' | 'Pendente' | 'Cancelado';
