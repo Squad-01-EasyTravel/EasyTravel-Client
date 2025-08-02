@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 
 
 // export interface RoleClient{
-//   
+//
 // }
 
 export interface LoginDto {
@@ -23,7 +23,7 @@ export interface RegisterClientDto {
   password: string;
   telephone: string;
   role? : string;
-  
+
 }
 
 export interface User {
@@ -52,7 +52,7 @@ export class AuthService {
 
 
 
-    
+
   }
 
    getUserRoleFromToken(): string | null {
@@ -61,19 +61,31 @@ export class AuthService {
 
     try {
       const decoded: any = jwtDecode(token);
-      
-      return decoded.id || null;
+
+      return decoded.role || null;
     } catch (error) {
       console.error('Erro ao decodificar o token:', error);
       return null;
     }
   }
 
- 
+  // Verificar se o usuário tem acesso administrativo
+  hasAdminAccess(): boolean {
+    const role = this.getUserRoleFromToken();
+    return role === 'ADMIN' || role === 'EMPLOYEE';
+  }
+
+  // Obter o role atual do usuário
+  getCurrentUserRole(): string | null {
+    return this.getUserRoleFromToken();
+  }
+
+
 
   login(data: LoginDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
       tap(response => {
+        console.log('Login bem sucedido, salvando dados:', response);
         this.setToken(response.token);
         this.setCurrentUser(response.user);
         localStorage.setItem('jwt', response.token);
@@ -81,6 +93,7 @@ export class AuthService {
         try {
           const decoded: any = jwtDecode(response.token);
           console.log('Role do usuário autenticado:', decoded.role);
+          console.log('Token decodificado:', decoded);
         } catch (error) {
           console.error('Erro ao decodificar o token:', error);
         }
@@ -95,7 +108,7 @@ export class AuthService {
           this.setToken(response.token);
           this.setCurrentUser(response.user);
           localStorage.setItem('jwt', response.token);
-          
+
         } else {
           throw new Error('Resposta de registro inválida.');
         }
@@ -104,11 +117,22 @@ export class AuthService {
   }
 
   logout(): void {
+    // Limpar todos os dados do localStorage
     localStorage.removeItem('jwt');
-    this.router.navigate(['/home']);
-  }
+    localStorage.removeItem('user');
 
-  setToken(token: string): void {
+    // Notificar observadores que o usuário foi deslogado
+    this.currentUserSubject.next(null);
+
+    // Só redirecionar se estivermos em uma rota protegida
+    const currentUrl = this.router.url;
+    const publicRoutes = ['/', '/home', '/bundles', '/auth/login', '/auth/register'];
+    const isInPublicRoute = publicRoutes.some(route => currentUrl === route || currentUrl.startsWith('/auth'));
+
+    if (!isInPublicRoute) {
+      this.router.navigate(['/home']);
+    }
+  }  setToken(token: string): void {
     localStorage.setItem('jwt', token);
   }
 
@@ -121,11 +145,6 @@ export class AuthService {
       localStorage.setItem('user', JSON.stringify(user));
       this.currentUserSubject.next(user);
     }
-
-  //    setCurrentUser(user: User): void {
-  //   localStorage.setItem('user', JSON.stringify(user));
-  //   this.currentUserSubject.next(user);
-  // }
   }
 
   getCurrentUser(): User | null {
@@ -155,13 +174,55 @@ export class AuthService {
   }
 
   checkAuthStatus(): void {
-    
     const token = this.getToken();
-    (!token && !this.isAuthenticated()) ?? this.logout(); 
+
+    if (token) {
+      if (this.isAuthenticated()) {
+        // Se há um token válido, recuperar dados do usuário
+        let user = this.getCurrentUser();
+
+        // Se não há usuário no localStorage, tentar extrair do token
+        if (!user) {
+          try {
+            const decoded: any = jwtDecode(token);
+            user = {
+              id: decoded.id || decoded.sub,
+              name: decoded.name || decoded.username || 'Usuário',
+              email: decoded.email,
+              cpf: decoded.cpf || '',
+              telephone: decoded.telephone || '',
+              role: decoded.role || 'CLIENT'
+            };
+            // Salvar o usuário extraído do token
+            this.setCurrentUser(user);
+          } catch (error) {
+            console.error('Erro ao extrair usuário do token:', error);
+          }
+        }
+
+        if (user) {
+          this.currentUserSubject.next(user);
+        }
+      } else {
+        // Token existe mas está inválido/expirado - limpar sem redirecionar
+        this.clearAuthData();
+      }
+    } else {
+      // Não há token - usuário nunca fez login ou já fez logout
+      // Apenas garantir que os dados estão limpos, sem redirecionar
+      this.clearAuthData();
+    }
   }
 
-    
- 
+  // Método para limpar dados de autenticação sem redirecionamento
+  private clearAuthData(): void {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
+  }
+
+
+
 
   // Método para obter informações do perfil do usuário (para o booking)
   getUserProfile(): Observable<User> {
