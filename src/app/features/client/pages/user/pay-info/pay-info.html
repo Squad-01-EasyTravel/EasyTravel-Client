@@ -1,0 +1,271 @@
+<app-navbar></app-navbar>
+
+<div class="profile-main-container">
+    <div class="upper-side">
+        <div class="upper-side-header">
+            <h3>Perfil</h3>
+            <!-- Botão mobile Bootstrap -->
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#profileSidebar" aria-controls="profileSidebar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <hr class="profile-divider">
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Desktop -->
+            <div class="col-lg-2 d-none d-lg-block sidebar-container">
+                <div class="sidebar-menu">
+                    <p><a routerLink="/profile">Informação da Conta</a></p>
+                    <p><a routerLink="/profile/paymentinformation" class="active">Informação de Pagamento</a></p>
+                    <p><a routerLink="/profile">Histórico de Viagens</a></p>
+                </div>
+            </div>
+
+            <!-- Sidebar Mobile (Offcanvas) -->
+            <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="profileSidebar" aria-labelledby="profileSidebarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="profileSidebarLabel">Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body p-0">
+                    <div class="sidebar-menu">
+                        <p><a routerLink="/profile" data-bs-dismiss="offcanvas">Informação da Conta</a></p>
+                        <p><a routerLink="/profile/paymentinformation" class="active" data-bs-dismiss="offcanvas">Informação de Pagamento</a></p>
+                        <p><a routerLink="/profile" data-bs-dismiss="offcanvas">Histórico de Viagens</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-10 main-content">
+                <div class="main-content-upper">
+                    <div class="upper-side-content">
+                        <h3>Informação de Pagamento</h3>
+                        <p>Gerencie seus cartões e formas de pagamento de forma segura. Adicione novos métodos ou edite os existentes.</p>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" (click)="openAddCardModal()">
+                            <i class="bi bi-plus-circle"></i> Adicionar Cartão
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="profile-divider-smaller">
+
+                <!-- Cards de Pagamento -->
+                <div class="payment-cards-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-credit-card-2-front"></i>
+                        Seus Cartões de Crédito
+                    </h4>
+
+                    <div class="payment-cards-grid">
+                        <!-- Cartão Principal (Default) -->
+                        <div class="payment-card default-card">
+                            <div class="card-header">
+                                <div class="card-brand">
+                                    <i class="bi bi-credit-card-2-front brand-icon visa"></i>
+                                    <span class="brand-name">Visa</span>
+                                </div>
+                                <div class="card-actions">
+                                    <span class="default-badge">
+                                        <i class="bi bi-star-fill"></i> Principal
+                                    </span>
+                                    <div class="action-buttons">
+                                        <button class="btn-icon edit-btn" (click)="editCard(1)" title="Editar cartão">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn-icon delete-btn" (click)="deleteCard(1)" title="Remover cartão">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-number">
+                                    <span class="dots">••••</span>
+                                    <span class="dots">••••</span>
+                                    <span class="dots">••••</span>
+                                    <span class="last-digits">1234</span>
+                                </div>
+                                <div class="card-details">
+                                    <div class="cardholder-name">João Silva</div>
+                                    <div class="expiry-date">12/26</div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">Adicionado em 15/01/2025</small>
+                            </div>
+                        </div>
+
+                        <!-- Cartão Secundário -->
+                        <div class="payment-card">
+                            <div class="card-header">
+                                <div class="card-brand">
+                                    <i class="bi bi-credit-card-2-front brand-icon mastercard"></i>
+                                    <span class="brand-name">Mastercard</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn-set-default" (click)="setAsDefault(2)">
+                                        <i class="bi bi-star"></i> Definir como Principal
+                                    </button>
+                                    <div class="action-buttons">
+                                        <button class="btn-icon edit-btn" (click)="editCard(2)" title="Editar cartão">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn-icon delete-btn" (click)="deleteCard(2)" title="Remover cartão">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-number">
+                                    <span class="dots">••••</span>
+                                    <span class="dots">••••</span>
+                                    <span class="dots">••••</span>
+                                    <span class="last-digits">5678</span>
+                                </div>
+                                <div class="card-details">
+                                    <div class="cardholder-name">João Silva</div>
+                                    <div class="expiry-date">08/27</div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">Adicionado em 20/03/2025</small>
+                            </div>
+                        </div>
+
+                        <!-- Card para adicionar novo -->
+                        <div class="payment-card add-new-card" (click)="openAddCardModal()">
+                            <div class="add-card-content">
+                                <div class="add-icon">
+                                    <i class="bi bi-plus-circle-dotted"></i>
+                                </div>
+                                <h5>Adicionar Novo Cartão</h5>
+                                <p>Clique aqui para adicionar um novo método de pagamento</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações de Segurança -->
+                <div class="security-section">
+                    <h4 class="section-title">
+                        <i class="bi bi-shield-check"></i>
+                        Segurança dos seus Dados
+                    </h4>
+
+                    <div class="security-card">
+                        <div class="security-content">
+                            <div class="security-item">
+                                <i class="bi bi-lock-fill"></i>
+                                <span>Todas as informações são criptografadas com SSL 256-bit</span>
+                            </div>
+                            <div class="security-item">
+                                <i class="bi bi-eye-slash-fill"></i>
+                                <span>Nunca compartilhamos seus dados com terceiros</span>
+                            </div>
+                            <div class="security-item">
+                                <i class="bi bi-credit-card-2-back"></i>
+                                <span>Processamento seguro via gateway de pagamento certificado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Adicionar/Editar Cartão -->
+<div class="modal fade" id="cardModal" tabindex="-1" aria-labelledby="cardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cardModalLabel">
+                    <i class="bi bi-credit-card-plus"></i>
+                    {{ isEditMode ? 'Editar Cartão' : 'Adicionar Novo Cartão' }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="card-form">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="cardNumber" class="form-label">
+                                    <i class="bi bi-credit-card"></i> Número do Cartão
+                                </label>
+                                <input type="text" class="form-control" id="cardNumber"
+                                       placeholder="1234 5678 9012 3456" maxlength="19">
+                                <div class="card-brand-indicator">
+                                    <i class="bi bi-credit-card-2-front"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="cardName" class="form-label">
+                                    <i class="bi bi-person"></i> Nome no Cartão
+                                </label>
+                                <input type="text" class="form-control" id="cardName"
+                                       placeholder="Nome como está impresso no cartão">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="cardExpiry" class="form-label">
+                                    <i class="bi bi-calendar"></i> Validade
+                                </label>
+                                <input type="text" class="form-control" id="cardExpiry"
+                                       placeholder="MM/AA" maxlength="5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="cardCVV" class="form-label">
+                                    <i class="bi bi-shield-lock"></i> CVV
+                                </label>
+                                <input type="text" class="form-control" id="cardCVV"
+                                       placeholder="123" maxlength="4">
+                                <small class="form-text text-muted">
+                                    3 dígitos no verso (4 para Amex)
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="setAsDefault">
+                                    <label class="form-check-label" for="setAsDefault">
+                                        <i class="bi bi-star"></i> Definir como cartão principal
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="saveCard()">
+                    <i class="bi bi-check-circle"></i>
+                    {{ isEditMode ? 'Salvar Alterações' : 'Adicionar Cartão' }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1312 @@
+<div class="d-flex">
+  <div class="container-fluid">
+    <!-- Hero Header Section com Bootstrap -->
+    <div class="hero-section position-relative mb-4">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="container position-relative">
+        <div class="row align-items-center py-5">
+          <div class="col-lg-8">
+            <div class="hero-content text-white">
+              <!-- Badge animado -->
+              <span
+                class="hero-badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill mb-3 d-inline-flex align-items-center">
+                <i class="fas fa-plane me-2 text-warning"></i>
+                <span class="fw-semibold">Gerenciamento de Pacotes</span>
+              </span>
+
+              <!-- Título com gradiente -->
+              <h1 class="hero-title display-3 fw-bold mb-3">
+                Pacotes de <span class="text-gradient">Viagem</span>
+              </h1>
+
+              <!-- Subtítulo -->
+              <p class="hero-description lead mb-4 opacity-75">
+                Crie, edite e gerencie experiências únicas para seus clientes com nossa plataforma intuitiva e moderna
+              </p>
+
+              <!-- Estatísticas melhoradas com cores -->
+              <div class="row g-3 text-center hero-stats">
+                <div class="col-4">
+                  <div class="stats-card stats-total bg-primary bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{packages.length}}</h3>
+                    <small class="stats-label fw-semibold">Pacotes Totais</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div
+                    class="stats-card stats-available bg-success bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{getAvailablePackagesCount()}}</h3>
+                    <small class="stats-label fw-semibold">Disponíveis</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="stats-card stats-inactive bg-warning bg-opacity-90 text-dark rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{getUnavailablePackagesCount()}}</h3>
+                    <small class="stats-label fw-semibold">Inativos</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 text-center">
+            <div class="hero-action">
+              <button class="btn-create-main btn btn-light btn-lg px-5 py-3 shadow-lg rounded-4 fw-bold"
+                (click)="openCreateModal()">
+                <i class="fas fa-plus me-2"></i>
+                Criar Pacote
+              </button>
+              <div class="hero-decorations mt-4">
+                <div class="floating-element element-1">
+                  <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="floating-element element-2">
+                  <i class="fas fa-suitcase"></i>
+                </div>
+                <div class="floating-element element-3">
+                  <i class="fas fa-plane"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section Modernizada -->
+    <div class="container mb-4">
+      <div class="search-section-modern">
+        <div class="card border-0 shadow-lg search-card">
+          <div class="card-body p-0">
+            <!-- Header da seção de busca -->
+            <div class="search-header p-4">
+              <div class="row align-items-center">
+                <div class="col">
+                  <div class="search-title-container">
+                    <div class="search-icon-wrapper me-3">
+                      <i class="fas fa-search"></i>
+                    </div>
+                    <div>
+                      <h5 class="search-title mb-1 fw-bold text-white">
+                        Buscar Pacotes
+                      </h5>
+                      <p class="search-subtitle text-white mb-0 opacity-90">
+                        Encontre rapidamente o ue você procura
+                     </p>
+                   </div>
+                  </div>
+               </div>
+                <div class="col-auto">
+                  <div class="search-actions">
+                   <button class="btn btn-search-action" (click)="openFilterModal()" title="Filtros avançados">
+                      <i class="fas fa-sliders-h"></i>
+                    </button>
+                    <button class="btn btn-search-action" title="Limpar filtros">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Área de busca -->
+            <div class="search-content p-4">
+              <div class="search-input-container">
+                <div class="search-input-wrapper">
+                  <div class="search-input-icon">
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <input type="text"
+                         class="search-input-field"
+                         placeholder="Digite o nome do pacote, destino ou categoria..."
+                         #searchInput>
+                  <div class="search-input-actions">
+                    <button type="button" class="btn-clear-search" title="Limpar busca">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Tags de filtros ativos (visual) -->
+                <div class="active-filters-container">
+                  <!-- As tags de filtros aparecerão aqui quando filtros forem aplicados -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Grid de Pacotes -->
+    <div class="container packages-section" *ngIf="getPaginatedPackages().length > 0">
+      <div class="packages-grid row g-4">
+        <div class="col-xl-4 col-lg-6" *ngFor="let package of getPaginatedPackages()">
+          <div class="package-card card h-100 border-0 shadow-sm">
+            <!-- Imagem do Card com overlay melhorado -->
+            <div class="card-image-container position-relative overflow-hidden">
+              <img [src]="package.imageUrl" [alt]="package.bundleTitle"
+                class="card-img-top w-100 h-100 object-fit-cover">
+
+              <!-- Gradient overlay -->
+              <div class="image-overlay position-absolute top-0 start-0 w-100 h-100"></div>
+
+              <!-- Badges flutuantes -->
+              <div
+                class="card-badges position-absolute top-0 start-0 w-100 p-3 d-flex justify-content-between align-items-start">
+                <!-- Rank Badge -->
+                <span class="rank-badge badge rounded-pill px-3 py-2 fw-bold"
+                  [class]="'rank-' + package.bundleRank.toLowerCase()">
+                  <i class="fas fa-star me-1"></i>
+                  {{package.bundleRank}}
+                </span>
+
+                <!-- Status Badge -->
+                <span class="status-badge badge rounded-pill px-3 py-2 fw-bold" [class.bg-success]="package.available"
+                  [class.bg-danger]="!package.available">
+                  <i class="fas fa-circle pulse-dot me-1"></i>
+                  {{ package.available ? 'Disponível' : 'Indisponível' }}
+                </span>
+              </div>
+
+              <!-- Price Tag -->
+              <div class="price-tag position-absolute bottom-0 end-0 m-3">
+                <div class="bg-white rounded-3 px-3 py-2 shadow-sm">
+                  <small class="text-muted d-block">a partir de</small>
+                  <strong class="text-primary h5 mb-0">R$ {{ package.initialPrice | number:'1.0-0' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conteúdo do Card melhorado -->
+            <div class="card-body d-flex flex-column p-4">
+              <!-- Header com título -->
+              <div class="package-header mb-3">
+                <h5 class="package-title card-title fw-bold mb-2 text-truncate-2">
+                  {{ package.bundleTitle }}
+                </h5>
+                <div class="package-meta d-flex align-items-center text-muted small">
+                  <i class="fas fa-calendar-alt me-1"></i>
+                  <span>Criado em {{ package.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+
+              <!-- Descrição -->
+              <p class="package-description card-text text-muted mb-3 text-truncate-2">
+                {{ package.bundleDescription }}
+              </p>
+
+              <!-- Detalhes em pills -->
+              <div class="package-details mb-3">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <div class="detail-pill bg-light rounded-pill p-2 text-center">
+                      <i class="fas fa-calendar-alt text-primary d-block mb-1"></i>
+                      <small class="fw-semibold d-block">{{ package.initialDate | date:'dd/MM' }} - {{ package.finalDate
+                        | date:'dd/MM' }}</small>
+                      <small class="text-muted" style="font-size: 0.7rem;">Período</small>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="detail-pill bg-light rounded-pill p-2 text-center">
+                      <i class="fas fa-ticket-alt text-warning d-block mb-1"></i>
+                      <small class="fw-semibold d-block">{{ package.quantity }} vagas</small>
+                      <small class="text-muted" style="font-size: 0.7rem;">Disponível</small>
+                    </div>
+                  </div>
+                  <div class="col-6" *ngIf="package.videoUrl">
+                    <div class="detail-pill bg-light rounded-pill p-2 text-center">
+                      <i class="fas fa-video text-info d-block mb-1"></i>
+                      <small class="fw-semibold d-block">
+                        <a [href]="package.videoUrl" target="_blank" class="text-decoration-none">
+                          Ver vídeo
+                        </a>
+                      </small>
+                      <small class="text-muted" style="font-size: 0.7rem;">Mídia</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botões de ação premium redesignados -->
+              <div class="card-actions mt-auto">
+                <div class="action-buttons-grid">
+                  <!-- Botão Editar -->
+                  <button class="btn-action btn-edit" (click)="openEditModal(package)"
+                    title="Editar informações do pacote">
+                    <div class="btn-icon">
+                      <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="btn-content">
+                      <span class="btn-label">Editar</span>
+                      <small class="btn-desc">Modificar dados</small>
+                    </div>
+                  </button>
+
+                  <!-- Botão Ativar/Desativar -->
+                  <button class="btn-action" [class.btn-activate]="!package.available"
+                    [class.btn-deactivate]="package.available" (click)="toggleAvailability(package)"
+                    [title]="package.available ? 'Desativar pacote' : 'Ativar pacote'">
+                    <div class="btn-icon">
+                      <i class="fas" [class.fa-play-circle]="!package.available"
+                        [class.fa-pause-circle]="package.available"></i>
+                    </div>
+                    <div class="btn-content">
+                      <span class="btn-label">{{ package.available ? 'Pausar' : 'Ativar' }}</span>
+                      <small class="btn-desc">{{ package.available ? 'Tornar inativo' : 'Tornar ativo' }}</small>
+                    </div>
+                  </button>
+
+                  <!-- Botão Visualizar -->
+                  <button class="btn-action btn-view" (click)="openViewModal(package)" title="Visualizar detalhes completos">
+                    <div class="btn-icon">
+                      <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="btn-content">
+                      <span class="btn-label">Ver</span>
+                      <small class="btn-desc">Detalhes</small>
+                    </div>
+                  </button>
+
+                  <!-- Botão Excluir -->
+                  <button class="btn-action btn-delete" (click)="deletePackage(package.id)"
+                    title="Excluir pacote permanentemente">
+                    <div class="btn-icon">
+                      <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="btn-content">
+                      <span class="btn-label">Excluir</span>
+                      <small class="btn-desc">Remover</small>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- Paginação Premium com Bootstrap -->
+    <div class="container mt-5" *ngIf="packages.length > 0">
+      <div class="pagination-section">
+        <div class="card border-0 shadow-lg">
+          <div class="card-body p-4">
+            <div class="row align-items-center">
+              <!-- Informações da página -->
+              <div class="col-md-4">
+                <div class="pagination-info">
+                  <h6 class="mb-1 fw-bold text-primary">Resultados</h6>
+                  <p class="text-muted mb-0">
+                    Mostrando <strong class="text-primary">{{getDisplayStart()}}-{{getDisplayEnd()}}</strong>
+                    de <strong class="text-primary">{{packages.length}}</strong> pacotes
+                  </p>
+                </div>
+              </div>
+
+              <!-- Controles de paginação -->
+              <div class="col-md-4 text-center" *ngIf="getTotalPages() > 1">
+                <nav aria-label="Navegação de páginas">
+                  <ul class="pagination pagination-lg justify-content-center mb-0 custom-pagination">
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                      <button class="page-link" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+                        <i class="fas fa-chevron-left"></i>
+                      </button>
+                    </li>
+
+                    <li class="page-item" *ngFor="let page of getVisiblePages()" [class.active]="page === currentPage"
+                      [class.disabled]="page === '...'">
+                      <button class="page-link" (click)="changePage(page)" [disabled]="page === '...'">
+                        {{page}}
+                      </button>
+                    </li>
+
+                    <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+                      <button class="page-link" (click)="changePage(currentPage + 1)"
+                        [disabled]="currentPage === getTotalPages()">
+                        <i class="fas fa-chevron-right"></i>
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+
+              <!-- Seletor de itens por página -->
+              <div class="col-md-4 text-end">
+                <div class="page-size-controls d-flex align-items-center justify-content-end">
+                  <label class="text-muted me-3 mb-0 fw-semibold">
+                    <i class="fas fa-list me-1"></i>
+                    Itens por página:
+                  </label>
+                  <select [(ngModel)]="pageSize" (change)="onPageSizeChange()"
+                    class="form-select form-select-lg custom-select" style="width: auto;">
+                    <option value="6">6</option>
+                    <option value="12">12</option>
+                    <option value="18">18</option>
+                    <option value="24">24</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State Premium -->
+    <div class="container empty-state-section" *ngIf="packages.length === 0">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="empty-state-card text-center p-5">
+            <!-- Illustration -->
+            <div class="empty-illustration mb-4">
+              <div class="illustration-container">
+                <div class="floating-icons">
+                  <i class="fas fa-suitcase-rolling icon-1"></i>
+                  <i class="fas fa-plane icon-2"></i>
+                  <i class="fas fa-map-marker-alt icon-3"></i>
+                  <i class="fas fa-camera icon-4"></i>
+                </div>
+                <div class="main-illustration">
+                  <i class="fas fa-suitcase-rolling"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="empty-content">
+              <h2 class="empty-title fw-bold mb-3">Nenhum pacote encontrado</h2>
+              <p class="empty-description text-muted mb-4 lead">
+                Comece criando seu primeiro pacote de viagem e ofereça experiências
+                incríveis aos seus clientes. Nossa plataforma facilita todo o processo!
+              </p>
+
+              <!-- Features -->
+              <div class="empty-features row g-3 mb-5">
+                <div class="col-md-4">
+                  <div class="feature-card p-3 rounded-4">
+                    <div class="feature-icon mb-2">
+                      <i class="fas fa-star text-warning"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1">Gerencie facilmente</h6>
+                    <small class="text-muted">Interface intuitiva e moderna</small>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="feature-card p-3 rounded-4">
+                    <div class="feature-icon mb-2">
+                      <i class="fas fa-map-marker-alt text-primary"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1">Organize destinos</h6>
+                    <small class="text-muted">Estruture rotas e experiências</small>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="feature-card p-3 rounded-4">
+                    <div class="feature-icon mb-2">
+                      <i class="fas fa-users text-success"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1">Atenda clientes</h6>
+                    <small class="text-muted">Proporcione experiências únicas</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CTA Button -->
+              <button class="btn-create-first btn btn-primary btn-lg px-5 py-3 rounded-4 fw-bold"
+                (click)="openCreateModal()">
+                <i class="fas fa-plus me-2"></i>
+                Criar Primeiro Pacote
+                <i class="fas fa-arrow-right ms-2"></i>
+              </button>
+
+              <!-- Help Text -->
+              <p class="text-muted mt-3 small">
+                <i class="fas fa-lightbulb me-1"></i>
+                Dica: Use as estatísticas acima para acompanhar o crescimento do seu negócio
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Premium Modernizado com Scroll Otimizado -->
+  <div class="modal fade modern-modal" [class.show]="isModalOpen" [style.display]="isModalOpen ? 'block' : 'none'"
+    tabindex="-1" *ngIf="isModalOpen" (click)="closeModal()">
+    <div class="modal-dialog modal-xl modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content modern-modal-content d-flex flex-column" style="max-height: 90vh;">
+
+        <!-- Header Premium do Modal - Fixo -->
+        <div class="modal-header-premium flex-shrink-0">
+          <div class="modal-header-bg"></div>
+          <div class="modal-header-content">
+            <div class="row align-items-center w-100">
+              <div class="col">
+                <div class="modal-title-section">
+                  <div class="modal-icon-container">
+                    <div class="modal-icon-wrapper">
+                      <i class="fas fa-suitcase-rolling"></i>
+                    </div>
+                  </div>
+                  <div class="modal-title-content">
+                    <h3 class="modal-title-main">
+                      {{ isEditMode ? 'Editar Pacote' : 'Criar Novo Pacote' }}
+                    </h3>
+                    <p class="modal-title-subtitle">
+                      {{ isEditMode ? 'Atualize as informações do seu pacote de viagem' : 'Crie uma nova experiência
+                      incrível para seus clientes' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-auto">
+                <button type="button" class="btn-close-premium" (click)="closeModal()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Corpo do Modal - Rolável -->
+        <div class="modal-body-premium flex-grow-1 overflow-auto" style="max-height: calc(90vh - 200px);">
+          <form (ngSubmit)="savePackage()" class="modern-form">
+
+            <!-- Seção: Informações Básicas -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="section-title-content">
+                  <h5 class="section-title">Informações Básicas</h5>
+                  <p class="section-subtitle">Defina os dados principais do seu pacote</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label for="bundleTitle" class="form-label-modern">
+                    <i class="fas fa-tag label-icon"></i>
+                    Título do Pacote
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <input type="text" id="bundleTitle" class="form-control-modern" [(ngModel)]="newPackage.bundleTitle"
+                    name="bundleTitle" placeholder="Ex: Pacote Férias Nordeste - 7 Dias" required>
+                </div>
+
+                <div class="form-group full-width">
+                  <label for="bundleDescription" class="form-label-modern">
+                    <i class="fas fa-align-left label-icon"></i>
+                    Descrição Completa
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <textarea id="bundleDescription" class="form-control-modern textarea-modern" rows="4"
+                    [(ngModel)]="newPackage.bundleDescription" name="bundleDescription"
+                    placeholder="Descreva detalhadamente o que o pacote inclui: destinos, atrações, hospedagem, alimentação..."
+                    required></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="initialPrice" class="form-label-modern">
+                    <i class="fas fa-dollar-sign label-icon"></i>
+                    Preço Inicial
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="input-group-modern">
+                    <span class="input-group-text-modern">R$</span>
+                    <input type="number" id="initialPrice" class="form-control-modern"
+                      [(ngModel)]="newPackage.initialPrice" name="initialPrice" min="0" step="0.01"
+                      placeholder="1200.00" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="bundleRank" class="form-label-modern">
+                    <i class="fas fa-star label-icon"></i>
+                    Categoria do Pacote
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <select id="bundleRank" class="form-control-modern select-modern" [(ngModel)]="newPackage.bundleRank"
+                    name="bundleRank" required>
+                    <option value="">Selecione a categoria</option>
+                    <option value="BRONZE">🥉 Bronze - Básico</option>
+                    <option value="PRATA">🥈 Prata - Intermediário</option>
+                    <option value="OURO">🥇 Ouro - Premium</option>
+                    <option value="PLATINA">💎 Platina - Luxo</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Período e Capacidade -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="section-title-content">
+                  <h5 class="section-title">Período e Capacidade</h5>
+                  <p class="section-subtitle">Configure datas e número de participantes</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="initialDate" class="form-label-modern">
+                    <i class="fas fa-play label-icon"></i>
+                    Data de Início
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <input type="datetime-local" id="initialDate" class="form-control-modern"
+                    [(ngModel)]="newPackage.initialDate" name="initialDate" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="finalDate" class="form-label-modern">
+                    <i class="fas fa-stop label-icon"></i>
+                    Data de Término
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <input type="datetime-local" id="finalDate" class="form-control-modern"
+                    [(ngModel)]="newPackage.finalDate" name="finalDate" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="quantity" class="form-label-modern">
+                    <i class="fas fa-ticket-alt label-icon"></i>
+                    Vagas Disponíveis
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <input type="number" id="quantity" class="form-control-modern" [(ngModel)]="newPackage.quantity"
+                    name="quantity" min="0" placeholder="10" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Mídia e Configurações -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                  <i class="fas fa-photo-video"></i>
+                </div>
+                <div class="section-title-content">
+                  <h5 class="section-title">Mídia e Configurações</h5>
+                  <p class="section-subtitle">Adicione imagens e vídeos para atrair mais clientes</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <!-- Upload de Imagem -->
+                <div class="form-group full-width">
+                  <label class="form-label-modern">
+                    <i class="fas fa-upload label-icon"></i>
+                    Upload de Imagem Principal
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <div class="image-upload-container">
+                    <!-- Preview da imagem atual -->
+                    <div class="image-preview-wrapper" *ngIf="newPackage.imageUrl || selectedImagePreview">
+                      <div class="image-preview">
+                        <img [src]="selectedImagePreview || newPackage.imageUrl"
+                             alt="Preview da imagem"
+                             class="preview-img">
+                        <div class="image-overlay-actions">
+                          <button type="button" class="btn-remove-image"
+                                  (click)="removeImage()"
+                                  title="Remover imagem">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                          <button type="button" class="btn-change-image"
+                                  (click)="imageFileInput.click()"
+                                  title="Alterar imagem">
+                            <i class="fas fa-edit"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Área de upload -->
+                    <div class="upload-area"
+                         *ngIf="!newPackage.imageUrl && !selectedImagePreview"
+                         [class.drag-over]="isDragOver"
+                         (click)="imageFileInput.click()"
+                         (dragover)="onDragOver($event)"
+                         (dragleave)="onDragLeave($event)"
+                         (drop)="onDrop($event)">
+                      <div class="upload-content">
+                        <div class="upload-icon">
+                          <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h6 class="upload-title">Arraste uma imagem aqui</h6>
+                        <p class="upload-subtitle">ou clique para selecionar</p>
+                        <div class="upload-formats">
+                          <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Formatos aceitos: JPG, PNG, WebP (máx. 5MB)
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Input de arquivo oculto -->
+                    <input type="file"
+                           #imageFileInput
+                           accept="image/*"
+                           (change)="onImageSelected($event)"
+                           style="display: none;">
+                  </div>
+                </div>
+
+                <!-- URL da Imagem (alternativa) -->
+                <div class="form-group">
+                  <label for="imageUrl" class="form-label-modern">
+                    <i class="fas fa-link label-icon"></i>
+                    OU URL da Imagem
+                  </label>
+                  <input type="url" id="imageUrl" class="form-control-modern"
+                         [(ngModel)]="newPackage.imageUrl"
+                         name="imageUrl"
+                         placeholder="https://exemplo.com/imagem.jpg"
+                         (ngModelChange)="onImageUrlChange($event)">
+                  <small class="form-text text-muted">
+                    <i class="fas fa-lightbulb me-1"></i>
+                    Cole o link direto de uma imagem da internet
+                  </small>
+                </div>
+
+                <!-- URL do Vídeo -->
+                <div class="form-group">
+                  <label for="videoUrl" class="form-label-modern">
+                    <i class="fas fa-video label-icon"></i>
+                    URL do Vídeo (Opcional)
+                  </label>
+                  <input type="url" id="videoUrl" class="form-control-modern"
+                         [(ngModel)]="newPackage.videoUrl"
+                         name="videoUrl"
+                         placeholder="https://exemplo.com/video.mp4">
+                  <small class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    YouTube, Vimeo ou link direto do vídeo
+                  </small>
+                </div>
+
+                <!-- Informações Adicionais -->
+                <div class="form-group full-width">
+                  <label for="additionalInfo" class="form-label-modern">
+                    <i class="fas fa-info-circle label-icon"></i>
+                    Informações Adicionais
+                  </label>
+                  <textarea id="additionalInfo" class="form-control-modern textarea-modern" rows="3"
+                    [(ngModel)]="newPackage.additionalInfo" name="additionalInfo"
+                    placeholder="Inclua informações extras como: o que está incluído, o que não está incluído, requisitos, etc."></textarea>
+                </div>
+
+                <!-- Destino e Origem -->
+                <div class="form-group">
+                  <label for="destination" class="form-label-modern">
+                    <i class="fas fa-map-marker-alt label-icon"></i>
+                    Destino
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <input type="text" id="destination" class="form-control-modern"
+                         [(ngModel)]="newPackage.destination"
+                         name="destination"
+                         placeholder="Ex: Fortaleza, CE" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="origin" class="form-label-modern">
+                    <i class="fas fa-plane-departure label-icon"></i>
+                    Origem
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <input type="text" id="origin" class="form-control-modern"
+                         [(ngModel)]="newPackage.origin"
+                         name="origin"
+                         placeholder="Ex: São Paulo, SP" required>
+                </div>
+
+                <!-- Status do Pacote -->
+                <div class="form-group full-width">
+                  <label class="form-label-modern">
+                    <i class="fas fa-toggle-on label-icon"></i>
+                    Status do Pacote
+                  </label>
+                  <div class="toggle-container">
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="newPackage.available" name="available">
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">
+                      {{ newPackage.available ? 'Ativo - Visível para clientes' : 'Inativo - Oculto para clientes' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer Premium do Modal - Fixo na parte inferior -->
+        <div class="modal-footer-premium flex-shrink-0" style="background: white; border-top: 1px solid #dee2e6; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
+          <div class="footer-actions d-flex justify-content-between align-items-center w-100 p-3">
+            <!-- Informações do formulário à esquerda -->
+            <div class="form-status-info">
+              <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                {{ isEditMode ? 'Editando pacote existente' : 'Criando novo pacote' }}
+              </small>
+            </div>
+
+            <!-- Botões de ação à direita -->
+            <div class="action-buttons d-flex gap-2">
+              <button type="button" class="btn btn-secondary-modern px-4 py-2" (click)="closeModal()">
+                <i class="fas fa-times me-2"></i>
+                Cancelar
+              </button>
+
+              <!-- Botão para modo de edição -->
+              <button type="button" class="btn btn-warning-modern px-4 py-2"
+                      *ngIf="isEditMode"
+                      (click)="savePackage()"
+                      [disabled]="!isFormValid()"
+                      title="Salvar todas as alterações feitas no pacote">
+                <i class="fas fa-save me-2"></i>
+                <span class="d-none d-sm-inline">Salvar Alterações</span>
+                <span class="d-sm-none">Salvar</span>
+              </button>
+
+              <!-- Botão para criação -->
+              <button type="button" class="btn btn-primary-modern px-4 py-2"
+                      *ngIf="!isEditMode"
+                      (click)="savePackage()"
+                      [disabled]="!isFormValid()">
+                <i class="fas fa-plus me-2"></i>
+                <span class="d-none d-sm-inline">Criar Pacote</span>
+                <span class="d-sm-none">Criar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop do Modal -->
+  <div class="modal-backdrop fade" [class.show]="isModalOpen" *ngIf="isModalOpen"></div>
+
+  <!-- Modal de Visualização (Somente Leitura) -->
+  <div class="modal fade modern-modal" [class.show]="isViewModalOpen" [style.display]="isViewModalOpen ? 'block' : 'none'"
+    tabindex="-1" *ngIf="isViewModalOpen" (click)="closeViewModal()">
+    <div class="modal-dialog modal-xl modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content modern-modal-content d-flex flex-column" style="max-height: 90vh;">
+
+        <!-- Header do Modal de Visualização -->
+        <div class="modal-header-premium flex-shrink-0">
+          <div class="modal-header-bg"></div>
+          <div class="modal-header-content">
+            <div class="row align-items-center w-100">
+              <div class="col">
+                <div class="modal-title-section">
+                  <div class="modal-icon-container">
+                    <div class="modal-icon-wrapper" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                      <i class="fas fa-eye"></i>
+                    </div>
+                  </div>
+                  <div class="modal-title-content">
+                    <h3 class="modal-title-main">
+                      Visualizar Pacote
+                    </h3>
+                    <p class="modal-title-subtitle">
+                      Veja todas as informações detalhadas do pacote selecionado
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-auto">
+                <button type="button" class="btn-close-premium" (click)="closeViewModal()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Corpo do Modal de Visualização - Rolável -->
+        <div class="modal-body-premium flex-grow-1 overflow-auto" style="max-height: calc(90vh - 200px);">
+          <div class="view-form">
+
+            <!-- Seção: Informações Básicas (Visualização) -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="section-title-content">
+                  <h5 class="section-title">Informações Básicas</h5>
+                  <p class="section-subtitle">Dados principais do pacote</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label class="form-label-modern">
+                    <i class="fas fa-tag label-icon"></i>
+                    Título do Pacote
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">{{ viewPackage?.bundleTitle }}</span>
+                  </div>
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="form-label-modern">
+                    <i class="fas fa-align-left label-icon"></i>
+                    Descrição Completa
+                  </label>
+                  <div class="view-field view-field-large">
+                    <span class="view-content">{{ viewPackage?.bundleDescription }}</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-dollar-sign label-icon"></i>
+                    Preço Inicial
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content view-price">R$ {{ viewPackage?.initialPrice | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-star label-icon"></i>
+                    Categoria do Pacote
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content view-rank" [class]="'rank-' + viewPackage?.bundleRank?.toLowerCase()">
+                      <i class="fas fa-star me-1"></i>
+                      {{ getRankDisplay(viewPackage?.bundleRank) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Período e Capacidade (Visualização) -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="section-title-content">
+                  <h5 class="section-title">Período e Capacidade</h5>
+                  <p class="section-subtitle">Datas e número de participantes</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-play label-icon"></i>
+                    Data de Início
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">{{ viewPackage?.initialDate | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-stop label-icon"></i>
+                    Data de Término
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">{{ viewPackage?.finalDate | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-ticket-alt label-icon"></i>
+                    Vagas Disponíveis
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">{{ viewPackage?.quantity }} vagas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Mídia e Configurações (Visualização) -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                  <i class="fas fa-photo-video"></i>
+                </div>
+                <div class="section-title-content">
+                  <h5 class="section-title">Mídia e Configurações</h5>
+                  <p class="section-subtitle">Imagens, vídeos e configurações</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <!-- Imagem do Pacote -->
+                <div class="form-group full-width" *ngIf="viewPackage?.imageUrl">
+                  <label class="form-label-modern">
+                    <i class="fas fa-image label-icon"></i>
+                    Imagem Principal
+                  </label>
+                  <div class="view-image-container">
+                    <img [src]="viewPackage!.imageUrl" [alt]="viewPackage!.bundleTitle" class="view-image">
+                  </div>
+                </div>
+
+                <!-- URL do Vídeo -->
+                <div class="form-group" *ngIf="viewPackage?.videoUrl">
+                  <label class="form-label-modern">
+                    <i class="fas fa-video label-icon"></i>
+                    URL do Vídeo
+                  </label>
+                  <div class="view-field">
+                    <a [href]="viewPackage!.videoUrl" target="_blank" class="view-link">
+                      <i class="fas fa-external-link-alt me-1"></i>
+                      Ver Vídeo
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Informações Adicionais -->
+                <div class="form-group full-width" *ngIf="viewPackage?.additionalInfo">
+                  <label class="form-label-modern">
+                    <i class="fas fa-info-circle label-icon"></i>
+                    Informações Adicionais
+                  </label>
+                  <div class="view-field view-field-large">
+                    <span class="view-content">{{ viewPackage!.additionalInfo }}</span>
+                  </div>
+                </div>
+
+                <!-- Destino e Origem -->
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-map-marker-alt label-icon"></i>
+                    Destino
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">
+                      <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                      {{ viewPackage?.destination }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-plane-departure label-icon"></i>
+                    Origem
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">
+                      <i class="fas fa-plane-departure text-success me-1"></i>
+                      {{ viewPackage?.origin }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Status do Pacote -->
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-toggle-on label-icon"></i>
+                    Status do Pacote
+                  </label>
+                  <div class="view-field">
+                    <span class="view-status" [class.status-active]="viewPackage?.available" [class.status-inactive]="!viewPackage?.available">
+                      <i class="fas fa-circle me-1"></i>
+                      {{ viewPackage?.available ? 'Ativo - Visível para clientes' : 'Inativo - Oculto para clientes' }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Data de Criação -->
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-calendar-plus label-icon"></i>
+                    Data de Criação
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">{{ viewPackage?.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer do Modal de Visualização -->
+        <div class="modal-footer-premium flex-shrink-0" style="background: white; border-top: 1px solid #dee2e6; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
+          <div class="footer-actions d-flex justify-content-between align-items-center w-100 p-3">
+            <!-- Informações do pacote -->
+            <div class="form-status-info">
+              <small class="text-muted">
+                <i class="fas fa-eye me-1"></i>
+                Visualizando: {{ viewPackage?.bundleTitle }}
+              </small>
+            </div>
+
+            <!-- Botões de ação -->
+            <div class="action-buttons d-flex gap-2">
+              <button type="button" class="btn btn-secondary-modern px-4 py-2" (click)="closeViewModal()">
+                <i class="fas fa-times me-2"></i>
+                Fechar
+              </button>
+
+              <button type="button" class="btn btn-primary-modern px-4 py-2" (click)="editFromView()">
+                <i class="fas fa-edit me-2"></i>
+                <span class="d-none d-sm-inline">Editar Pacote</span>
+                <span class="d-sm-none">Editar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop do Modal de Visualização -->
+  <div class="modal-backdrop fade" [class.show]="isViewModalOpen" *ngIf="isViewModalOpen"></div>
+
+  <!-- Modal de Filtros -->
+  <div class="modal fade filter-modal" [class.show]="isFilterModalOpen" [style.display]="isFilterModalOpen ? 'block' : 'none'"
+    tabindex="-1" *ngIf="isFilterModalOpen" (click)="closeFilterModal()">
+    <div class="modal-dialog modal-lg modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content filter-modal-content">
+
+        <!-- Header do Modal de Filtros -->
+        <div class="filter-modal-header">
+          <div class="filter-header-bg"></div>
+          <div class="filter-header-content">
+            <div class="row align-items-center w-100">
+              <div class="col">
+                <div class="filter-title-section">
+                  <div class="filter-icon-container">
+                    <div class="filter-icon-wrapper">
+                      <i class="fas fa-sliders-h"></i>
+                    </div>
+                  </div>
+                  <div class="filter-title-content">
+                    <h4 class="filter-title-main">
+                      Filtros Avançados
+                    </h4>
+                    <p class="filter-title-subtitle">
+                      Refine sua busca para encontrar exatamente o que procura
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-auto">
+                <button type="button" class="btn-close-filter" (click)="closeFilterModal()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Corpo do Modal de Filtros -->
+        <div class="filter-modal-body">
+          <form class="filter-form">
+
+            <!-- Seção: Categoria e Preço -->
+            <div class="filter-section">
+              <div class="filter-section-header">
+                <h6 class="filter-section-title">
+                  <i class="fas fa-star me-2"></i>
+                  Categoria e Preço
+                </h6>
+              </div>
+
+              <div class="filter-grid">
+                <!-- Categoria -->
+                <div class="filter-group">
+                  <label class="filter-label">Categoria do Pacote</label>
+                  <div class="filter-options">
+                    <div class="filter-checkbox-group">
+                      <label class="filter-checkbox">
+                        <input type="checkbox" value="BRONZE">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-label">🥉 Bronze</span>
+                      </label>
+                      <label class="filter-checkbox">
+                        <input type="checkbox" value="PRATA">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-label">🥈 Prata</span>
+                      </label>
+                      <label class="filter-checkbox">
+                        <input type="checkbox" value="OURO">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-label">🥇 Ouro</span>
+                      </label>
+                      <label class="filter-checkbox">
+                        <input type="checkbox" value="PLATINA">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-label">💎 Platina</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Faixa de Preço -->
+                <div class="filter-group">
+                  <label class="filter-label">Faixa de Preço</label>
+                  <div class="price-range-container">
+                    <div class="price-inputs">
+                      <div class="price-input-group">
+                        <span class="price-prefix">R$</span>
+                        <input type="number" class="price-input" placeholder="Min" min="0">
+                      </div>
+                      <span class="price-separator">até</span>
+                      <div class="price-input-group">
+                        <span class="price-prefix">R$</span>
+                        <input type="number" class="price-input" placeholder="Max" min="0">
+                      </div>
+                    </div>
+                    <div class="price-range-slider">
+                      <input type="range" class="range-input" min="0" max="5000" value="0">
+                      <input type="range" class="range-input" min="0" max="5000" value="5000">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Localização -->
+            <div class="filter-section">
+              <div class="filter-section-header">
+                <h6 class="filter-section-title">
+                  <i class="fas fa-map-marker-alt me-2"></i>
+                  Localização
+                </h6>
+              </div>
+
+              <div class="filter-grid">
+                <!-- Destino -->
+                <div class="filter-group">
+                  <label class="filter-label">Destino</label>
+                  <div class="filter-select-container">
+                    <select class="filter-select">
+                      <option value="">Todos os destinos</option>
+                      <option value="nordeste">Nordeste</option>
+                      <option value="sul">Sul</option>
+                      <option value="sudeste">Sudeste</option>
+                      <option value="centro-oeste">Centro-Oeste</option>
+                      <option value="norte">Norte</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Origem -->
+                <div class="filter-group">
+                  <label class="filter-label">Origem</label>
+                  <div class="filter-select-container">
+                    <select class="filter-select">
+                      <option value="">Todas as origens</option>
+                      <option value="sao-paulo">São Paulo</option>
+                      <option value="rio-de-janeiro">Rio de Janeiro</option>
+                      <option value="belo-horizonte">Belo Horizonte</option>
+                      <option value="brasilia">Brasília</option>
+                      <option value="salvador">Salvador</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Período e Capacidade -->
+            <div class="filter-section">
+              <div class="filter-section-header">
+                <h6 class="filter-section-title">
+                  <i class="fas fa-calendar-alt me-2"></i>
+                  Período e Capacidade
+                </h6>
+              </div>
+
+              <div class="filter-grid">
+                <!-- Período -->
+                <div class="filter-group full-width">
+                  <label class="filter-label">Período da Viagem</label>
+                  <div class="date-range-container">
+                    <div class="date-input-group">
+                      <input type="date" class="date-input">
+                      <span class="date-label">Data início</span>
+                    </div>
+                    <span class="date-separator">até</span>
+                    <div class="date-input-group">
+                      <input type="date" class="date-input">
+                      <span class="date-label">Data fim</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status -->
+                <div class="filter-group">
+                  <label class="filter-label">Status</label>
+                  <div class="status-toggles">
+                    <label class="status-toggle">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                      <span class="toggle-label">Disponível</span>
+                    </label>
+                    <label class="status-toggle">
+                      <input type="checkbox">
+                      <span class="toggle-slider"></span>
+                      <span class="toggle-label">Indisponível</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Footer do Modal de Filtros -->
+        <div class="filter-modal-footer">
+          <div class="filter-footer-actions">
+            <div class="filter-results-info">
+              <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                <span class="results-count">24</span> pacotes encontrados
+              </small>
+            </div>
+
+            <div class="filter-action-buttons">
+              <button type="button" class="btn btn-outline-secondary" (click)="closeFilterModal()">
+                <i class="fas fa-times me-2"></i>
+                Cancelar
+              </button>
+
+              <button type="button" class="btn btn-outline-primary">
+                <i class="fas fa-undo me-2"></i>
+                Limpar Filtros
+              </button>
+
+              <button type="button" class="btn btn-primary" (click)="closeFilterModal()">
+                <i class="fas fa-search me-2"></i>
+                Aplicar Filtros
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop do Modal de Filtros -->
+  <div class="modal-backdrop fade" [class.show]="isFilterModalOpen" *ngIf="isFilterModalOpen"></div>
+</div>

@@ -1,0 +1,367 @@
+<app-navbar></app-navbar>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-decoration"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-credit-card"></i>
+        <span>Finalizar Compra</span>
+      </div>
+      <h1 class="hero-title">Finalizar Reserva</h1>
+      <p class="hero-description">
+        Confirme seu pacote e preencha as informações dos viajantes para finalizar sua reserva com segurança.
+      </p>
+      <div class="hero-steps">
+        <div class="step active">
+          <span class="step-number">1</span>
+          <span class="step-label">Seleção</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step active">
+          <span class="step-number">2</span>
+          <span class="step-label">Revisão</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-label">Pagamento</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section class="booking-main-container">
+  <div class="container">
+    <div class="row">
+
+      <!-- Informações da Reserva -->
+      <div class="col-lg-8">
+        <div class="booking-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="fas fa-check-circle"></i>
+              Pacote Selecionado
+            </h2>
+            <p class="section-subtitle">Confirme seu pacote e preencha os dados dos viajantes</p>
+          </div>
+
+          <!-- Pacote no Carrinho -->
+          <div class="packages-container">
+            <div class="package-card">
+              <div class="selected-package-card">
+                <div class="package-image-container">
+                  <img [src]=" '/assets/imgs/fortaleza.jpg'"
+                       class="package-image"
+                       [alt]="currentBundle.bundleTitle">
+                  <div class="package-badge">
+                    <i class="fas fa-star"></i>
+                    {{currentBundle.bundleRank}}
+                  </div>
+                </div>
+
+                <div class="package-details">
+                  <div class="package-header">
+                    <h3 class="package-title">{{currentBundle.bundleTitle}}</h3>
+                    <div class="package-category">{{currentBundle.bundleRank}}</div>
+                  </div>
+
+                  <div class="package-info">
+                    <div class="info-item">
+                      <i class="fas fa-calendar-alt"></i>
+                      <span>{{currentBundle.initialDate}} - {{currentBundle.finalDate}}</span>
+                    </div>
+                    <div class="info-item">
+                      <i class="fas fa-users"></i>
+                      <span>{{currentBundle.travelersNumber}} viajantes</span>
+                      <div class="traveler-controls">
+                        <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.travelers - 1)">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                        <span class="traveler-count">{{currentBundle.travelersNumber}}</span>
+                        <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.travelers + 1)">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="info-item">
+                      <i class="fas fa-clock"></i>
+                      <span>{{currentPackage.duration || 7}} dias</span>
+                    </div>
+                  </div>
+
+                  <div class="package-description">
+                    <p>{{currentBundle.bundleDescription}}</p>
+                  </div>
+
+                  <div class="package-includes">
+                    <h4>O que está incluso:</h4>
+                    <div class="includes-grid">
+                      <div class="include-item" *ngFor="let item of currentPackage.includes">
+                        <i class="fas fa-check"></i>
+                        <span>{{item}}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="package-price-summary">
+                    <div class="price-item">
+                      <span class="price-label">Preço total ({{currentBundle.travelersNumber}} pessoas)</span>
+                      <span class="price-value">R$ {{getFormattedBasePrice(currentPackage)}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Informações dos Viajantes -->
+              <div class="package-travelers-section" *ngIf="currentPackage.travelers > 1">
+                <div class="section-header">
+                  <h4 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Viajantes Extras
+                  </h4>
+                  <p class="section-subtitle">Você (titular) + {{currentPackage.travelers - 1}} viajante(s) extra(s)</p>
+                </div>
+
+                <div class="user-profile-card">
+                  <div class="traveler-header">
+                    <h5 class="traveler-title">
+                      <i class="fas fa-user-circle"></i>
+                      Você (Titular da Conta)
+                    </h5>
+                    <span class="profile-badge">Dados do Perfil</span>
+                  </div>
+                  <div class="traveler-details">
+                    <div class="detail-row">
+                      <span class="detail-label">Nome Completo:</span>
+                      <span class="detail-value">{{userProfile.fullName}}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Email:</span>
+                      <span class="detail-value">{{userProfile.email}}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Telefone:</span>
+                      <span class="detail-value">{{userProfile.phone}}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="travelers-container">
+                  <div class="traveler-card" *ngFor="let traveler of travelersInfoByPackage[currentPackage.id]; let i = index">
+                    <div class="traveler-header">
+                      <h5 class="traveler-title">
+                        <i class="fas fa-user"></i>
+                        Viajante Extra {{i + 1}}
+                      </h5>
+                      <button class="btn-edit-traveler" (click)="editTraveler(i)">
+                        <i class="fas fa-edit"></i>
+                        Editar
+                      </button>
+                    </div>
+
+                    <div class="traveler-details" *ngIf="!traveler.editing">
+                      <div class="detail-row">
+                        <span class="detail-label">Nome Completo:</span>
+                        <span class="detail-value">{{traveler.fullName || 'Nome não informado'}}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">Data de Nascimento:</span>
+                        <span class="detail-value">{{traveler.birthDate || 'Data não informada'}}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">CPF:</span>
+                        <span class="detail-value">{{traveler.cpf || 'CPF não informado'}}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">RG:</span>
+                        <span class="detail-value">{{traveler.rg || 'RG não informado'}}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{traveler.email || 'Email não informado'}}</span>
+                      </div>
+                      <div class="detail-row">
+                        <span class="detail-label">Telefone:</span>
+                        <span class="detail-value">{{traveler.phone || 'Telefone não informado'}}</span>
+                      </div>
+                    </div>
+
+                    <!-- Formulário de Edição -->
+                    <div class="traveler-form" *ngIf="traveler.editing">
+                      <form (ngSubmit)="saveTraveler(i)" #travelerForm="ngForm">
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="fullName{{currentPackage.id}}{{i}}">Nome Completo *</label>
+                            <input type="text"
+                                   id="fullName{{currentPackage.id}}{{i}}"
+                                   class="form-control"
+                                   [(ngModel)]="traveler.fullName"
+                                   name="fullName{{currentPackage.id}}{{i}}"
+                                   required
+                                   placeholder="Digite o nome completo">
+                          </div>
+                        </div>
+
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="birthDate{{currentPackage.id}}{{i}}">Data de Nascimento *</label>
+                            <input type="date"
+                                   id="birthDate{{currentPackage.id}}{{i}}"
+                                   class="form-control"
+                                   [(ngModel)]="traveler.birthDate"
+                                   name="birthDate{{currentPackage.id}}{{i}}"
+                                   required>
+                          </div>
+                          <div class="form-group">
+                            <label for="cpf{{currentPackage.id}}{{i}}">CPF *</label>
+                            <input type="text"
+                                   id="cpf{{currentPackage.id}}{{i}}"
+                                   class="form-control"
+                                   [(ngModel)]="traveler.cpf"
+                                   name="cpf{{currentPackage.id}}{{i}}"
+                                   required
+                                   placeholder="000.000.000-00">
+                          </div>
+                        </div>
+
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="rg{{currentPackage.id}}{{i}}">RG *</label>
+                            <input type="text"
+                                   id="rg{{currentPackage.id}}{{i}}"
+                                   class="form-control"
+                                   [(ngModel)]="traveler.rg"
+                                   name="rg{{currentPackage.id}}{{i}}"
+                                   required
+                                   placeholder="00.000.000-0">
+                          </div>
+                          <div class="form-group">
+                            <label for="email{{currentPackage.id}}{{i}}">Email *</label>
+                            <input type="email"
+                                   id="email{{currentPackage.id}}{{i}}"
+                                   class="form-control"
+                                   [(ngModel)]="traveler.email"
+                                   name="email{{currentPackage.id}}{{i}}"
+                                   required
+                                   placeholder="seu@email.com">
+                          </div>
+                        </div>
+
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="phone{{currentPackage.id}}{{i}}">Telefone *</label>
+                            <input type="tel"
+                                   id="phone{{currentPackage.id}}{{i}}"
+                                   class="form-control"
+                                   [(ngModel)]="traveler.phone"
+                                   name="phone{{currentPackage.id}}{{i}}"
+                                   required
+                                   placeholder="(00) 00000-0000">
+                          </div>
+                        </div>
+
+                        <div class="form-actions">
+                          <button type="button" class="btn-cancel" (click)="cancelEdit(i)">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                          </button>
+                          <button type="submit" class="btn-save" [disabled]="!travelerForm.valid">
+                            <i class="fas fa-save"></i>
+                            Salvar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumo de Compra -->
+      <div class="col-lg-4">
+        <div class="purchase-summary-sticky">
+          <div class="summary-card">
+            <div class="summary-header">
+              <h3 class="summary-title">
+                <i class="fas fa-receipt"></i>
+                Resumo da Compra
+              </h3>
+            </div>
+
+            <div class="summary-content">
+              <!-- Detalhes do Preço -->
+              <div class="price-breakdown">
+                <div class="selected-packages-list">
+                  <div class="selected-package-summary">
+                    <div class="package-summary-header">
+                      <h5 class="package-summary-title">{{currentPackage.title}}</h5>
+                      <span class="package-summary-travelers">{{currentPackage.travelers}} pessoa(s)</span>
+                    </div>
+                    <div class="price-item">
+                      <span class="price-label">Pacote base</span>
+                      <span class="price-value">R$ {{getFormattedBasePrice(currentPackage)}}</span>
+                    </div>
+                    <div class="price-item" *ngIf="currentPackage.extraServices">
+                      <span class="price-label">Serviços extras</span>
+                      <span class="price-value">R$ {{currentPackage.extraPrice || '0,00'}}</span>
+                    </div>
+                    <div class="price-item discount" *ngIf="currentPackage.discount">
+                      <span class="price-label">Desconto</span>
+                      <span class="price-value">- R$ {{currentPackage.discount || '0,00'}}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="price-divider"></div>
+                <div class="price-item total">
+                  <span class="price-label">Total</span>
+                  <span class="price-value">R$ {{totalPrice}}</span>
+                </div>
+              </div>
+
+              <!-- Botão de Ir para Pagamento -->
+              <div class="checkout-actions">
+                <button class="btn-checkout" (click)="goToPayment()" [disabled]="!allTravelersCompleted()">
+                  <i class="fas fa-credit-card"></i>
+                  Ir para Pagamento
+                </button>
+                <p class="security-note">
+                  <i class="fas fa-shield-alt"></i>
+                  Complete todos os dados dos viajantes para continuar
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card de Suporte -->
+          <div class="support-card">
+            <div class="support-icon">
+              <i class="fas fa-headset"></i>
+            </div>
+            <div class="support-content">
+              <h4>Precisa de Ajuda?</h4>
+              <p>Nossa equipe está pronta para te auxiliar</p>
+              <button class="btn-support">
+                <i class="fas fa-phone"></i>
+                Falar com Suporte
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

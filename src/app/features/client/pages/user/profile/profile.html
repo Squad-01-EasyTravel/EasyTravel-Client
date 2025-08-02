@@ -1,0 +1,165 @@
+<app-navbar></app-navbar>
+
+<div class="profile-main-container">
+    <div class="upper-side">
+        <div class="upper-side-header">
+            <h3>Perfil</h3>
+            <!-- Botão mobile Bootstrap -->
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#profileSidebar" aria-controls="profileSidebar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <hr class="profile-divider">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Desktop -->
+            <div class="col-lg-2 d-none d-lg-block sidebar-container">
+                <div class="sidebar-menu">
+                    <p><a routerLink="/profile" class="active">Informação da Conta</a></p>
+                    <p><a routerLink="/profile/paymentinformation">Informação de Pagamento</a></p>
+                    <p><a routerLink="/profile">Histórico de Viagens</a></p>
+                </div>
+            </div>
+
+            <!-- Sidebar Mobile (Offcanvas) -->
+            <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="profileSidebar" aria-labelledby="profileSidebarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="profileSidebarLabel">Menu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body p-0">
+                    <div class="sidebar-menu">
+                        <p><a routerLink="/profile" class="active" data-bs-dismiss="offcanvas">Informação da Conta</a></p>
+                        <p><a routerLink="/profile/paymentinformation" data-bs-dismiss="offcanvas">Informação de Pagamento</a></p>
+                        <p><a routerLink="/profile" data-bs-dismiss="offcanvas">Histórico de Viagens</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-10 main-content">
+                <div class="main-content-upper">
+                    <div class="upper-side-content">
+                        <h3>Informação da Conta</h3>
+                        <p>Atualize sua foto e informações pessoais aqui. Mantenha seus dados sempre atualizados para uma melhor experiência.</p>
+                    </div>
+                </div>
+
+                <hr class="profile-divider-smaller">
+
+                <div class="photo-content-div">
+                    <div class="information-photo">
+                        <h4>Sua foto</h4>
+                        <p>Esta foto será mostrada no seu Perfil. Escolha uma imagem que represente você profissionalmente.</p>
+                    </div>
+                    <div class="photo" onclick="document.getElementById('photo-upload').click()">
+                        <input type="file" id="photo-upload" accept="image/*" style="display: none;">
+                        <img src="#" alt="" style="display: none;">
+                        <a class="btn" href="#"><i class="bi bi-upload"></i></a>
+                        <p id="placeholder-photo"><a href="#">Clique para fazer upload</a></p>
+                        <p id="photo-description"><a href="#">ou arraste a foto para cá</a></p>
+                        <p id="photo-type">SVG, PNG, or GIF (Max: 800 x 400px)</p>
+                    </div>
+                </div>
+
+                <hr class="profile-divider-smaller">
+
+                <div class="input-content-div">
+                    <div class="input-label">
+                        <h3><i class="bi bi-person-fill"></i> Nome Completo</h3>
+                    </div>
+                    <div class="input-fields">
+                        <div class="input-group">
+                            <label class="input-label-text required">Primeiro nome</label>
+                            <input type="text" class="form-control input-custom" placeholder="Digite seu primeiro nome" required>
+                            <i class="validation-icon check bi bi-check-circle"></i>
+                            <i class="validation-icon times bi bi-x-circle"></i>
+                            <div class="error-message">Este campo é obrigatório</div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label-text required">Sobrenome</label>
+                            <input type="text" class="form-control input-custom" placeholder="Digite seu sobrenome" required>
+                            <i class="validation-icon check bi bi-check-circle"></i>
+                            <i class="validation-icon times bi bi-x-circle"></i>
+                            <div class="error-message">Este campo é obrigatório</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="profile-divider-smaller">
+
+                <div class="email-content-div">
+                    <div class="email-label">
+                        <h3><i class="bi bi-envelope-fill"></i> Endereço de E-mail</h3>
+                    </div>
+                    <div class="email-fields">
+                        <div class="input-group">
+                            <label class="input-label-text required">E-mail principal</label>
+                            <input type="email" class="form-control input-custom" placeholder="exemplo@email.com" required>
+                            <i class="validation-icon check bi bi-check-circle"></i>
+                            <i class="validation-icon times bi bi-x-circle"></i>
+                            <div class="error-message">Digite um e-mail válido</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="profile-divider-smaller">
+
+                <div class="phone-content-div">
+                    <div class="phone-label">
+                        <h3><i class="bi bi-telephone-fill"></i> Telefone</h3>
+                    </div>
+                    <div class="phone-fields">
+                        <div class="input-group">
+                            <label class="input-label-text required">Telefone Principal</label>
+                            <input type="tel" class="form-control input-custom" placeholder="(11) 99999-9999" required>
+                            <i class="validation-icon check bi bi-check-circle"></i>
+                            <i class="validation-icon times bi bi-x-circle"></i>
+                            <div class="error-message">Digite um telefone válido</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="profile-divider-smaller">
+
+                <div class="documents-content-div">
+                    <div class="documents-label">
+                        <h3><i class="bi bi-file-earmark-text-fill"></i> Documentos</h3>
+                    </div>
+                    <div class="documents-fields">
+                        <div class="input-group">
+                            <label class="input-label-text required">CPF</label>
+                            <input type="text" class="form-control input-custom" placeholder="000.000.000-00" required>
+                            <i class="validation-icon check bi bi-check-circle"></i>
+                            <i class="validation-icon times bi bi-x-circle"></i>
+                            <div class="error-message">Digite um CPF válido</div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label-text">Passaporte</label>
+                            <input type="text" class="form-control input-custom" placeholder="Número do passaporte (opcional)">
+                            <i class="validation-icon check bi bi-check-circle"></i>
+                            <i class="validation-icon times bi bi-x-circle"></i>
+                            <div class="error-message">Formato de passaporte inválido</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <div class="button-group">
+                        <button class="btn btn-secondary" type="button">
+                            <i class="bi bi-x-circle"></i>
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-check-circle"></i>
+                            Salvar Mudanças
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

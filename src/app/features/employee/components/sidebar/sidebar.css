@@ -1,0 +1,176 @@
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="sidebar-dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23sidebar-dots)"/></svg>');
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sidebar h1 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  background: linear-gradient(135deg, #ffffff 0%, #ff6b35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  z-index: 2;
+  padding: 0 1rem;
+}
+
+.sidebar-highlight {
+  margin: 1rem 1.5rem 2rem 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 107, 53, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  border-radius: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar-highlight h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.highlight-bar {
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  border-radius: 2px;
+  margin-right: 0.75rem;
+}
+
+.sidebar-links {
+  flex: 1;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  margin: 0.5rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.sidebar a:hover::before {
+  left: 100%;
+}
+
+.sidebar a:hover {
+  color: #ffffff;
+  background: rgba(255, 107, 53, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  transform: translateX(8px);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+}
+
+.sidebar a.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+  border: 1px solid rgba(255, 107, 53, 0.5);
+}
+
+.sidebar a i {
+  font-size: 1.2rem;
+  width: 20px;
+  text-align: center;
+  color: #ff6b35;
+  transition: all 0.3s ease;
+}
+
+.sidebar a:hover i,
+.sidebar a.active i {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.placeholder-icon {
+  display: none;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 250px;
+  }
+
+  .sidebar h1 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 999;
+  }
+
+  .sidebar-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .sidebar a {
+    margin: 0;
+    text-align: center;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+}

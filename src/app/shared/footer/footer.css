@@ -1,0 +1,92 @@
+footer {
+    background-color: #ff8000 !important;
+    font-family: Arial, sans-serif;
+    position: relative;
+    z-index: 1000;
+}
+
+/* Texto da logo com fundo escuro */
+
+.logo-icon
+{
+    height: 45px;
+    width: auto;
+    padding-right: 10px;
+}
+.logo-text {
+    background: #7a4a00;
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.logo-easy {
+    color: #b6ff7a;
+}
+
+.logo-travel {
+    color: #ffb84d;
+}
+
+/* Descrição */
+.footer-desc {
+    background: #ffa64d;
+    color: #fff;
+    border-radius: 14px;
+    padding: 16px 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 350px;
+}
+
+/* Títulos das seções */
+.footer-title {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+/* Links do footer */
+.footer-link {
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+    font-size: 14px;
+}
+
+.footer-link:hover {
+    opacity: 1;
+    text-decoration: underline !important;
+}
+
+/* Ícones sociais */
+.social-icon {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-decoration: none;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+    background: #fff;
+    color: #ff8000;
+    opacity: 1;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .footer-desc {
+        max-width: 100%;
+    }
+
+    .social-icons {
+        justify-content: start !important;
+        margin-top: 10px;
+    }
+}

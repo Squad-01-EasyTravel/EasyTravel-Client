@@ -1,0 +1,23 @@
+<div class="admin-dashboard-content">
+  <h2>Bem-vindo ao Dashboard do Administrador</h2>
+  <p>Aqui você pode visualizar estatísticas, gráficos e informações administrativas.</p>
+<div class="filters mb-4 d-flex flex-wrap gap-2">
+  <button 
+    *ngFor="let metric of metrics" 
+    (click)="selectMetric(metric.key)" 
+    class="btn btn-outline-primary"
+    [class.active]="selectedMetric === metric.key"
+    [class.btn-primary]="selectedMetric === metric.key"
+    [class.btn-outline-primary]="selectedMetric !== metric.key"
+  >
+    {{ metric.label }}
+  </button>
+</div>
+ 
+  <canvas id="myChart"></canvas>
+  <div class="d-flex justify-content-end mt-3">
+    <button class="btn btn-success" (click)="exportExcel()">
+      <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+    </button>
+  </div>
+</div>

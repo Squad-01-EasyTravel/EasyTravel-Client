@@ -1,0 +1,495 @@
+<app-navbar></app-navbar>
+
+<!-- Seção Hero -->
+<section class="hero-section">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-decoration"></div>
+  </div>
+
+  <div class="container">
+    <div class="row align-items-center min-vh-100">
+      <div class="col-lg-6">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <i class="fas fa-plane"></i>
+            <span>Explore o Mundo</span>
+          </div>
+
+          <h1 class="hero-title">
+            Descubra Destinos
+            <span class="hero-highlight">Incríveis</span>
+          </h1>
+
+          <p class="hero-description">
+            Planeje sua próxima aventura com nossos pacotes completos. Oferecemos as melhores experiências de viagem com preços acessíveis e qualidade garantida.
+          </p>
+
+          <!-- Formulário de Busca -->
+          <div class="hero-search-wrapper">
+            <div class="search-tabs">
+              <button class="search-tab active">
+                <i class="fas fa-map-marker-alt"></i>
+                Destinos
+              </button>
+            </div>
+
+            <div class="hero-search-form">
+              <div class="search-container">
+                <div class="search-row">
+                  <div class="search-field">
+                    <label class="search-label">Local de Partida</label>
+                    <select class="search-select" [(ngModel)]="origemSelecionada">
+                      <option value="">Selecione sua cidade</option>
+                      <option value="sao-paulo">São Paulo, SP</option>
+                      <option value="rio-janeiro">Rio de Janeiro, RJ</option>
+                      <option value="belo-horizonte">Belo Horizonte, MG</option>
+                      <option value="brasilia">Brasília, DF</option>
+                      <option value="salvador">Salvador, BA</option>
+                      <option value="fortaleza">Fortaleza, CE</option>
+                      <option value="recife">Recife, PE</option>
+                      <option value="porto-alegre">Porto Alegre, RS</option>
+                      <option value="curitiba">Curitiba, PR</option>
+                      <option value="manaus">Manaus, AM</option>
+                    </select>
+                  </div>
+                  <div class="search-field">
+                    <label class="search-label">Local de Destino</label>
+                    <select class="search-select" [(ngModel)]="destinoSelecionada">
+                      <option value="">Para onde você quer ir?</option>
+                      <option value="lisboa">Lisboa, Portugal</option>
+                      <option value="paris">Paris, França</option>
+                      <option value="roma">Roma, Itália</option>
+                      <option value="madrid">Madrid, Espanha</option>
+                      <option value="londres">Londres, Inglaterra</option>
+                      <option value="amsterdam">Amsterdam, Holanda</option>
+                      <option value="barcelona">Barcelona, Espanha</option>
+                      <option value="praga">Praga, República Tcheca</option>
+                      <option value="viena">Viena, Áustria</option>
+                      <option value="budapest">Budapeste, Hungria</option>
+                    </select>
+                  </div>
+                </div>
+
+                
+
+                  
+
+                <button class="search-btn" (click)="buscarViagens()">
+                  <i class="fas fa-search"></i>
+                  Buscar Viagens
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-number">50K+</span>
+              <span class="stat-label">Viajantes</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">200+</span>
+              <span class="stat-label">Destinos</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">98%</span>
+              <span class="stat-label">Satisfação</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="hero-visual">
+          <div class="hero-image-container">
+            <div class="hero-floating-elements">
+              <div class="floating-card card-1">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Explore</span>
+              </div>
+              <div class="floating-card card-2">
+                <i class="fas fa-camera"></i>
+                <span>Capture</span>
+              </div>
+              <div class="floating-card card-3">
+                <i class="fas fa-heart"></i>
+                <span>Ame</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--Contéudo da Pagina-->
+
+<!-- Título da seção -->
+<section class="offers-title-section py-4">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center">
+        <h2 class="offers-main-title">Melhores Ofertas Para Você</h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Seção de Ilustrações com Placeholders -->
+<section class="illustration-section py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Primeira ilustração -->
+      <div class="col-lg-4 col-md-6">
+        <div class="illustration-card text-center">
+          <div class="illustration-placeholder mb-4">
+            <i class="fas fa-calendar-alt illustration-icon"></i>
+          </div>
+          <h4 class="illustration-title">Viagem dos Sonhos</h4>
+          <p class="illustration-text">
+            Escolha uma data flexível e encontre as melhores ofertas de viagem para seu destino dos sonhos. Nossa plataforma oferece opções personalizadas para cada tipo de viajante.
+          </p>
+        </div>
+      </div>
+
+      <!-- Segunda ilustração -->
+      <div class="col-lg-4 col-md-6">
+        <div class="illustration-card text-center">
+          <div class="illustration-placeholder mb-4">
+            <i class="fas fa-map-marked-alt illustration-icon"></i>
+          </div>
+          <h4 class="illustration-title">Sua próxima viagem começa com um clique</h4>
+          <p class="illustration-text">
+            Com apenas alguns cliques você pode ter sua viagem dos sonhos. Nossa plataforma é intuitiva e fácil de usar, garantindo a melhor experiência de reserva.
+          </p>
+        </div>
+      </div>
+
+      <!-- Terceira ilustração -->
+      <div class="col-lg-4 col-md-6">
+        <div class="illustration-card text-center">
+          <div class="illustration-placeholder mb-4">
+            <i class="fas fa-shield-alt illustration-icon"></i>
+          </div>
+          <h4 class="illustration-title">Viajar bem não precisa ser complicado</h4>
+          <p class="illustration-text">
+            Com a EasyTravel, você tem segurança, praticidade e os melhores preços em um só lugar. Deixe-nos cuidar dos detalhes enquanto você aproveita a viagem.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Transição com cor sólida -->
+<section class="transition-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <div class="transition-placeholder">
+          <i class="fas fa-globe-americas transition-icon"></i>
+          <h2 class="transition-title">Pacotes Custo Benefício</h2>
+          <p class="transition-subtitle">Descubra destinos incríveis com os melhores preços</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-trip-carousel></app-trip-carousel>
+
+<!-- Seção de Marketing da Empresa -->
+<section class="marketing-section py-5 mt-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 order-lg-1 order-2">
+        <div class="marketing-content">
+          <h2 class="marketing-title">Por que escolher a EasyTravel?</h2>
+          <p class="marketing-subtitle">Mais de 10 anos conectando você aos seus sonhos</p>
+
+          <div class="marketing-features">
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-award"></i>
+              </div>
+              <div class="feature-content">
+                <h5>Experiência Comprovada</h5>
+                <p>Mais de 50.000 viajantes satisfeitos em todo o Brasil</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-hand-holding-heart"></i>
+              </div>
+              <div class="feature-content">
+                <h5>Atendimento Personalizado</h5>
+                <p>Suporte 24/7 com consultores especializados em destinos</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div class="feature-content">
+                <h5>Segurança Garantida</h5>
+                <p>Parceiros certificados e pagamento 100% seguro</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-piggy-bank"></i>
+              </div>
+              <div class="feature-content">
+                <h5>Melhor Preço</h5>
+                <p>Encontrou mais barato? Igualamos o preço!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 order-lg-2 order-1">
+        <div class="marketing-image">
+          <div class="image-placeholder">
+            <i class="fas fa-plane marketing-plane-icon"></i>
+            <div class="floating-elements">
+              <div class="element element-1"><i class="fas fa-map-marker-alt"></i></div>
+              <div class="element element-2"><i class="fas fa-camera"></i></div>
+              <div class="element element-3"><i class="fas fa-suitcase"></i></div>
+              <div class="element element-4"><i class="fas fa-heart"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Transição para Pacotes Populares -->
+<section class="transition-section-popular">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <div class="transition-placeholder">
+          <i class="fas fa-star transition-icon-popular"></i>
+          <h2 class="transition-title">Pacotes Populares</h2>
+          <p class="transition-subtitle">Os destinos mais procurados pelos nossos clientes</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-popular-packages></app-popular-packages>
+
+<!-- Seção de Avaliações -->
+<section class="reviews-section py-5 mt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center mb-5">
+        <h2 class="section-title">Clientes da EasyTravel</h2>
+        <p class="section-subtitle">Veja o que nossos clientes dizem sobre nossas viagens</p>
+      </div>
+    </div>
+
+    <!-- Carousel de Avaliações -->
+    <div id="reviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+      <div class="carousel-inner">
+        <!-- Primeiro slide -->
+        <div class="carousel-item active">
+          <div class="row justify-content-center">
+            <!-- Card 1 -->
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-avatar">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
+                  <div class="reviewer-info">
+                    <h6 class="reviewer-name">Guilherme Israel</h6>
+                    <div class="review-rating">
+                      <span class="rating-number">4.5</span>
+                      <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-content">
+                  <p>"Experiência incrível! A EasyTravel superou todas as minhas expectativas. O atendimento foi excepcional desde o primeiro contato até o retorno da viagem. Recomendo fortemente!"</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 - Oculto no mobile -->
+            <div class="col-12 col-md-6 col-lg-4 mb-4 d-none d-md-block">
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-avatar">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
+                  <div class="reviewer-info">
+                    <h6 class="reviewer-name">Ana Carolina</h6>
+                    <div class="review-rating">
+                      <span class="rating-number">5.0</span>
+                      <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-content">
+                  <p>"Perfeito! Consegui uma viagem dos sonhos com um preço incrível. A plataforma é muito fácil de usar e o suporte ao cliente é excelente. Já estou planejando minha próxima viagem!"</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3 - Oculto no mobile e tablet -->
+            <div class="col-12 col-md-6 col-lg-4 mb-4 d-none d-lg-block">
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-avatar">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
+                  <div class="reviewer-info">
+                    <h6 class="reviewer-name">Roberto Silva</h6>
+                    <div class="review-rating">
+                      <span class="rating-number">4.8</span>
+                      <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-content">
+                  <p>"Serviço de primeira qualidade! A organização da viagem foi impecável e conseguimos economizar muito. A EasyTravel realmente entende do negócio. Nota 10!"</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segundo slide -->
+        <div class="carousel-item">
+          <div class="row justify-content-center">
+            <!-- Card 4 -->
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-avatar">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
+                  <div class="reviewer-info">
+                    <h6 class="reviewer-name">Maria Santos</h6>
+                    <div class="review-rating">
+                      <span class="rating-number">4.7</span>
+                      <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-content">
+                  <p>"Fantástico! Viajei em família e tudo foi perfeito. Desde a reserva até o check-out, tudo funcionou como esperado. Recomendo para quem busca qualidade e economia."</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5 - Oculto no mobile -->
+            <div class="col-12 col-md-6 col-lg-4 mb-4 d-none d-md-block">
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-avatar">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
+                  <div class="reviewer-info">
+                    <h6 class="reviewer-name">Carlos Oliveira</h6>
+                    <div class="review-rating">
+                      <span class="rating-number">4.9</span>
+                      <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-content">
+                  <p>"Excelente custo-benefício! A EasyTravel conseguiu me oferecer exatamente o que eu estava procurando. O processo foi simples e rápido. Super satisfeito!"</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6 - Oculto no mobile e tablet -->
+            <div class="col-12 col-md-6 col-lg-4 mb-4 d-none d-lg-block">
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-avatar">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
+                  <div class="reviewer-info">
+                    <h6 class="reviewer-name">Fernanda Costa</h6>
+                    <div class="review-rating">
+                      <span class="rating-number">5.0</span>
+                      <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-content">
+                  <p>"Simplesmente perfeito! Consegui realizar o sonho de conhecer a Europa com um preço que cabia no meu orçamento. Obrigada EasyTravel por tornar isso possível!"</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controles do carousel -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#reviewsCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Anterior</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#reviewsCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Próximo</span>
+      </button>
+
+      <!-- Indicadores -->
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#reviewsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#reviewsCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

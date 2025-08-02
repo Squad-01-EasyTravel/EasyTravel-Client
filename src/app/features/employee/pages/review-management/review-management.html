@@ -1,0 +1,474 @@
+<div class="d-flex">
+  <div class="container-fluid">
+    <!-- Hero Header Section com Bootstrap -->
+    <div class="hero-section position-relative mb-4">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="container position-relative">
+        <div class="row align-items-center py-5">
+          <div class="col-lg-8">
+            <div class="hero-content text-white">
+              <!-- Badge animado -->
+              <span class="hero-badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill mb-3 d-inline-flex align-items-center">
+                <i class="fas fa-star me-2 text-warning"></i>
+                <span class="fw-semibold">Gerenciamento de Avaliações</span>
+              </span>
+
+              <!-- Título com gradiente -->
+              <h1 class="hero-title display-3 fw-bold mb-3">
+                Avaliações dos <span class="text-gradient">Clientes</span>
+              </h1>
+
+              <!-- Subtítulo -->
+              <p class="hero-description lead mb-4 opacity-75">
+                Gerencie, monitore e responda às avaliações dos seus clientes de forma eficiente e profissional
+              </p>
+
+              <!-- Estatísticas melhoradas com cores -->
+              <div class="row g-3 text-center hero-stats">
+                <div class="col-4">
+                  <div class="stats-card stats-total bg-primary bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{usuarios.length}}</h3>
+                    <small class="stats-label fw-semibold">Total Clientes</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="stats-card stats-available bg-success bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{getTotalComments()}}</h3>
+                    <small class="stats-label fw-semibold">Comentários</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="stats-card stats-inactive bg-warning bg-opacity-90 text-dark rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{getAverageRating()}}</h3>
+                    <small class="stats-label fw-semibold">Média Geral</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 text-center">
+            <div class="hero-action">
+              <button class="btn-create-main btn btn-light btn-lg px-5 py-3 shadow-lg rounded-4 fw-bold"
+                (click)="exportReviews()">
+                <i class="fas fa-download me-2"></i>
+                Exportar Avaliações
+              </button>
+              <div class="hero-decorations mt-4">
+                <div class="floating-element element-1">
+                  <i class="fas fa-comments"></i>
+                </div>
+                <div class="floating-element element-2">
+                  <i class="fas fa-star"></i>
+                </div>
+                <div class="floating-element element-3">
+                  <i class="fas fa-users"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="container mb-4">
+      <app-filter-search-review></app-filter-search-review>
+    </div>
+
+    <!-- Grid de Avaliações -->
+    <div class="container reviews-section" *ngIf="usuarios.length > 0">
+      <!-- Informações da paginação -->
+      <div class="pagination-info-section mb-4">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="pagination-info bg-white rounded-4 p-3 shadow-sm border">
+              <h5 class="pagination-title mb-2 text-primary fw-bold">
+                <i class="fas fa-comments me-2"></i>
+                Avaliações dos Clientes
+              </h5>
+              <p class="pagination-details mb-0 text-muted">
+                Mostrando <strong class="text-dark">{{ getStartItem() }} - {{ getEndItem() }}</strong>
+                de <strong class="text-dark">{{ usuarios.length }}</strong> avaliações
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <div class="items-per-page-selector">
+              <label class="form-label me-2 fw-semibold text-muted">Itens por página:</label>
+              <select class="form-select form-select-sm d-inline-block w-auto"
+                      [(ngModel)]="itemsPerPage"
+                      (change)="currentPage = 1">
+                <option value="3">3</option>
+                <option value="6">6</option>
+                <option value="9">9</option>
+                <option value="12">12</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reviews-grid row g-4">
+        <div class="col-xl-6 col-lg-12" *ngFor="let usuario of paginatedUsers">
+          <div class="review-card card h-100 border-0 shadow-lg">
+            <!-- Header do Card -->
+            <div class="card-header-modern position-relative overflow-hidden">
+              <div class="header-bg-gradient"></div>
+              <div class="card-header-content p-4">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <div class="user-info-section d-flex align-items-center">
+                      <div class="user-avatar-container me-3">
+                        <img [src]="getPlaceholderImage(usuario.nome)"
+                             [alt]="'Avatar de ' + usuario.nome"
+                             class="user-avatar rounded-circle border border-3 border-white shadow"
+                             (error)="onImageError($event)">
+                        <div class="user-status-badge bg-success"></div>
+                      </div>
+                      <div class="user-details">
+                        <h4 class="user-name text-white fw-bold mb-1">{{ usuario.nome }}</h4>
+                        <p class="user-id text-white opacity-75 mb-0">
+                          <i class="fas fa-id-badge me-1"></i>
+                          ID: {{ usuario.id }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="user-stats-badge bg-white bg-opacity-20 rounded-pill px-3 py-2">
+                      <span class="text-white fw-semibold">
+                        <i class="fas fa-comment-dots me-1"></i>
+                        {{ usuario.comentarios.length }} comentários
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conteúdo do Card -->
+            <div class="card-body d-flex flex-column p-4">
+              <!-- Preview dos comentários -->
+              <div class="comments-preview mb-3" *ngIf="usuario.comentarios.length > 0">
+                <h6 class="comments-preview-title fw-bold mb-2 text-muted">
+                  <i class="fas fa-eye me-1"></i>
+                  Últimos Comentários
+                </h6>
+                <div class="comment-preview-item" *ngFor="let comentario of usuario.comentarios.slice(0, 2)">
+                  <div class="preview-card bg-light rounded-3 p-3 mb-2">
+                    <div class="preview-header d-flex justify-content-between align-items-center mb-1">
+                      <span class="preview-package fw-semibold text-primary">{{ comentario.pacote }}</span>
+                      <small class="preview-date text-muted">{{ comentario.data }}</small>
+                    </div>
+                    <p class="preview-text text-muted mb-0 text-truncate">{{ comentario.texto }}</p>
+                  </div>
+                </div>
+                <div class="more-comments-indicator" *ngIf="usuario.comentarios.length > 2">
+                  <small class="text-muted">
+                    <i class="fas fa-plus-circle me-1"></i>
+                    +{{ usuario.comentarios.length - 2 }} comentários adicionais
+                  </small>
+                </div>
+              </div>
+
+              <!-- Botões de ação -->
+              <div class="card-actions mt-auto">
+                <div class="action-buttons-row">
+                  <button class="btn-action btn-view-comments"
+                          (click)="abrirComentariosUsuario(usuario)"
+                          title="Ver todos os comentários">
+                    <div class="btn-icon">
+                      <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="btn-content">
+                      <span class="btn-label">Ver Comentários</span>
+                      <small class="btn-desc">{{ usuario.comentarios.length }} disponíveis</small>
+                    </div>
+                  </button>
+
+                  <button class="btn-action btn-user-actions"
+                          title="Ações do usuário">
+                    <div class="btn-icon">
+                      <i class="fas fa-user-cog"></i>
+                    </div>
+                    <div class="btn-content">
+                      <span class="btn-label">Gerenciar</span>
+                      <small class="btn-desc">Usuário</small>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Componente de Paginação Premium -->
+      <div class="pagination-section mt-5" *ngIf="totalPages > 1">
+        <div class="pagination-container bg-white rounded-4 shadow-sm border p-4">
+          <div class="row align-items-center">
+            <!-- Informações de paginação à esquerda -->
+            <div class="col-md-6">
+              <div class="pagination-info-text">
+                <p class="mb-0 text-muted">
+                  <span class="fw-semibold text-dark">{{ getStartItem() }} - {{ getEndItem() }}</span>
+                  de
+                  <span class="fw-semibold text-dark">{{ usuarios.length }}</span>
+                  avaliações
+                </p>
+              </div>
+            </div>
+
+            <!-- Controles de paginação à direita -->
+            <div class="col-md-6">
+              <nav aria-label="Navegação da paginação">
+                <div class="pagination-controls d-flex justify-content-md-end justify-content-center align-items-center gap-2">
+
+                  <!-- Botão Anterior -->
+                  <button class="pagination-btn pagination-btn-nav"
+                          [disabled]="currentPage <= 1"
+                          (click)="previousPage()"
+                          title="Página anterior">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+
+                  <!-- Numeração das páginas -->
+                  <div class="pagination-numbers d-flex gap-1">
+                    <!-- Primeira página -->
+                    <button *ngIf="currentPage > 3"
+                            class="pagination-btn"
+                            (click)="changePage(1)">
+                      1
+                    </button>
+
+                    <!-- Reticências iniciais -->
+                    <span *ngIf="currentPage > 4" class="pagination-dots">...</span>
+
+                    <!-- Páginas próximas à atual -->
+                    <button *ngFor="let page of pageNumbers"
+                            class="pagination-btn"
+                            [class.active]="page === currentPage"
+                            [class.d-none]="page < currentPage - 2 || page > currentPage + 2"
+                            (click)="changePage(page)">
+                      {{ page }}
+                    </button>
+
+                    <!-- Reticências finais -->
+                    <span *ngIf="currentPage < totalPages - 3" class="pagination-dots">...</span>
+
+                    <!-- Última página -->
+                    <button *ngIf="currentPage < totalPages - 2"
+                            class="pagination-btn"
+                            (click)="changePage(totalPages)">
+                      {{ totalPages }}
+                    </button>
+                  </div>
+
+                  <!-- Botão Próximo -->
+                  <button class="pagination-btn pagination-btn-nav"
+                          [disabled]="currentPage >= totalPages"
+                          (click)="nextPage()"
+                          title="Próxima página">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </nav>
+            </div>
+          </div>
+
+          <!-- Barra de progresso da paginação -->
+          <div class="pagination-progress mt-3">
+            <div class="progress" style="height: 4px;">
+              <div class="progress-bar bg-primary"
+                   [style.width.%]="(currentPage / totalPages) * 100"
+                   role="progressbar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Premium para Comentários -->
+    <div class="modal fade modern-modal" [class.show]="comentariosUsuarioAbertos" [style.display]="comentariosUsuarioAbertos ? 'block' : 'none'"
+         tabindex="-1" *ngIf="comentariosUsuarioAbertos" (click)="fecharComentariosUsuario()">
+      <div class="modal-dialog modal-xl modal-dialog-centered" (click)="$event.stopPropagation()">
+        <div class="modal-content modern-modal-content d-flex flex-column" style="max-height: 90vh;">
+
+          <!-- Header Premium do Modal -->
+          <div class="modal-header-premium flex-shrink-0">
+            <div class="modal-header-bg"></div>
+            <div class="modal-header-content">
+              <div class="row align-items-center w-100">
+                <div class="col">
+                  <div class="modal-title-section">
+                    <div class="modal-icon-container">
+                      <div class="modal-icon-wrapper" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <i class="fas fa-comments"></i>
+                      </div>
+                    </div>
+                    <div class="modal-title-content">
+                      <h3 class="modal-title-main">
+                        Comentários de {{ usuarioSelecionado?.nome }}
+                      </h3>
+                      <p class="modal-title-subtitle">
+                        Gerencie e modere os comentários deste usuário
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <button type="button" class="btn-close-premium" (click)="fecharComentariosUsuario()">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Corpo do Modal - Rolável -->
+          <div class="modal-body-premium flex-grow-1 overflow-auto" style="max-height: calc(90vh - 200px);">
+            <div class="comments-container">
+
+              <!-- Informações do Usuário -->
+              <div class="user-info-section mb-4">
+                <div class="card border-0 bg-light">
+                  <div class="card-body p-4">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <img [src]="usuarioSelecionado?.foto"
+                             [alt]="'Foto de ' + usuarioSelecionado?.nome"
+                             class="rounded-circle border border-3 border-primary"
+                             style="width: 80px; height: 80px; object-fit: cover;">
+                      </div>
+                      <div class="col">
+                        <h5 class="fw-bold mb-1">{{ usuarioSelecionado?.nome }}</h5>
+                        <p class="text-muted mb-2">ID: {{ usuarioSelecionado?.id }}</p>
+                        <div class="user-stats d-flex gap-3">
+                          <span class="badge bg-primary">
+                            <i class="fas fa-comments me-1"></i>
+                            {{ usuarioSelecionado?.comentarios?.length }} comentários
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lista de Comentários -->
+              <div class="comments-list">
+                <div *ngFor="let comentario of usuarioSelecionado?.comentarios; let i = index"
+                     class="comment-card-modern mb-4">
+                  <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                      <div class="row align-items-center">
+                        <div class="col">
+                          <div class="comment-header-info">
+                            <h6 class="fw-bold mb-1 text-primary">
+                              <i class="fas fa-suitcase-rolling me-1"></i>
+                              {{ comentario.pacote }}
+                            </h6>
+                            <small class="text-muted">
+                              <i class="fas fa-calendar-alt me-1"></i>
+                              {{ comentario.data }}
+                            </small>
+                          </div>
+                        </div>
+                        <div class="col-auto">
+                          <div class="comment-actions-dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown">
+                              <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body p-4">
+                      <div class="comment-content mb-3">
+                        <p class="comment-text mb-0">{{ comentario.texto }}</p>
+                      </div>
+                      <div class="comment-actions d-flex gap-2">
+                        <button class="btn btn-danger btn-sm"
+                                (click)="apagarComentario(i)"
+                                title="Apagar comentário">
+                          <i class="fas fa-trash-alt me-1"></i>
+                          Apagar Comentário
+                        </button>
+                        <button class="btn btn-warning btn-sm"
+                                title="Reportar como inadequado">
+                          <i class="fas fa-flag me-1"></i>
+                          Reportar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Estado vazio -->
+                <div *ngIf="!usuarioSelecionado?.comentarios?.length" class="empty-comments text-center py-5">
+                  <div class="empty-illustration mb-3">
+                    <i class="fas fa-comment-slash text-muted" style="font-size: 3rem;"></i>
+                  </div>
+                  <h5 class="text-muted">Nenhum comentário encontrado</h5>
+                  <p class="text-muted">Este usuário ainda não fez nenhum comentário.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer do Modal -->
+          <div class="modal-footer-premium flex-shrink-0">
+            <div class="footer-actions d-flex justify-content-between align-items-center w-100 p-3">
+              <div class="user-management-actions">
+                <button class="btn btn-warning me-2">
+                  <i class="fas fa-user-slash me-1"></i>
+                  Desativar Usuário
+                </button>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" (click)="fecharComentariosUsuario()">
+                  <i class="fas fa-times me-1"></i>
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backdrop do Modal -->
+    <div class="modal-backdrop fade" [class.show]="comentariosUsuarioAbertos" *ngIf="comentariosUsuarioAbertos"></div>
+
+    <!-- Empty State Premium -->
+    <div class="container empty-state-section" *ngIf="usuarios.length === 0">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="empty-state-card text-center p-5">
+            <div class="empty-illustration mb-4">
+              <div class="illustration-container">
+                <div class="floating-icons">
+                  <i class="fas fa-star icon-1"></i>
+                  <i class="fas fa-comment icon-2"></i>
+                  <i class="fas fa-users icon-3"></i>
+                </div>
+                <div class="main-illustration">
+                  <i class="fas fa-comments"></i>
+                </div>
+              </div>
+            </div>
+            <div class="empty-content">
+              <h2 class="empty-title fw-bold mb-3">Nenhuma avaliação encontrada</h2>
+              <p class="empty-description text-muted mb-4 lead">
+                Quando os clientes começarem a avaliar seus pacotes,
+                as avaliações aparecerão aqui para você gerenciar.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

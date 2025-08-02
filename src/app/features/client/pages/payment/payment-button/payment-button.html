@@ -1,0 +1,12 @@
+<div class="button-container">
+  <button 
+    type="submit" 
+    class="prosseguir-button" 
+    [class.disabled]="!isFormValid"
+    [disabled]="!isFormValid"
+    (click)="onButtonClick()">
+    {{ getButtonText() }}
+  </button>
+</div>
+
+
