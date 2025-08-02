@@ -68,13 +68,13 @@
                   Ver Detalhes
                 </button>
 
-                <button *ngIf="trip.status === 'Finalizado' || trip.status === 'Confirmado'"
+                <button *ngIf="trip.status === 'Confirmado'"
                         class="btn btn-secondary-custom" (click)="downloadVoucher(trip)">
                   <i class="fas fa-download"></i>
                   Voucher
                 </button>
 
-                <button *ngIf="trip.status === 'Finalizado'"
+                <button *ngIf="trip.status === 'Confirmado'"
                         class="btn btn-info-custom" (click)="rateTrip(trip)">
                   <i class="fas fa-star"></i>
                   Avaliar
@@ -135,7 +135,6 @@
                 <option value="Todos">Todos os status</option>
                 <option value="Confirmado">Confirmado</option>
                 <option value="Pendente">Pendente</option>
-                <option value="Finalizado">Finalizado</option>
                 <option value="Cancelado">Cancelado</option>
               </select>
             </div>
@@ -194,5 +193,116 @@
     </nav>
   </div>
 </section>
+
+<!-- Modal de Detalhes -->
+<div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedTrip">
+    <div class="modal-header">
+      <h3 class="modal-title">Detalhes da Viagem</h3>
+      <button class="modal-close-btn" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="trip-detail-grid">
+        <!-- Imagem e Informações Básicas -->
+        <div class="trip-image-section">
+          <img [src]="selectedTrip.imageUrl" [alt]="selectedTrip.origin + ' - ' + selectedTrip.destination" class="trip-detail-image">
+          <div class="trip-basic-info">
+            <h4>{{selectedTrip.origin}} - {{selectedTrip.destination}}</h4>
+            <p class="order-number">Pedido: {{selectedTrip.orderId}}</p>
+            <div class="status-badge-large" [ngClass]="getStatusBadgeClass(selectedTrip.status)">
+              <i [class]="getStatusIcon(selectedTrip.status)"></i>
+              {{selectedTrip.status}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalhes da Viagem -->
+        <div class="trip-details-section">
+          <div class="detail-row">
+            <div class="detail-item">
+              <i class="fas fa-calendar-alt detail-icon"></i>
+              <div>
+                <span class="detail-label">Data de Ida</span>
+                <span class="detail-value">{{formatDate(selectedTrip.departureDate)}}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-calendar-check detail-icon"></i>
+              <div>
+                <span class="detail-label">Data de Volta</span>
+                <span class="detail-value">{{formatDate(selectedTrip.returnDate)}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <i class="fas fa-clock detail-icon"></i>
+              <div>
+                <span class="detail-label">Duração</span>
+                <span class="detail-value">{{selectedTrip.duration}} dias</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-credit-card detail-icon"></i>
+              <div>
+                <span class="detail-label">Forma de Pagamento</span>
+                <span class="detail-value">{{selectedTrip.paymentMethod}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <i class="fas fa-dollar-sign detail-icon"></i>
+              <div>
+                <span class="detail-label">Valor Total</span>
+                <span class="detail-value price">R$ {{selectedTrip.price.toLocaleString('pt-BR')}}</span>
+              </div>
+            </div>
+            <div class="detail-item" *ngIf="selectedTrip.rating">
+              <i class="fas fa-star detail-icon"></i>
+              <div>
+                <span class="detail-label">Avaliação Média</span>
+                <div class="rating-display">
+                  <span class="rating-value">{{selectedTrip.rating}}</span>
+                  <div class="stars">
+                    <i *ngFor="let star of getStarArray(selectedTrip.rating!)" 
+                       class="fas fa-star" 
+                       [class.filled]="star"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          <div class="description-section">
+            <h5><i class="fas fa-info-circle"></i> Descrição</h5>
+            <p class="description-text">{{selectedTrip.description}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary-custom" (click)="downloadVoucher(selectedTrip)">
+        <i class="fas fa-download"></i>
+        Baixar Voucher
+      </button>
+      <button class="btn btn-info-custom" (click)="rateTrip(selectedTrip)">
+        <i class="fas fa-star"></i>
+        Avaliar Viagem
+      </button>
+      <button class="btn btn-outline-custom" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
 
 <app-footer></app-footer>

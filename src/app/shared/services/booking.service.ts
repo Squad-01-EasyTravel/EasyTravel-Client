@@ -20,9 +20,13 @@ export class BookingService {
         destination: 'São Paulo',
         departureDate: '2025-08-15',
         returnDate: '2025-08-22',
-        status: 'Finalizado',
+        status: 'Confirmado',
         orderId: '#123456',
-        price: 2500
+        price: 2500,
+        duration: 7,
+        paymentMethod: 'Cartão de Crédito',
+        rating: 4.5,
+        description: 'Pacote completo incluindo hospedagem em hotel 4 estrelas, traslados e city tour.'
       },
       {
         id: '2',
@@ -33,7 +37,11 @@ export class BookingService {
         returnDate: '2025-09-17',
         status: 'Confirmado',
         orderId: '#234567',
-        price: 1800
+        price: 1800,
+        duration: 7,
+        paymentMethod: 'PIX',
+        rating: 4.2,
+        description: 'Viagem para Salvador com hospedagem na orla, passeios históricos e gastronômicos.'
       },
       {
         id: '3',
@@ -44,7 +52,9 @@ export class BookingService {
         returnDate: '2025-11-01',
         status: 'Pendente',
         orderId: '#345678',
-        price: 2200
+        price: 2200,
+        duration: 7,
+        description: 'Pacote para Fortaleza com hospedagem em resort all-inclusive.'
       },
       {
         id: '4',
@@ -55,7 +65,11 @@ export class BookingService {
         returnDate: '2025-12-27',
         status: 'Confirmado',
         orderId: '#456789',
-        price: 3000
+        price: 3000,
+        duration: 7,
+        paymentMethod: 'Boleto Bancário',
+        rating: 4.8,
+        description: 'Pacote para Porto Alegre incluindo hospedagem e passeios pela região.'
       },
       {
         id: '5',
@@ -66,7 +80,9 @@ export class BookingService {
         returnDate: '2026-01-22',
         status: 'Pendente',
         orderId: '#567890',
-        price: 2800
+        price: 2800,
+        duration: 7,
+        description: 'Viagem para Curitiba com foco em ecoturismo e gastronomia local.'
       }
     ];
 
