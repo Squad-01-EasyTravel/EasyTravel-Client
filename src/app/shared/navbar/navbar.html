@@ -39,39 +39,48 @@
             <!-- Botão de Login ou Avatar do Usuário -->
             <div class="d-flex align-items-center">
                 <!-- Botão de Login (quando não logado) -->
-                <a href="#" class="btn btn-login" routerLink="/auth/login" *ngIf="!isLoggedIn" (click)="onNavLinkClick()">Fazer Login</a>
+                <a class="btn btn-login" routerLink="/auth/login" *ngIf="!isLoggedIn" (click)="onNavLinkClick()">Fazer Login</a>
 
                 <!-- Avatar do Usuário (quando logado) -->
                 <div class="dropdown" *ngIf="isLoggedIn">
-                    <button class="btn p-0 user-avatar-btn" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                    <button class="btn p-0 user-avatar-btn" type="button"
+                        (click)="toggleUserDropdown()"
+                        [attr.aria-expanded]="isUserDropdownOpen">
                         <img [src]="userImage" [alt]="userName" class="user-avatar"
                             (error)="onImageError($event)">
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end user-dropdown">
+                    <ul class="dropdown-menu dropdown-menu-end user-dropdown"
+                        [class.show]="isUserDropdownOpen">
                         <li>
                             <div class="dropdown-header">
                                 <strong>{{userName}}</strong>
+                                <small class="text-muted d-block">{{userRole}}</small>
                             </div>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#" routerLink="/perfil" (click)="onNavLinkClick()">
+                            <a class="dropdown-item" routerLink="/profile" (click)="onDropdownItemClick()">
                                 <i class="bi bi-person me-2"></i>Perfil
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#" routerLink="/minhas-reservas" (click)="onNavLinkClick()">
+                            <a class="dropdown-item" routerLink="/my-booking" (click)="onDropdownItemClick()">
                                 <i class="bi bi-calendar-check me-2"></i>Minhas Reservas
+                            </a>
+                        </li>
+                        <!-- Aba de Administração (apenas para ADMIN e EMPLOYEE) -->
+                        <li *ngIf="hasAdminAccess">
+                            <a class="dropdown-item" routerLink="/employee/package-management" (click)="onDropdownItemClick()">
+                                <i class="bi bi-gear me-2"></i>Administração
                             </a>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item text-danger" href="#" (click)="logout()">
+                            <a class="dropdown-item text-danger" (click)="logout()">
                                 <i class="bi bi-box-arrow-right me-2"></i>Logout
                             </a>
                         </li>

@@ -1,7 +1,9 @@
-import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { AuthService, User } from '../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -9,22 +11,44 @@ import { filter } from 'rxjs/operators';
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
-export class Navbar implements OnInit {
-  // Simular estado de login - Adicionar Autentição Posteriormente apenas teste
+export class Navbar implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  // Estados de autenticação
   isLoggedIn: boolean = false;
+  currentUser: User | null = null;
   userImage: string = 'assets/imgs/et_mascote.png';
-  userName: string = 'João Silva';
+  userName: string = '';
+  userRole: string | null = null;
+  hasAdminAccess: boolean = false;
+  isUserDropdownOpen: boolean = false;
 
   currentRoute: string = '';
   isMenuOpen: boolean = false;
 
-  constructor(private router: Router, private elementRef: ElementRef) {}
+  constructor(
+    private router: Router,
+    private elementRef: ElementRef,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     this.currentRoute = this.router.url;
 
+    // Verificar estado inicial de autenticação
+    this.checkAuthenticationStatus();
+
+    // Observar mudanças no usuário atual
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUser = user;
+        this.updateUserInfo(user);
+      });
+
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
     ).subscribe((event: NavigationEnd) => {
       this.currentRoute = event.url;
       // Fechar menu quando navegar
@@ -33,6 +57,45 @@ export class Navbar implements OnInit {
 
     // Listener para mudanças no tamanho da tela
     this.checkScreenSize();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // Verificar status de autenticação
+  checkAuthenticationStatus() {
+    // Força uma verificação completa do auth service
+    this.authService.checkAuthStatus();
+
+    this.isLoggedIn = this.authService.isAuthenticated();
+
+    if (this.isLoggedIn) {
+      const user = this.authService.getCurrentUser();
+      this.updateUserInfo(user);
+    } else {
+      // Limpar dados quando não logado
+      this.userRole = null;
+      this.hasAdminAccess = false;
+    }
+  }  // Atualizar informações do usuário
+  updateUserInfo(user: User | null) {
+    if (user) {
+      this.isLoggedIn = true;
+      this.userName = user.name;
+      this.userRole = this.authService.getUserRoleFromToken();
+      this.hasAdminAccess = this.authService.hasAdminAccess();
+      // Você pode adicionar lógica para definir a imagem do usuário aqui
+      // Por exemplo, se houver um campo de avatar no usuário
+      this.userImage = 'assets/imgs/et_mascote.png'; // padrão por enquanto
+    } else {
+      this.isLoggedIn = false;
+      this.userName = '';
+      this.userRole = null;
+      this.hasAdminAccess = false;
+      this.userImage = 'assets/imgs/et_mascote.png';
+    }
   }
 
   isRouteActive(route: string): boolean {
@@ -96,12 +159,18 @@ export class Navbar implements OnInit {
   }
 
   logout() {
-    this.isLoggedIn = false;
+    this.authService.logout();
+    this.isUserDropdownOpen = false;
     this.closeMenu();
   }
 
-  login() {
-    this.isLoggedIn = true;
+  // Métodos para controlar o dropdown do usuário
+  toggleUserDropdown() {
+    this.isUserDropdownOpen = !this.isUserDropdownOpen;
+  }
+
+  onDropdownItemClick() {
+    this.isUserDropdownOpen = false;
     this.closeMenu();
   }
 
@@ -110,20 +179,23 @@ export class Navbar implements OnInit {
     event.target.src = 'assets/imgs/et_mascote.png';
   }
 
-  toggleLoginState() {
-    this.isLoggedIn = !this.isLoggedIn;
-    this.closeMenu();
-  }
-
-  // Fechar menu quando clicar fora
+  // Fechar menu e dropdown quando clicar fora
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
     const navbar = this.elementRef.nativeElement.querySelector('.navbar-custom');
+    const userDropdown = this.elementRef.nativeElement.querySelector('.user-dropdown');
+    const userAvatar = this.elementRef.nativeElement.querySelector('.user-avatar-btn');
 
     // Se clicou fora do navbar e o menu está aberto, fecha o menu
     if (this.isMenuOpen && navbar && !navbar.contains(target)) {
       this.closeMenu();
+    }
+
+    // Se clicou fora do dropdown do usuário e não foi no avatar, fecha o dropdown
+    if (this.isUserDropdownOpen && userDropdown && !userDropdown.contains(target) &&
+        userAvatar && !userAvatar.contains(target)) {
+      this.isUserDropdownOpen = false;
     }
   }
 

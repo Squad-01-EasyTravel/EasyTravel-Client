@@ -14,23 +14,28 @@ import { TravelHistory } from './features/client/pages/user/travel-history/trave
 import { Payment } from './features/client/pages/payment/payment';
 import { AdminDashboardContent } from './features/admin/pages/admin-dashboard-content/admin-dashboard-content';
 import { AdminDashboard } from './features/admin/pages/admin-dashboard/admin-dashboard';
+import { AuthGuard } from './shared/guards/auth.guard';
 
 
 export const routes: Routes = [
+  // Rotas públicas (sem autenticação necessária)
   { path: '', component: Home },
   { path: 'home', component: Home },
-  { path: 'bundles', component: Bundle },
-  { path: 'booking', component: Booking },
-  { path: 'my-booking', component: MyBooking },
-  { path: 'bundles/details-bundle/:id', component: DetailsBundle },
-  { path: 'payment', component: Payment },
+  { path: 'bundles', component: Bundle }, // Rota pública para visualizar pacotes
   { path: 'auth', children: AUTH_ROUTES },
-  { path: 'profile', component: Profile},
-  { path: 'profile/paymentinformation', component: PayInfo},
-  { path: 'profile/travelhistory', component: TravelHistory},
+
+  // Rotas protegidas (autenticação necessária)
+  { path: 'booking', component: Booking, canActivate: [AuthGuard] },
+  { path: 'my-booking', component: MyBooking, canActivate: [AuthGuard] },
+  { path: 'bundles/details-bundle/:id', component: DetailsBundle, canActivate: [AuthGuard] },
+  { path: 'payment', component: Payment, canActivate: [AuthGuard] },
+  { path: 'profile', component: Profile, canActivate: [AuthGuard] },
+  { path: 'profile/paymentinformation', component: PayInfo, canActivate: [AuthGuard] },
+  { path: 'profile/travelhistory', component: TravelHistory, canActivate: [AuthGuard] },
   {
     path: 'employee',
     component: EmployeeLayoutComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: 'package-management', component: PackageManagementComponent },
       { path: 'review-management', component: ReviewManagement }
@@ -39,8 +44,11 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminDashboard, // layout com sidebar e router-outlet
+    canActivate: [AuthGuard],
     children: [
       { path: 'dashboard', component: AdminDashboardContent } // conteúdo do dashboard
     ]
   },
+  // Rota catch-all: redireciona qualquer rota não encontrada para home
+  { path: '**', redirectTo: '/home' }
 ];
