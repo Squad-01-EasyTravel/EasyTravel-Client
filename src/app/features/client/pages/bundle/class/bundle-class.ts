@@ -1,12 +1,12 @@
 export class BundleClass {
 
     bundleTitle:string = ''
-    descricao: string = ''
+    bundleDescription: string = ''
     initialPrice: string = ''
-    rankPacote: string = ''
+    bundleRank: string = ''
     initialDate: string = ''
     finalDate: string = ''
-    quantidade: string = ''
-    viajantes: string = ''
+    quantity: string = ''
+    travelersNumber: string = ''
     bundleStatus: string = ''
 }

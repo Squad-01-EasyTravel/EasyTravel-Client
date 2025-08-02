@@ -2,16 +2,25 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { BookedTrip } from '../models/booked-trip.interface';
+import { HttpClient } from '@angular/common/http';
+import { CurrentUser } from '@/app/features/client/pages/booking/classe/current-user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
 
-  constructor() { }
+  private baseUrl = "http://localhost:8080/api/reservations";
+  constructor(private http: HttpClient) {}
+
+  getCurrentUser(): Observable<CurrentUser> {
+    const url = `${this.baseUrl}/my`;
+    return this.http.get<CurrentUser>(url);
+  }
 
   // Simula busca de pacotes do usuário no back-end
   getUserBookings(): Observable<BookedTrip[]> {
+
     const mockData: BookedTrip[] = [
       {
         id: '1',
