@@ -33,14 +33,6 @@ export class Card implements OnInit {
     }).format(price);
   }
 
-  getStarArray(rating: number): number[] {
-    return Array(Math.floor(rating)).fill(0);
-  }
-
-  hasPartialStar(rating: number): boolean {
-    return rating % 1 !== 0;
-  }
-
   showDetails(): void {
     this.router.navigate(['/bundles/', this.pacote.id]);
   }
@@ -80,5 +72,64 @@ export class Card implements OnInit {
   onImageLoad(event: any): void {
     console.log('🖼️ ✅ Imagem carregada com sucesso:', event.target.src);
     console.log('🖼️ ✅ Para o pacote:', this.pacote?.bundleTitle);
+  }
+
+  getRankTranslation(rank: string): string {
+    if (!rank) return 'BRONZE';
+    
+    switch (rank.toUpperCase().trim()) {
+      case 'GOLD': return 'OURO';
+      case 'SILVER': return 'PRATA';
+      case 'BRONZE': return 'BRONZE';
+      case 'PLATINUM': return 'PLATINA';
+      // Casos já em português
+      case 'OURO': return 'OURO';
+      case 'PRATA': return 'PRATA';
+      case 'PLATINA': return 'PLATINA';
+      default: return rank.toUpperCase();
+    }
+  }
+
+  getRankCssClass(rank: string): string {
+    if (!rank) return 'rank-bronze';
+    
+    switch (rank.toUpperCase().trim()) {
+      case 'GOLD':
+      case 'OURO': 
+        return 'rank-gold';
+      case 'SILVER':
+      case 'PRATA': 
+        return 'rank-silver';
+      case 'BRONZE': 
+        return 'rank-bronze';
+      case 'PLATINUM':
+      case 'PLATINA': 
+        return 'rank-platinum';
+      default: 
+        return 'rank-bronze';
+    }
+  }
+
+  // Métodos de avaliação seguindo a mesma lógica da home
+  getRatingFromRankConsistent(rank: string, bundleId: number): number {
+    switch (rank.toUpperCase()) {
+      case 'BRONZE': return 1;
+      case 'SILVER': 
+      case 'PRATA': return 2;
+      case 'GOLD': 
+      case 'OURO': return 3;
+      case 'PLATINUM': 
+      case 'PLATINA': 
+        return (bundleId % 2 === 0) ? 4 : 5;
+      default: return 3;
+    }
+  }
+
+  getStarsArray(rating: number): boolean[] {
+    const stars: boolean[] = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(i <= rating);
+    }
+    return stars;
   }
 }

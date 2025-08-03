@@ -51,6 +51,38 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badge-category i {
+  font-size: 0.7rem;
+}
+
+/* Estilos específicos para ranks */
+.badge-category.rank-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+  color: #000 !important;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4) !important;
+}
+
+.badge-category.rank-silver {
+  background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%) !important;
+  color: #000 !important;
+  box-shadow: 0 2px 8px rgba(192, 192, 192, 0.4) !important;
+}
+
+.badge-category.rank-bronze {
+  background: linear-gradient(135deg, #CD7F32 0%, #A0522D 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4) !important;
+}
+
+.badge-category.rank-platinum {
+  background: linear-gradient(135deg, #87CEEB 0%, #5F9EA0 100%) !important;
+  color: #000 !important;
+  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.4) !important;
 }
 
 .card-rating-overlay {
@@ -71,9 +103,19 @@
   gap: 2px;
 }
 
-.rating-stars i {
-  color: #ffd700;
+.rating-stars .star {
+  color: #666;
   font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.rating-stars .star.filled {
+  color: #ffd700;
+}
+
+.rating-stars .star i {
+  color: inherit;
+  font-size: inherit;
 }
 
 .rating-number {
@@ -341,6 +383,11 @@
   .badge-category {
     padding: 0.3rem 0.6rem;
     font-size: 0.7rem;
+    gap: 0.2rem;
+  }
+
+  .badge-category i {
+    font-size: 0.6rem;
   }
 
   .card-rating-overlay {
@@ -349,8 +396,12 @@
     padding: 0.4rem 0.6rem;
   }
 
-  .rating-stars i {
+  .rating-stars .star {
     font-size: 0.8rem;
+  }
+
+  .rating-stars .star i {
+    font-size: inherit;
   }
 
   .rating-number {

@@ -7,14 +7,21 @@
       (error)="onImageError($event)"
       (load)="onImageLoad($event)">
     <div class="card-badge">
-      <span class="badge-category">{{pacote.bundleRank}}</span>
+      <span class="badge-category" 
+            [class]="'badge-category ' + getRankCssClass(pacote.bundleRank)">
+        <i class="fas fa-star"></i>
+        {{ getRankTranslation(pacote.bundleRank) }}
+      </span>
     </div>
     <div class="card-rating-overlay">
       <div class="rating-stars">
-        <i class="fas fa-star" *ngFor="let star of getStarArray(pacote.evaluation)"></i>
-        <i class="fas fa-star-half-alt" *ngIf="hasPartialStar(pacote.evaluation)"></i>
+        <span *ngFor="let filled of getStarsArray(getRatingFromRankConsistent(pacote.bundleRank, pacote.id))"
+              class="star"
+              [class.filled]="filled">
+          <i class="fas fa-star"></i>
+        </span>
       </div>
-      <span class="rating-number">{{pacote.evaluation}}</span>
+      <span class="rating-number">{{ getRatingFromRankConsistent(pacote.bundleRank, pacote.id) }}</span>
     </div>
   </div>
 
