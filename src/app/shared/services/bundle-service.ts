@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MediaResponse } from '../models/media-response.interface';
+import { BundleLocationResponse } from '../models/bundle-location-response.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -29,5 +30,11 @@ export class BundleService {
   getBundleImage(bundleId: number): Observable<MediaResponse[]> {
     const url = `${this.mediaUrl}/images/bundle/${bundleId}`;
     return this.http.get<MediaResponse[]>(url);
+  }
+
+  // Buscar localização do pacote por ID
+  getBundleLocation(bundleId: number): Observable<BundleLocationResponse[]> {
+    const url = `http://localhost:8080/api/bundle-locations/bundle/${bundleId}`;
+    return this.http.get<BundleLocationResponse[]>(url);
   }
 }

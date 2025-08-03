@@ -22,6 +22,14 @@
               <div class="card-body">
                 <h5 class="card-title">{{ bundle.bundleTitle }}</h5>
                 
+                <!-- Rota do pacote -->
+                <div class="card-route mb-2">
+                  <small class="text-primary">
+                    <i class="fas fa-route"></i>
+                    <strong>{{ formatRoute(bundle) }}</strong>
+                  </small>
+                </div>
+                
                 <p class="card-description">{{ bundle.bundleDescription }}</p>
 
                 <!-- Informações do pacote -->

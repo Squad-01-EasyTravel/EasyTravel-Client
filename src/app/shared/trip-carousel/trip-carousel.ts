@@ -80,8 +80,8 @@ export class TripCarousel implements OnInit, AfterViewInit {
     this.bundleService.getAvailableBundles().subscribe({
       next: (bundles) => {
         this.bundles = bundles;
-        // Buscar imagens para cada bundle
-        this.loadBundleImages();
+        // Buscar imagens e localizações para cada bundle
+        this.loadBundleImagesAndLocations();
       },
       error: (error) => {
         console.error('Erro ao carregar pacotes disponíveis:', error);
@@ -94,6 +94,97 @@ export class TripCarousel implements OnInit, AfterViewInit {
     if (imgElement) {
       // Se a imagem falhar, usar a imagem padrão
       imgElement.src = '/assets/imgs/gramado.jpg';
+    }
+  }
+
+  private loadBundleImagesAndLocations(): void {
+    let completedRequests = 0;
+    const totalRequests = this.bundles.length * 2; // 2 requisições por bundle (imagem + localização)
+    
+    console.log(`🖼️🗺️ Iniciando carregamento de imagens e localizações para ${this.bundles.length} bundles`);
+    
+    this.bundles.forEach((bundle, index) => {
+      console.log(`🔍 Buscando dados para bundle ID: ${bundle.id}, título: ${bundle.bundleTitle}`);
+      
+      // Buscar imagem
+      this.bundleService.getBundleImage(bundle.id).subscribe({
+        next: (mediaResponse) => {
+          console.log(`📸 Resposta da API de imagem para bundle ${bundle.id}:`, mediaResponse);
+          
+          let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
+          
+          if (mediaData && mediaData.mediaUrl) {
+            let imageUrl = `http://localhost:8080${mediaData.mediaUrl}`;
+            bundle.imageUrl = imageUrl;
+            console.log(`✅ URL da imagem definida para bundle ${bundle.id}: ${bundle.imageUrl}`);
+          } else {
+            bundle.imageUrl = '/assets/imgs/gramado.jpg';
+            console.log(`⚠️ Usando imagem padrão para bundle ${bundle.id}`);
+          }
+          
+          completedRequests++;
+          this.checkAllRequestsCompleted(completedRequests, totalRequests);
+        },
+        error: (error) => {
+          console.error(`❌ Erro ao carregar imagem do bundle ${bundle.id}:`, error);
+          bundle.imageUrl = '/assets/imgs/gramado.jpg';
+          completedRequests++;
+          this.checkAllRequestsCompleted(completedRequests, totalRequests);
+        }
+      });
+
+      // Buscar localização
+      this.bundleService.getBundleLocation(bundle.id).subscribe({
+        next: (locationResponse) => {
+          console.log(`🗺️ Resposta da API de localização para bundle ${bundle.id}:`, locationResponse);
+          
+          let locationData = Array.isArray(locationResponse) ? locationResponse[0] : locationResponse;
+          
+          if (locationData && locationData.destination && locationData.departure) {
+            bundle.destinationCity = locationData.destination.city;
+            bundle.destinationState = locationData.destination.states;
+            bundle.departureCity = locationData.departure.city;
+            bundle.departureState = locationData.departure.states;
+            
+            console.log(`✅ Rota definida para bundle ${bundle.id}: ${bundle.departureCity}/${bundle.departureState} → ${bundle.destinationCity}/${bundle.destinationState}`);
+          } else {
+            console.log(`⚠️ Dados de localização incompletos para bundle ${bundle.id}`);
+          }
+          
+          completedRequests++;
+          this.checkAllRequestsCompleted(completedRequests, totalRequests);
+        },
+        error: (error) => {
+          console.error(`❌ Erro ao carregar localização do bundle ${bundle.id}:`, error);
+          completedRequests++;
+          this.checkAllRequestsCompleted(completedRequests, totalRequests);
+        }
+      });
+    });
+  }
+
+  private checkAllRequestsCompleted(completed: number, total: number): void {
+    console.log(`📊 Progresso: ${completed}/${total} requisições completadas`);
+    
+    if (completed === total) {
+      console.log('🎨 Todas as imagens e localizações processadas, organizando carousel...');
+      console.log('📋 Bundles finais:', this.bundles.map(b => ({ 
+        id: b.id, 
+        title: b.bundleTitle, 
+        imageUrl: b.imageUrl,
+        route: `${b.departureCity}/${b.departureState} → ${b.destinationCity}/${b.destinationState}`
+      })));
+      
+      this.groupedBundles = this.groupBundles(this.bundles, this.currentCardsPerSlide);
+      console.log('🎪 Carousel organizado:', this.groupedBundles);
+      
+      // Forçar detecção de mudanças
+      this.cdr.detectChanges();
+      console.log('🔄 Change detection executada');
+      
+      setTimeout(() => {
+        this.initializeCarousel();
+      }, 100);
     }
   }
 
@@ -247,6 +338,14 @@ export class TripCarousel implements OnInit, AfterViewInit {
       case 'PRATA': return 'rank-silver';
       default: return '';
     }
+  }
+
+  // Método para formatar a rota
+  formatRoute(bundle: BundleClass): string {
+    if (bundle.departureCity && bundle.departureState && bundle.destinationCity && bundle.destinationState) {
+      return `${bundle.departureCity}/${bundle.departureState} → ${bundle.destinationCity}/${bundle.destinationState}`;
+    }
+    return 'Rota não disponível';
   }
 
 }

@@ -10,4 +10,10 @@ export class BundleClass {
     travelersNumber: number = 0;
     bundleStatus: string = '';
     imageUrl?: string; // Propriedade opcional para URL da imagem
+    
+    // Propriedades para rota
+    departureCity?: string; // Cidade de origem
+    departureState?: string; // Estado de origem
+    destinationCity?: string; // Cidade de destino
+    destinationState?: string; // Estado de destino
 }
