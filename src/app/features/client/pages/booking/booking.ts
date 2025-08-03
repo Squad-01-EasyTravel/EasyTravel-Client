@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Navbar } from "../../../../shared/navbar/navbar";
 import { Footer } from "../../../../shared/footer/footer";
+import { CurrentUser } from './classe/current-user';
+import { BookingService } from '@/app/shared/services/booking.service';
+import { BundleService } from '@/app/shared/services/bundle-service';
+import { BundleClass } from '../bundle/class/bundle-class';
+import { AuthService } from '@/app/shared/services/auth.service';
 
 interface SelectedPackage {
   id: string;
@@ -101,26 +106,53 @@ export class Booking implements OnInit {
   }
 
   constructor(
-    private router: Router
+    private router: Router,
+    private service: BookingService,
+    private bundleService: BundleService, private authService: AuthService
   ) {}
 
+  currentUser: CurrentUser = new CurrentUser();
+  currentBundle: BundleClass = new BundleClass();
+
   ngOnInit(): void {
-    this.loadUserProfile();
-    this.initializeTravelersForCurrentPackage();
-    this.calculateTotalPrice();
-    this.loadBookingData();
+    // 1. Pega o id do usuário autenticado
+    const userId = this.authService.currentUser.userId;
+    // 2. Busca os dados completos do usuário
+    this.service.getCurrentUser(userId).subscribe(user => {
+      this.currentUser = user;
+      // 3. Busca o bundle pelo bundleId do usuário
+      if (user.bundleId) {
+        this.bundleService.getBundleById(user.bundleId).subscribe(bundle => {
+          this.currentBundle = bundle;
+          // Inicializa dependências após os dados estarem carregados
+          this.initializeTravelersForCurrentPackage();
+          this.calculateTotalPrice();
+          this.loadBookingData();
+        });
+      } else {
+        // Caso não tenha bundleId, inicializa apenas o restante
+        this.initializeTravelersForCurrentPackage();
+        this.calculateTotalPrice();
+        this.loadBookingData();
+      }
+    });
   }
 
-  loadUserProfile(): void {
-    // Dados mockados para teste
-    this.userProfile = {
-      fullName: 'João Silva Santos',
-      birthDate: '1990-05-15',
-      cpf: '123.456.789-00',
-      rg: '12.345.678-9',
-      email: 'joao.silva@email.com',
-      phone: '(11) 99999-9999'
-    };
+  showCurrentUser(): void {
+    console.log(this.currentUser);
+  } 
+
+  getLoggedUser() {
+    this.service.getCurrentUser(this.currentUser.userId).subscribe(res => {
+      this.currentUser = res;
+     
+    });
+  }
+
+  getLoggedBundle() {
+    const id = this.currentUser.bundleId;
+    this.bundleService.getBundleById(id)
+    .subscribe(res => this.currentBundle = res)
   }
 
   initializeTravelersForCurrentPackage(): void {
@@ -235,7 +267,9 @@ export class Booking implements OnInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
-  }  loadBookingData(): void {
+  }  
+
+  loadBookingData(): void {
     // Simular carregamento de dados do backend
     console.log('Loading booking data from backend...');
 
