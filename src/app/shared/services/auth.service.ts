@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { CurrentUser } from '@/app/features/client/pages/booking/classe/current-user';
 
 
 // export interface RoleClient{
@@ -80,7 +81,7 @@ export class AuthService {
     return this.getUserRoleFromToken();
   }
 
-
+   currentUser: CurrentUser = new CurrentUser();
 
   login(data: LoginDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
@@ -89,16 +90,31 @@ export class AuthService {
         this.setToken(response.token);
         this.setCurrentUser(response.user);
         localStorage.setItem('jwt', response.token);
-        // Decodifica o token e mostra apenas o campo 'role' no console
+
+        // Decodifica o token e armazena os dados em currentUser
         try {
           const decoded: any = jwtDecode(response.token);
           console.log('Role do usuário autenticado:', decoded.role);
           console.log('Token decodificado:', decoded);
+
+          // Mapeia os dados decodificados para CurrentUser
+          this.currentUser = this.mapDecodedToCurrentUser(decoded);
+
         } catch (error) {
           console.error('Erro ao decodificar o token:', error);
         }
       })
     );
+  }
+
+  private mapDecodedToCurrentUser(decoded: any): CurrentUser {
+    const user = new CurrentUser();
+    user.userId = decoded.id ;
+
+   
+  
+    
+    return user;
   }
 
   registerClient(data: RegisterClientDto): Observable<AuthResponse> {

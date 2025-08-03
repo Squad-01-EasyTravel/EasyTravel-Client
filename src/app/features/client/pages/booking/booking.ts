@@ -8,6 +8,7 @@ import { CurrentUser } from './classe/current-user';
 import { BookingService } from '@/app/shared/services/booking.service';
 import { BundleService } from '@/app/shared/services/bundle-service';
 import { BundleClass } from '../bundle/class/bundle-class';
+import { AuthService } from '@/app/shared/services/auth.service';
 
 interface SelectedPackage {
   id: string;
@@ -107,24 +108,44 @@ export class Booking implements OnInit {
   constructor(
     private router: Router,
     private service: BookingService,
-    private bundleService: BundleService
+    private bundleService: BundleService, private authService: AuthService
   ) {}
 
   currentUser: CurrentUser = new CurrentUser();
   currentBundle: BundleClass = new BundleClass();
 
   ngOnInit(): void {
-    this.getLoggedUser();
-    console.log(this.currentUser);
-    this.initializeTravelersForCurrentPackage();
-    this.calculateTotalPrice();
-    this.loadBookingData();
+    // 1. Pega o id do usuário autenticado
+    const userId = this.authService.currentUser.userId;
+    // 2. Busca os dados completos do usuário
+    this.service.getCurrentUser(userId).subscribe(user => {
+      this.currentUser = user;
+      // 3. Busca o bundle pelo bundleId do usuário
+      if (user.bundleId) {
+        this.bundleService.getBundleById(user.bundleId).subscribe(bundle => {
+          this.currentBundle = bundle;
+          // Inicializa dependências após os dados estarem carregados
+          this.initializeTravelersForCurrentPackage();
+          this.calculateTotalPrice();
+          this.loadBookingData();
+        });
+      } else {
+        // Caso não tenha bundleId, inicializa apenas o restante
+        this.initializeTravelersForCurrentPackage();
+        this.calculateTotalPrice();
+        this.loadBookingData();
+      }
+    });
   }
 
+  showCurrentUser(): void {
+    console.log(this.currentUser);
+  } 
+
   getLoggedUser() {
-    this.service.getCurrentUser().subscribe(res => {
+    this.service.getCurrentUser(this.currentUser.userId).subscribe(res => {
       this.currentUser = res;
-      this.getLoggedBundle();
+     
     });
   }
 
