@@ -19,7 +19,9 @@ export class Home implements OnInit {
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    
+  }
 
   buscarViagens() {
     if (!this.origemSelecionada || !this.destinoSelecionada) {
