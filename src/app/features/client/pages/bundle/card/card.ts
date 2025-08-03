@@ -1,6 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TravelPackage } from '../bundle';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
@@ -9,15 +8,15 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
   templateUrl: './card.html',
   styleUrl: './card.css'
 })
-export class Card {
+export class Card implements OnInit {
+  constructor(private route: ActivatedRoute, private router: Router) {}
 
+  @Input() pacote!: any; // Aceita o objeto processado com dados da API
 
-  constructor(private route: ActivatedRoute, private router: Router) {
-
+  ngOnInit() {
+    console.log('🎴 Card inicializado com dados:', this.pacote);
+    console.log('🎴 Imagem do pacote:', this.pacote?.image);
   }
-
-
-  @Input() pacote!: TravelPackage;
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -42,11 +41,44 @@ export class Card {
     return rating % 1 !== 0;
   }
 
-  showDetails():void {
-    let id = this.route.snapshot.paramMap.get('id') as string;
-    //buscar o pacote tomando como base o id
+  showDetails(): void {
+    this.router.navigate(['/bundles/', this.pacote.id]);
+  }
 
-    //ou, se os detalhes do pacote estiverem em outro componente, chamar esse componente pela rota
-    this.router.navigate(['/bundles/'])
+  onImageError(event: any): void {
+    console.log('🖼️ ❌ Erro ao carregar imagem do card:', event);
+    console.log('🖼️ ❌ URL que falhou:', event.target.src);
+    console.log('🖼️ ❌ Dados do pacote:', this.pacote);
+    
+    const currentSrc = event.target.src;
+    
+    // Se a imagem da API falhou, tentar com imagem local
+    if (currentSrc.includes('localhost:8080') || currentSrc.includes('/uploads/')) {
+      console.log('🖼️ 🔄 Imagem da API falhou, usando fallback local');
+      event.target.src = 'assets/imgs/gramado.jpg';
+      return;
+    }
+    
+    // Se já estamos usando fallback local e ainda falhou, tentar outras opções
+    const fallbackImages = [
+      'assets/imgs/gramado.jpg',
+      'assets/imgs/fortaleza.jpg',
+      'assets/imgs/background-hero-section.png'
+    ];
+    
+    const currentImageName = currentSrc.split('/').pop();
+    const nextFallback = fallbackImages.find(img => !img.includes(currentImageName));
+    
+    if (nextFallback) {
+      console.log(`🖼️ 🔄 Tentando próxima imagem fallback: ${nextFallback}`);
+      event.target.src = nextFallback;
+    } else {
+      console.log('🖼️ ❌ Todas as imagens fallback falharam');
+    }
+  }
+
+  onImageLoad(event: any): void {
+    console.log('🖼️ ✅ Imagem carregada com sucesso:', event.target.src);
+    console.log('🖼️ ✅ Para o pacote:', this.pacote?.bundleTitle);
   }
 }

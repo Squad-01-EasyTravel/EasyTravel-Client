@@ -16,19 +16,19 @@
           <h1 class="page-title">Pacotes de Viagem</h1>
           <p class="results-count">
             <i class="fas fa-search"></i>
-            {{filteredPackages.length}} pacotes encontrados
+            {{packagesWithImages.length}} pacotes encontrados
           </p>
         </div>
 
         <div class="view-options">
           <span class="showing-text">
-            Mostrando {{getDisplayStart()}}-{{getDisplayEnd()}} de {{filteredPackages.length}}
+            Mostrando {{getDisplayStart()}}-{{getDisplayEnd()}} de {{packagesWithImages.length}}
           </span>
         </div>
       </div>
 
       <!-- Grid de Cards -->
-      <div class="cards-grid" *ngIf="filteredPackages.length > 0">
+      <div class="cards-grid" *ngIf="packagesWithImages.length > 0">
         <app-card
           *ngFor="let pacote of getPaginatedPackages()"
           [pacote]="pacote">
@@ -36,7 +36,7 @@
       </div>
 
       <!-- Estado vazio -->
-      <div class="empty-state" *ngIf="filteredPackages.length === 0">
+      <div class="empty-state" *ngIf="packagesWithImages.length === 0">
         <div class="empty-content">
           <div class="empty-icon">
             <i class="fas fa-map-marked-alt"></i>
@@ -51,7 +51,7 @@
       </div>
 
       <!-- Paginação centralizada abaixo dos cards -->
-      <div class="pagination-section" *ngIf="filteredPackages.length > 0">
+      <div class="pagination-section" *ngIf="packagesWithImages.length > 0">
         <div class="pagination-wrapper">
           <!-- Container principal centralizado com navegação e seletor lado a lado -->
           <div class="pagination-main-controls">
