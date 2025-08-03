@@ -288,10 +288,16 @@ export class TripCarousel implements OnInit, AfterViewInit {
   }
 
   getDurationInDays(initialDate: string, finalDate: string): number {
+    if (!initialDate || !finalDate) {
+      return 0;
+    }
+    
     const start = new Date(initialDate);
     const end = new Date(finalDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
   }
 
   getRankColor(rank: string): string {
@@ -346,6 +352,65 @@ export class TripCarousel implements OnInit, AfterViewInit {
       return `${bundle.departureCity}/${bundle.departureState} → ${bundle.destinationCity}/${bundle.destinationState}`;
     }
     return 'Rota não disponível';
+  }
+
+  // Método para gerar avaliação baseada no rank do pacote
+  getMockedRating(bundleId: number): number {
+    // Buscar o bundle pelo ID para pegar o rank
+    const bundle = this.bundles.find(b => b.id === bundleId);
+    if (bundle && bundle.bundleRank) {
+      return this.getRatingFromRank(bundle.bundleRank);
+    }
+    // Fallback para ID se não encontrar o bundle
+    return ((bundleId % 5) + 1);
+  }
+
+  // Método para mapear rank para avaliação
+  getRatingFromRank(rank: string): number {
+    switch (rank.toUpperCase()) {
+      case 'BRONZE': return 1;        // 1 estrela
+      case 'SILVER': 
+      case 'PRATA': return 2;         // 2 estrelas
+      case 'GOLD': 
+      case 'OURO': return 3;          // 3 estrelas
+      case 'PLATINUM': 
+      case 'PLATINA': 
+        // Para platina, alternar entre 4 e 5 estrelas baseado no ID
+        return Math.random() > 0.5 ? 4 : 5;
+      default: return 3;              // Default: 3 estrelas
+    }
+  }
+
+  // Método alternativo para platina com base no ID (mais consistente)
+  getRatingFromRankConsistent(rank: string, bundleId: number): number {
+    switch (rank.toUpperCase()) {
+      case 'BRONZE': return 1;        // 1 estrela
+      case 'SILVER': 
+      case 'PRATA': return 2;         // 2 estrelas
+      case 'GOLD': 
+      case 'OURO': return 3;          // 3 estrelas
+      case 'PLATINUM': 
+      case 'PLATINA': 
+        // Para platina, alternar entre 4 e 5 estrelas baseado no ID
+        return (bundleId % 2 === 0) ? 4 : 5;
+      default: return 3;              // Default: 3 estrelas
+    }
+  }
+
+  // Método para gerar número de avaliações mockadas
+  getMockedReviewCount(bundleId: number): number {
+    // Gerar um número de avaliações baseado no ID (entre 10 e 500)
+    const count = ((bundleId * 17) % 491) + 10; // Resultado entre 10 e 500
+    return count;
+  }
+
+  // Método para gerar array de estrelas para exibição
+  getStarsArray(rating: number): boolean[] {
+    const stars: boolean[] = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(i <= rating);
+    }
+    return stars;
   }
 
 }
