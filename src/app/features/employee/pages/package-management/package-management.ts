@@ -1,20 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BundleService } from '@/app/shared/services/bundle-service';
+import { BundleClass } from '@/app/features/client/pages/bundle/class/bundle-class';
 
 interface TravelPackage {
   id: number;
   bundleTitle: string;
   bundleDescription: string;
   initialPrice: number;
-  bundleRank: 'BRONZE' | 'PRATA' | 'OURO' | 'PLATINA';
+  bundleRank: 'BRONZE' | 'PRATA' | 'OURO' | 'PLATINA' | 'GOLD' | 'SILVER';
   initialDate: string;
   finalDate: string;
   quantity: number;
-  imageUrl: string;
+  travelersNumber: number;
+  bundleStatus: string;
+  imageUrl?: string;
   videoUrl?: string;
-  available: boolean;
-  createdAt: Date;
+  available?: boolean;
+  createdAt?: Date;
   additionalInfo?: string;
   destination?: string;
   origin?: string;
@@ -65,48 +69,101 @@ export class PackageManagementComponent implements OnInit {
   // Propriedades para o modal de filtro
   isFilterModalOpen = false;
 
-  constructor() {}
+  constructor(private service: BundleService) {}
+
+  bundleArray: BundleClass[] = [];
 
   ngOnInit(): void {
+    console.log('Iniciando carregamento dos bundles...');
+    this.service.getAllBundles().subscribe({
+      next: (res) => {
+        this.bundleArray = res;
+        console.log('Bundles carregados com sucesso:', this.bundleArray);
+        console.log('Quantidade de bundles:', this.bundleArray.length);
+      },
+      error: (error) => {
+        console.error('Erro ao carregar bundles:', error);
+        console.log('Status do erro:', error.status);
+        console.log('Mensagem do erro:', error.message);
+      }
+    });
     this.loadPackages();
   }
 
   loadPackages(): void {
-    // Simulando dados de pacotes - substitua por chamada real à API
-    this.packages = [
-      {
-        id: 1,
-        bundleTitle: 'Pacote Férias Nordeste',
-        bundleDescription: 'Pacote para o nordeste com tudo incluso',
-        initialPrice: 1200,
-        bundleRank: 'BRONZE',
-        initialDate: '2025-07-29T18:12:22.171Z',
-        finalDate: '2025-07-29T18:12:22.171Z',
-        quantity: 10,
-        imageUrl: '/assets/imgs/fortaleza.jpg',
-        videoUrl: '',
-        available: true,
-        createdAt: new Date('2024-01-15'),
-        destination: 'Fortaleza, CE',
-        origin: 'São Paulo, SP'
+    console.log('🔄 Carregando pacotes da API...');
+    
+    this.service.getAllBundles().subscribe({
+      next: (bundles: BundleClass[]) => {
+        console.log('📦 Pacotes recebidos da API:', bundles.length, bundles);
+        
+        if (!bundles || !Array.isArray(bundles)) {
+          console.warn('⚠️ Nenhum pacote encontrado ou resposta inválida');
+          this.packages = [];
+          return;
+        }
+        
+        // Converter BundleClass para TravelPackage
+        this.packages = bundles.map(bundle => this.convertBundleToTravelPackage(bundle));
+        
+        console.log('✅ Pacotes convertidos para TravelPackage:', this.packages.length, this.packages);
+        
+        // Resetar para primeira página
+        this.currentPage = 1;
       },
-      {
-        id: 2,
-        bundleTitle: 'Pacote Sul',
-        bundleDescription: 'Experiência única na Serra Gaúcha',
-        initialPrice: 980,
-        bundleRank: 'OURO',
-        initialDate: '2025-08-01T10:00:00.000Z',
-        finalDate: '2025-08-10T10:00:00.000Z',
-        quantity: 5,
-        imageUrl: '/assets/imgs/gramado.jpg',
-        videoUrl: '',
-        available: true,
-        createdAt: new Date('2024-02-10'),
-        destination: 'Gramado, RS',
-        origin: 'Rio de Janeiro, RJ'
+      error: (error) => {
+        console.error('❌ Erro ao carregar pacotes:', error);
+        console.log('Status do erro:', error.status);
+        console.log('Mensagem do erro:', error.message);
+        
+        // Em caso de erro, manter array vazio
+        this.packages = [];
       }
-    ];
+    });
+  }
+
+  private convertBundleToTravelPackage(bundle: BundleClass): TravelPackage {
+    return {
+      id: bundle.id,
+      bundleTitle: bundle.bundleTitle,
+      bundleDescription: bundle.bundleDescription,
+      initialPrice: bundle.initialPrice,
+      bundleRank: this.mapBundleRank(bundle.bundleRank),
+      initialDate: bundle.initialDate,
+      finalDate: bundle.finalDate,
+      quantity: bundle.quantity,
+      travelersNumber: bundle.travelersNumber,
+      bundleStatus: bundle.bundleStatus,
+      imageUrl: bundle.imageUrl || '/assets/imgs/fortaleza.jpg', // Imagem padrão se não tiver
+      videoUrl: '',
+      available: bundle.bundleStatus === 'AVAILABLE',
+      createdAt: new Date(),
+      destination: bundle.destinationCity && bundle.destinationState 
+        ? `${bundle.destinationCity}, ${bundle.destinationState}` 
+        : 'Destino não informado',
+      origin: bundle.departureCity && bundle.departureState 
+        ? `${bundle.departureCity}, ${bundle.departureState}` 
+        : 'Origem não informada'
+    };
+  }
+
+  private mapBundleRank(rank: string): 'BRONZE' | 'PRATA' | 'OURO' | 'PLATINA' | 'GOLD' | 'SILVER' {
+    // Mapear diferentes formatos de rank para nosso enum
+    const normalizedRank = rank.toUpperCase();
+    
+    switch (normalizedRank) {
+      case 'GOLD':
+        return 'OURO';
+      case 'SILVER':
+        return 'PRATA';
+      case 'BRONZE':
+        return 'BRONZE';
+      case 'PLATINUM':
+      case 'PLATINA':
+        return 'PLATINA';
+      default:
+        return 'BRONZE';
+    }
   }
 
   getAvailablePackagesCount(): number {
@@ -188,11 +245,14 @@ export class PackageManagementComponent implements OnInit {
   getRankDisplay(rank?: string): string {
     const rankMap: { [key: string]: string } = {
       'BRONZE': '🥉 Bronze - Básico',
-      'PRATA': '🥈 Prata - Intermediário',
+      'PRATA': '🥈 Prata - Intermediário', 
+      'SILVER': '🥈 Prata - Intermediário',
       'OURO': '🥇 Ouro - Premium',
-      'PLATINA': '💎 Platina - Luxo'
+      'GOLD': '🥇 Ouro - Premium',
+      'PLATINA': '💎 Platina - Luxo',
+      'PLATINUM': '💎 Platina - Luxo'
     };
-    return rank ? rankMap[rank] || rank : '';
+    return rank ? rankMap[rank.toUpperCase()] || rank : 'Não definido';
   }
 
   resetForm(): void {
@@ -296,6 +356,11 @@ export class PackageManagementComponent implements OnInit {
   savePackage(): void {
     if (this.isEditMode && this.selectedPackage) {
       // Atualizar pacote existente
+      console.log('✏️ Atualizando pacote existente:', this.selectedPackage.id);
+      
+      // Aqui você implementaria a chamada para API de update
+      // this.service.updateBundle(this.selectedPackage.id, this.newPackage).subscribe({...})
+      
       const index = this.packages.findIndex(p => p.id === this.selectedPackage!.id);
       if (index !== -1) {
         this.packages[index] = {
@@ -307,11 +372,19 @@ export class PackageManagementComponent implements OnInit {
       }
     } else {
       // Criar novo pacote
+      console.log('➕ Criando novo pacote');
+      
+      // Aqui você implementaria a chamada para API de create
+      // this.service.createBundle(this.newPackage).subscribe({...})
+      
       const newId = Math.max(...this.packages.map(p => p.id), 0) + 1;
       const packageToAdd: TravelPackage = {
         ...this.newPackage,
         id: newId,
-        createdAt: new Date()
+        createdAt: new Date(),
+        available: true,
+        bundleStatus: 'AVAILABLE',
+        travelersNumber: 1
       } as TravelPackage;
 
       this.packages.push(packageToAdd);
@@ -324,10 +397,19 @@ export class PackageManagementComponent implements OnInit {
     }
 
     this.closeModal();
+    
+    // Recarregar dados da API após salvar
+    console.log('🔄 Recarregando dados da API após operação...');
+    this.loadPackages();
   }
 
   deletePackage(id: number): void {
     if (confirm('Tem certeza que deseja excluir este pacote?')) {
+      console.log('🗑️ Excluindo pacote ID:', id);
+      
+      // Aqui você implementaria a chamada para API de delete
+      // this.service.deleteBundle(id).subscribe({...})
+      
       this.packages = this.packages.filter(p => p.id !== id);
 
       // Ajustar página se necessário
@@ -335,11 +417,25 @@ export class PackageManagementComponent implements OnInit {
       if (this.currentPage > totalPages && totalPages > 0) {
         this.currentPage = totalPages;
       }
+      
+      // Recarregar dados da API após excluir
+      console.log('🔄 Recarregando dados da API após exclusão...');
+      this.loadPackages();
     }
   }
 
   toggleAvailability(packageItem: TravelPackage): void {
+    console.log('🔄 Alterando disponibilidade do pacote ID:', packageItem.id);
+    
+    // Aqui você implementaria a chamada para API de update status
+    // this.service.updateBundleStatus(packageItem.id, !packageItem.available).subscribe({...})
+    
     packageItem.available = !packageItem.available;
+    packageItem.bundleStatus = packageItem.available ? 'AVAILABLE' : 'UNAVAILABLE';
+    
+    // Recarregar dados da API após alterar status
+    console.log('🔄 Recarregando dados da API após alterar status...');
+    setTimeout(() => this.loadPackages(), 500); // Pequeno delay para dar tempo da API processar
   }
 
   // ===== MÉTODOS PARA UPLOAD DE IMAGEM =====
