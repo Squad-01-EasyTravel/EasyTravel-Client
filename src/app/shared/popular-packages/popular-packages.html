@@ -88,6 +88,15 @@
                     {{ bundle.bundleStatus === 'AVAILABLE' ? 'DISPONÍVEL' : bundle.bundleStatus }}
                   </span>
                 </div>
+                
+                <!-- Botão Ver Detalhes -->
+                <div class="card-actions mt-3">
+                  <button class="btn btn-outline-primary btn-sm w-100" 
+                          (click)="verDetalhes(bundle.id)">
+                    <i class="fas fa-eye"></i>
+                    Ver Detalhes
+                  </button>
+                </div>
                 <hr>
               </div>
             </div>

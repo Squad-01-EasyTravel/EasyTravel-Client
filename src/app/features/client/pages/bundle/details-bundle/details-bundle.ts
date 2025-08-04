@@ -6,6 +6,8 @@ import { Navbar } from '../../../../../shared/navbar/navbar';
 import { Footer } from '../../../../../shared/footer/footer';
 import { BundleService } from '@/app/shared/services/bundle-service';
 import { BundleClass } from '../class/bundle-class';
+import { MediaResponse } from '../../../../../shared/models/media-response.interface';
+import { BundleLocationResponse } from '../../../../../shared/models/bundle-location-response.interface';
 
 // Interface para tipagem do pacote
 interface Pacote {
@@ -134,11 +136,203 @@ export class DetailsBundle implements OnInit {
 
   id!: string;
   bundleClass: BundleClass = new BundleClass();
+  bundleImageUrl: string = '';
+  
+  // Propriedades para localização
+  departureLocation: string = '';
+  destinationLocation: string = '';
+  
+  // Propriedades para datas formatadas
+  formattedDepartureDate: string = '';
+  formattedReturnDate: string = '';
+  
+  // Propriedade para duração calculada
+  calculatedDuration: string = '';
+  
+  // Propriedade para avaliação calculada
+  calculatedRating: number = 5;
 
   ngOnInit():void {
     this.id = this.route.snapshot.paramMap.get('id') as string;
     this.service.getBundleById(this.id)
-    .subscribe(res => this.bundleClass = res);
+    .subscribe(res => {
+      this.bundleClass = res;
+      this.loadBundleImage();
+      this.loadBundleLocation();
+      this.formatDates();
+      this.calculateBundleDuration();
+      this.calculateBundleRating();
+    });
+  }
+
+  loadBundleImage(): void {
+    if (this.id) {
+      console.log(`🖼️ Iniciando carregamento de imagem para bundle ${this.id}...`);
+      console.log(`🖼️ URL do endpoint: http://localhost:8080/api/medias/images/bundle/${this.id}`);
+      
+      this.service.getBundleImage(parseInt(this.id)).subscribe({
+        next: (imageResponse: MediaResponse[]) => {
+          console.log(`🖼️ Resposta da API de imagem para bundle ${this.id}:`, imageResponse);
+          console.log(`🖼️ Tipo da resposta:`, typeof imageResponse, Array.isArray(imageResponse));
+          
+          if (imageResponse && Array.isArray(imageResponse) && imageResponse.length > 0) {
+            const rawImageUrl = imageResponse[0].mediaUrl;
+            this.bundleImageUrl = this.processImageUrl(rawImageUrl);
+            console.log(`🖼️ URL original da API: ${rawImageUrl}`);
+            console.log(`🖼️ URL processada: ${this.bundleImageUrl}`);
+          } else {
+            console.log(`🖼️ Resposta inválida ou vazia, usando imagem padrão`);
+            this.bundleImageUrl = 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop';
+          }
+        },
+        error: (error) => {
+          console.error(`❌ Erro ao carregar imagem para bundle ${this.id}:`, error);
+          this.bundleImageUrl = 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop';
+        }
+      });
+    }
+  }
+
+  private processImageUrl(rawUrl: string): string {
+    console.log(`🔄 Processando URL da imagem: ${rawUrl}`);
+    
+    if (!rawUrl) {
+      console.log(`❌ URL vazia, retornando imagem padrão`);
+      return 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop';
+    }
+
+    // Se já for uma URL completa (http/https), retorna como está
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+      console.log(`✅ URL já é completa: ${rawUrl}`);
+      return rawUrl;
+    }
+
+    // Se começar com /, remove a barra inicial
+    const cleanUrl = rawUrl.startsWith('/') ? rawUrl.substring(1) : rawUrl;
+    const processedUrl = `http://localhost:8080/${cleanUrl}`;
+    
+    console.log(`🔄 URL processada: ${processedUrl}`);
+    return processedUrl;
+  }
+
+  onImageError(): void {
+    console.log('❌ Erro ao carregar imagem no HTML, aplicando fallback');
+    this.bundleImageUrl = 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop';
+  }
+
+  loadBundleLocation(): void {
+    if (this.id) {
+      console.log(`🗺️ Iniciando carregamento de localização para bundle ${this.id}...`);
+      
+      this.service.getBundleLocation(parseInt(this.id)).subscribe({
+        next: (locationResponse: BundleLocationResponse[]) => {
+          console.log(`🗺️ Resposta da API de localização para bundle ${this.id}:`, locationResponse);
+          
+          if (locationResponse && Array.isArray(locationResponse) && locationResponse.length > 0) {
+            const location = locationResponse[0];
+            
+            // Formatar local de partida
+            if (location.departure) {
+              this.departureLocation = `${location.departure.city}, ${location.departure.states} - ${location.departure.country.trim()}`;
+              console.log(`🛫 Local de partida: ${this.departureLocation}`);
+            }
+            
+            // Formatar local de destino
+            if (location.destination) {
+              this.destinationLocation = `${location.destination.city}, ${location.destination.states} - ${location.destination.country.trim()}`;
+              console.log(`🛬 Local de destino: ${this.destinationLocation}`);
+            }
+          } else {
+            console.log(`🗺️ Resposta de localização inválida ou vazia`);
+            this.departureLocation = 'Local de partida não informado';
+            this.destinationLocation = 'Local de destino não informado';
+          }
+        },
+        error: (error) => {
+          console.error(`❌ Erro ao carregar localização para bundle ${this.id}:`, error);
+          this.departureLocation = 'Erro ao carregar local de partida';
+          this.destinationLocation = 'Erro ao carregar local de destino';
+        }
+      });
+    }
+  }
+
+  formatDates(): void {
+    console.log(`📅 Formatando datas do bundle...`);
+    
+    // Formatar data de partida
+    if (this.bundleClass.initialDate) {
+      this.formattedDepartureDate = this.formatDate(this.bundleClass.initialDate);
+      console.log(`📅 Data de partida formatada: ${this.formattedDepartureDate}`);
+    }
+    
+    // Formatar data de retorno
+    if (this.bundleClass.finalDate) {
+      this.formattedReturnDate = this.formatDate(this.bundleClass.finalDate);
+      console.log(`📅 Data de retorno formatada: ${this.formattedReturnDate}`);
+    }
+  }
+
+  private formatDate(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return dateString; // Retorna a data original se houver erro
+    }
+  }
+
+  calculateBundleDuration(): void {
+    console.log(`⏱️ Calculando duração do bundle...`);
+    
+    if (this.bundleClass.initialDate && this.bundleClass.finalDate) {
+      const duration = this.calculateDuration(this.bundleClass.initialDate, this.bundleClass.finalDate);
+      this.calculatedDuration = `${duration} ${duration === 1 ? 'dia' : 'dias'}`;
+      console.log(`⏱️ Duração calculada: ${this.calculatedDuration}`);
+    } else {
+      console.log(`⏱️ Datas não disponíveis para cálculo de duração`);
+      this.calculatedDuration = 'Duração não informada';
+    }
+  }
+
+  private calculateDuration(startDate: string, endDate: string): number {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  }
+
+  calculateBundleRating(): void {
+    console.log(`⭐ Calculando avaliação do bundle...`);
+    
+    if (this.bundleClass.bundleRank && this.bundleClass.id) {
+      this.calculatedRating = this.getRatingFromRankConsistent(this.bundleClass.bundleRank, this.bundleClass.id);
+      console.log(`⭐ Rank do bundle: ${this.bundleClass.bundleRank}`);
+      console.log(`⭐ Avaliação calculada: ${this.calculatedRating} estrelas`);
+    } else {
+      console.log(`⭐ Dados de rank não disponíveis, usando avaliação padrão`);
+      this.calculatedRating = 5; // Valor padrão
+    }
+  }
+
+  // Método de avaliação consistente (mesmo usado na página bundle)
+  private getRatingFromRankConsistent(rank: string, bundleId: number): number {
+    switch (rank.toUpperCase()) {
+      case 'BRONZE': return 1;
+      case 'SILVER': 
+      case 'PRATA': return 2;
+      case 'GOLD': 
+      case 'OURO': return 3;
+      case 'PLATINUM': 
+      case 'PLATINA': 
+        return (bundleId % 2 === 0) ? 4 : 5;
+      default: return 3;
+    }
   }
 
   // Métodos de paginação
@@ -183,7 +377,7 @@ export class DetailsBundle implements OnInit {
       imagemPrincipal: '/assets/imgs/fortaleza.jpg',
       preco: 2400, // Ajustado para corresponder ao hero
       avaliacao: 5.0,
-      totalAvaliacoes: 1000,
+      totalAvaliacoes: 50,
       dataIda: '12/01/2025',
       dataVolta: '12/01/2025',
       duracao: '7 dias',
@@ -204,8 +398,9 @@ export class DetailsBundle implements OnInit {
   }
 
   // Método para gerar array de estrelas
-  getStarsArray(rating: number): number[] {
-    return Array(Math.floor(rating)).fill(0);
+  getStarsArray(rating?: number): number[] {
+    const finalRating = rating !== undefined ? rating : this.calculatedRating;
+    return Array(Math.floor(finalRating)).fill(0);
   }
 
   // Método para calcular valor total
