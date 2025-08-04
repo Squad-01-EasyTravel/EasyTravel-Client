@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { DashboardService } from '../../../../shared/services/dashboard.service';
 import { AuthService } from '../../../../shared/services/auth.service';
 import { Router } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 
 @Component({
@@ -749,12 +749,54 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     const metric = this.metrics.find(m => m.key === metricKey);
     const chartName = metric ? metric.label : metricKey;
 
-    // Simula o processo de exportação
-    console.log(`Exportando gráfico: ${chartName}`);
+    console.log(`📊 Exportando gráfico: ${chartName} (${metricKey})`);
 
-    // Aqui seria implementada a lógica real de exportação
-    // Por exemplo, usando bibliotecas como xlsx ou html2canvas
-    alert(`📊 Exportando "${chartName}" para Excel...\n\n✅ Em desenvolvimento: funcionalidade será implementada em breve!`);
+    // Mapeamento das métricas para os métodos de exportação
+    const exportMethods: { [key: string]: () => Observable<Blob> } = {
+      'faturamentoPorPacote': () => this.dashboardService.exportFaturamentoPorPacote(),
+      'receitaTotalPorMes': () => this.dashboardService.exportReceitaPorMes(),
+      'reservasAtivasPorRank': () => this.dashboardService.exportReservasAtivasPorRank(),
+      'usuariosPorMetodoPagamento': () => this.dashboardService.exportUsuariosPorMetodoPagamento(),
+      'totalReservasPorPacote': () => this.dashboardService.exportTotalReservasPorPacote(),
+      'vendasPorCidadeDestino': () => this.dashboardService.exportVendasPorCidade(),
+      'reservasCanceladasPorMes': () => this.dashboardService.exportReservasCanceladasPorMes(),
+      'vendasPorPagamento': () => this.dashboardService.exportVendasPorPagamento()
+    };
+
+    const exportMethod = exportMethods[metricKey];
+    
+    if (exportMethod) {
+      // Chama o método de exportação correspondente
+      exportMethod().subscribe({
+        next: (blob: Blob) => {
+          // Cria um link temporário para download do arquivo
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          
+          // Define o nome do arquivo baseado na métrica
+          const fileName = `${metricKey}_${new Date().toISOString().split('T')[0]}.xlsx`;
+          link.download = fileName;
+          
+          // Adiciona ao DOM, clica e remove
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Limpa a URL temporária
+          window.URL.revokeObjectURL(url);
+          
+          console.log(`✅ Download concluído: ${fileName}`);
+        },
+        error: (error: any) => {
+          console.error(`❌ Erro ao exportar ${chartName}:`, error);
+          alert(`❌ Erro ao exportar "${chartName}"\n\nTente novamente ou verifique sua conexão.`);
+        }
+      });
+    } else {
+      console.warn(`⚠️ Método de exportação não encontrado para: ${metricKey}`);
+      alert(`⚠️ Exportação para "${chartName}" ainda não está disponível.`);
+    }
 
     // Exemplo de implementação futura:
     /*

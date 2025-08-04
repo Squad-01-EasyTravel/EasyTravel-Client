@@ -262,4 +262,142 @@ export class DashboardService {
       })
     );
   }
+
+  // ========== MÉTODOS DE EXPORTAÇÃO PARA EXCEL ==========
+
+  // GET /api/dashboard/export/vendas-por-pagamento
+  exportVendasPorPagamento(): Observable<Blob> {
+    const url = `${this.baseUrl}/export/vendas-por-pagamento`;
+    console.log('📊 DashboardService - Exportando vendas por pagamento:', url);
+
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    }).pipe(
+      tap(() => console.log('✅ DashboardService - Exportação vendas por pagamento concluída')),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro na exportação vendas por pagamento:', error);
+        throw error;
+      })
+    );
+  }
+
+  // GET /api/dashboard/export/vendas-por-cidade
+  exportVendasPorCidade(): Observable<Blob> {
+    const url = `${this.baseUrl}/export/vendas-por-cidade`;
+    console.log('📊 DashboardService - Exportando vendas por cidade:', url);
+
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    }).pipe(
+      tap(() => console.log('✅ DashboardService - Exportação vendas por cidade concluída')),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro na exportação vendas por cidade:', error);
+        throw error;
+      })
+    );
+  }
+
+  // GET /api/dashboard/export/usuarios-por-metodo-pagamento
+  exportUsuariosPorMetodoPagamento(): Observable<Blob> {
+    const url = `${this.baseUrl}/export/usuarios-por-metodo-pagamento`;
+    console.log('📊 DashboardService - Exportando usuários por método pagamento:', url);
+
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    }).pipe(
+      tap(() => console.log('✅ DashboardService - Exportação usuários por método pagamento concluída')),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro na exportação usuários por método pagamento:', error);
+        throw error;
+      })
+    );
+  }
+
+  // GET /api/dashboard/export/total-reservas-por-pacote
+  exportTotalReservasPorPacote(): Observable<Blob> {
+    const url = `${this.baseUrl}/export/total-reservas-por-pacote`;
+    console.log('📊 DashboardService - Exportando total reservas por pacote:', url);
+
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    }).pipe(
+      tap(() => console.log('✅ DashboardService - Exportação total reservas por pacote concluída')),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro na exportação total reservas por pacote:', error);
+        throw error;
+      })
+    );
+  }
+
+  // GET /api/dashboard/export/reservas-canceladas-por-mes
+  exportReservasCanceladasPorMes(): Observable<Blob> {
+    const url = `${this.baseUrl}/export/reservas-canceladas-por-mes`;
+    console.log('📊 DashboardService - Exportando reservas canceladas por mês:', url);
+
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    }).pipe(
+      tap(() => console.log('✅ DashboardService - Exportação reservas canceladas por mês concluída')),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro na exportação reservas canceladas por mês:', error);
+        throw error;
+      })
+    );
+  }
+
+  // GET /api/dashboard/export/reservas-ativas-por-rank
+  exportReservasAtivasPorRank(): Observable<Blob> {
+    const url = `${this.baseUrl}/export/reservas-ativas-por-rank`;
+    console.log('📊 DashboardService - Exportando reservas ativas por rank:', url);
+
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    }).pipe(
+      tap(() => console.log('✅ DashboardService - Exportação reservas ativas por rank concluída')),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro na exportação reservas ativas por rank:', error);
+        throw error;
+      })
+    );
+  }
+
+  // GET /api/dashboard/export/receita-por-mes
+  exportReceitaPorMes(): Observable<Blob> {
+    const url = `${this.baseUrl}/export/receita-por-mes`;
+    console.log('📊 DashboardService - Exportando receita por mês:', url);
+
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    }).pipe(
+      tap(() => console.log('✅ DashboardService - Exportação receita por mês concluída')),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro na exportação receita por mês:', error);
+        throw error;
+      })
+    );
+  }
+
+  // GET /api/dashboard/export/faturamento-por-pacote
+  exportFaturamentoPorPacote(): Observable<Blob> {
+    const url = `${this.baseUrl}/export/faturamento-por-pacote`;
+    console.log('📊 DashboardService - Exportando faturamento por pacote:', url);
+
+    return this.http.get(url, {
+      headers: this.getAuthHeaders(),
+      responseType: 'blob'
+    }).pipe(
+      tap(() => console.log('✅ DashboardService - Exportação faturamento por pacote concluída')),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro na exportação faturamento por pacote:', error);
+        throw error;
+      })
+    );
+  }
 }
