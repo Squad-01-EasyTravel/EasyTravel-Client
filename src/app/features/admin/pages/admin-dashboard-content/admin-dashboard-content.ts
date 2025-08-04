@@ -464,12 +464,30 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       case 'reservasAtivasPorRank':
         chartLabel = 'Reservas Ativas por Rank';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
+          console.log('📊 Dashboard - Dados reservas por rank para gráfico:', apiDataForMetric);
+          
+          // Mapeamento dos ranks para display mais amigável
+          const rankLabels: { [key: number]: string } = {
+            1: '1º Lugar - Ouro',
+            2: '2º Lugar - Prata', 
+            3: '3º Lugar - Bronze',
+            4: '4º Lugar'
+          };
+
           chartData = {
-            labels: apiDataForMetric.map((item: any) => item.rank || 'N/A'),
+            labels: apiDataForMetric.map((item: any) => {
+              const label = rankLabels[item.bundleRank] || item.rank || `Rank ${item.bundleRank}` || 'N/A';
+              console.log('🏷️ Dashboard - Label rank:', label, 'para item:', item);
+              return label;
+            }),
             datasets: [{
               label: chartLabel,
-              data: apiDataForMetric.map((item: any) => item.ativas || item.quantidade || 0),
-              backgroundColor: ['#CD7F32', '#C0C0C0', '#FFD700', '#E5E4E2']
+              data: apiDataForMetric.map((item: any) => {
+                const value = item.reservasAtivas || item.ativas || item.quantidade || 0;
+                console.log('🏆 Dashboard - Valor reservas rank:', value, 'para item:', item);
+                return value;
+              }),
+              backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32', '#E5E4E2'] // Ouro, Prata, Bronze, 4º lugar
             }]
           };
         } else {
@@ -483,11 +501,29 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       case 'usuariosPorMetodoPagamento':
         chartLabel = 'Usuários por Método';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
+          console.log('📊 Dashboard - Dados usuários por método de pagamento para gráfico:', apiDataForMetric);
+          
+          // Mapeamento dos métodos de pagamento
+          const paymentMethodLabels: { [key: number]: string } = {
+            0: 'Cartão de Crédito',
+            1: 'Cartão de Débito', 
+            2: 'PIX',
+            3: 'Boleto'
+          };
+
           chartData = {
-            labels: apiDataForMetric.map((item: any) => item.metodo || 'N/A'),
+            labels: apiDataForMetric.map((item: any) => {
+              const label = paymentMethodLabels[item.paymentMethod] || item.metodo || `Método ${item.paymentMethod}` || 'N/A';
+              console.log('🏷️ Dashboard - Label usuários método:', label, 'para item:', item);
+              return label;
+            }),
             datasets: [{
               label: chartLabel,
-              data: apiDataForMetric.map((item: any) => item.usuarios || item.quantidade || 0),
+              data: apiDataForMetric.map((item: any) => {
+                const value = item.totalUsuarios || item.usuarios || item.quantidade || 0;
+                console.log('👥 Dashboard - Valor usuários método:', value, 'para item:', item);
+                return value;
+              }),
               backgroundColor: ['#FF7900', '#7FC023', '#6AAE20', '#FF5722', '#2196F3']
             }]
           };
