@@ -356,18 +356,71 @@ export class PackageManagementComponent implements OnInit {
       // Atualizar pacote existente
       console.log('✏️ Atualizando pacote existente:', this.selectedPackage.id);
       
-      // Aqui você implementaria a chamada para API de update
-      // this.service.updateBundle(this.selectedPackage.id, this.newPackage).subscribe({...})
+      // Converter rank para formato do backend
+      const backendRank = this.convertRankToBackend(this.newPackage.bundleRank || 'BRONZE');
       
-      const index = this.packages.findIndex(p => p.id === this.selectedPackage!.id);
-      if (index !== -1) {
-        this.packages[index] = {
-          ...this.selectedPackage,
-          ...this.newPackage,
-          id: this.selectedPackage.id,
-          createdAt: this.selectedPackage.createdAt
-        } as TravelPackage;
-      }
+      // Preparar dados para update (todos os campos obrigatórios)
+      const updateData = {
+        bundleTitle: this.newPackage.bundleTitle || '',
+        bundleDescription: this.newPackage.bundleDescription || '',
+        initialPrice: this.newPackage.initialPrice || 0,
+        bundleRank: backendRank,
+        initialDate: this.newPackage.initialDate || '',
+        finalDate: this.newPackage.finalDate || '',
+        quantity: this.newPackage.quantity || 0,
+        travelersNumber: this.newPackage.travelersNumber || 1,
+        bundleStatus: this.newPackage.available ? 'AVAILABLE' : 'UNAVAILABLE'
+      };
+      
+      console.log('📤 Enviando dados de edição para API:', updateData);
+      
+      // Fazer chamada para API de update
+      this.service.updateBundle(this.selectedPackage.id, updateData).subscribe({
+        next: (updatedBundle) => {
+          console.log('✅ Bundle editado com sucesso:', updatedBundle);
+          
+          // Atualizar na lista local
+          const index = this.packages.findIndex(p => p.id === this.selectedPackage!.id);
+          if (index !== -1) {
+            this.packages[index] = {
+              ...this.selectedPackage!,
+              ...this.newPackage,
+              id: this.selectedPackage!.id,
+              createdAt: this.selectedPackage!.createdAt,
+              bundleRank: this.mapBundleRank(updatedBundle.bundleRank), // Converter de volta para frontend
+              available: updatedBundle.bundleStatus === 'AVAILABLE',
+              bundleStatus: updatedBundle.bundleStatus
+            } as TravelPackage;
+          }
+          
+          this.closeModal();
+          
+          // Recarregar dados da API após salvar
+          console.log('🔄 Recarregando dados da API após edição...');
+          this.loadPackages();
+          
+          // Mostrar mensagem de sucesso
+          alert('Pacote editado com sucesso!');
+        },
+        error: (error) => {
+          console.error('❌ Erro ao editar pacote:', error);
+          console.log('Status do erro:', error.status);
+          console.log('Mensagem do erro:', error.message);
+          
+          // Mostrar mensagem de erro
+          if (error.status === 404) {
+            alert('Pacote não encontrado. Pode ter sido excluído.');
+            this.loadPackages();
+            this.closeModal();
+          } else if (error.status === 403) {
+            alert('Você não tem permissão para editar este pacote.');
+          } else if (error.status === 400) {
+            alert('Dados inválidos. Verifique os campos e tente novamente.');
+          } else {
+            alert('Erro ao editar pacote. Tente novamente.');
+          }
+        }
+      });
     } else {
       // Criar novo pacote
       console.log('➕ Criando novo pacote');
@@ -386,19 +439,19 @@ export class PackageManagementComponent implements OnInit {
       } as TravelPackage;
 
       this.packages.push(packageToAdd);
-    }
+      
+      // Resetar para primeira página se necessário
+      const totalPages = this.getTotalPages();
+      if (this.currentPage > totalPages) {
+        this.currentPage = Math.max(1, totalPages);
+      }
 
-    // Resetar para primeira página se necessário
-    const totalPages = this.getTotalPages();
-    if (this.currentPage > totalPages) {
-      this.currentPage = Math.max(1, totalPages);
+      this.closeModal();
+      
+      // Recarregar dados da API após salvar
+      console.log('🔄 Recarregando dados da API após operação...');
+      this.loadPackages();
     }
-
-    this.closeModal();
-    
-    // Recarregar dados da API após salvar
-    console.log('🔄 Recarregando dados da API após operação...');
-    this.loadPackages();
   }
 
   deletePackage(id: number): void {
@@ -491,6 +544,61 @@ export class PackageManagementComponent implements OnInit {
         
         // Em caso de erro, reverter as alterações locais
         alert('Erro ao alterar disponibilidade do pacote. Tente novamente.');
+      }
+    });
+  }
+
+  changeQuantity(packageItem: TravelPackage, change: number): void {
+    console.log('🔢 Alterando quantidade do pacote ID:', packageItem.id, 'Mudança:', change);
+    
+    // Calcular nova quantidade
+    const newQuantity = packageItem.quantity + change;
+    
+    // Validar se a nova quantidade é válida (não pode ser negativa)
+    if (newQuantity < 0) {
+      console.log('⚠️ Quantidade não pode ser negativa');
+      return;
+    }
+    
+    console.log(`📋 Alterando quantidade de ${packageItem.quantity} para ${newQuantity}`);
+    
+    // Converter rank de volta para formato do backend
+    const backendRank = this.convertRankToBackend(packageItem.bundleRank);
+    
+    // Preparar dados para update (todos os campos obrigatórios)
+    const updateData = {
+      bundleTitle: packageItem.bundleTitle,
+      bundleDescription: packageItem.bundleDescription,
+      initialPrice: packageItem.initialPrice,
+      bundleRank: backendRank,
+      initialDate: packageItem.initialDate,
+      finalDate: packageItem.finalDate,
+      quantity: newQuantity, // Nova quantidade
+      travelersNumber: packageItem.travelersNumber,
+      bundleStatus: packageItem.bundleStatus
+    };
+    
+    console.log('📤 Enviando dados para API (alteração de quantidade):', updateData);
+    
+    // Fazer chamada para API
+    this.service.updateBundle(packageItem.id, updateData).subscribe({
+      next: (updatedBundle) => {
+        console.log('✅ Quantidade atualizada com sucesso:', updatedBundle);
+        
+        // Atualizar localmente
+        packageItem.quantity = newQuantity;
+        
+        // Recarregar dados da API para garantir sincronização
+        console.log('🔄 Recarregando dados da API após alterar quantidade...');
+        this.loadPackages();
+      },
+      error: (error) => {
+        console.error('❌ Erro ao alterar quantidade do bundle:', error);
+        console.log('Status do erro:', error.status);
+        console.log('Mensagem do erro:', error.message);
+        
+        // Em caso de erro, mostrar mensagem
+        alert('Erro ao alterar quantidade de vagas. Tente novamente.');
       }
     });
   }
