@@ -429,11 +429,20 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       case 'receitaTotalPorMes':
         chartLabel = 'Receita Total por Mês';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
+          console.log('📊 Dashboard - Dados receita para gráfico:', apiDataForMetric);
           chartData = {
-            labels: apiDataForMetric.map((item: any) => item.mes || 'N/A'),
+            labels: apiDataForMetric.map((item: any) => {
+              const label = item.mes || 'N/A';
+              console.log('🏷️ Dashboard - Label receita:', label, 'para item:', item);
+              return label;
+            }),
             datasets: [{
               label: chartLabel,
-              data: apiDataForMetric.map((item: any) => item.receita || item.valor || 0),
+              data: apiDataForMetric.map((item: any) => {
+                const value = item.faturamento || item.receita || item.valor || 0;
+                console.log('💰 Dashboard - Valor receita:', value, 'para item:', item);
+                return value;
+              }),
               borderColor: '#FF7900',
               backgroundColor: 'rgba(255, 121, 0, 0.1)',
               tension: 0.4
@@ -540,11 +549,20 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       case 'reservasCanceladasPorMes':
         chartLabel = 'Cancelamentos por Mês';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
+          console.log('📊 Dashboard - Dados cancelamentos para gráfico:', apiDataForMetric);
           chartData = {
-            labels: apiDataForMetric.map((item: any) => item.mes || 'N/A'),
+            labels: apiDataForMetric.map((item: any) => {
+              const label = item.mes || 'N/A';
+              console.log('🏷️ Dashboard - Label cancelamentos:', label, 'para item:', item);
+              return label;
+            }),
             datasets: [{
               label: chartLabel,
-              data: apiDataForMetric.map((item: any) => item.canceladas || item.quantidade || 0),
+              data: apiDataForMetric.map((item: any) => {
+                const value = item.totalCanceladas || item.canceladas || item.quantidade || 0;
+                console.log('❌ Dashboard - Valor cancelamentos:', value, 'para item:', item);
+                return value;
+              }),
               borderColor: '#FF5722',
               backgroundColor: 'rgba(255, 87, 34, 0.1)',
               tension: 0.4

@@ -47,7 +47,7 @@ export interface ReservasAtivasPorRank {
 
 export interface ReceitaPorMes {
   mes: string;
-  receita: number;
+  faturamento: number; // Alterado de 'receita' para 'faturamento' para coincidir com a API
 }
 
 export interface FaturamentoPorPacote {
