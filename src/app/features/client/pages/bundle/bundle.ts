@@ -1,29 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Card } from './card/card';
 import { Filter, FilterCriteria } from './filter/filter';
 import { Navbar } from '../../../../shared/navbar/navbar';
 import { Footer } from '../../../../shared/footer/footer';
-
-export interface TravelPackage {
-  id: string;
-  imagem: string;
-  preco: number;
-  dataInicio: string;
-  dataFim: string;
-  destino: string;
-  localOrigem: string;
-  localDestino: string;
-  avaliacao: number;
-  categoria: string;
-  descricao: string;
-  incluso: string[];
-  maxViajantes: number;
-  popularidade: number;
-  relevancia: number;
-  dataPublicacao: Date;
-}
+import { BundleService } from '../../../../shared/services/bundle-service';
+import { BundleClass } from './class/bundle-class';
+import { MediaResponse } from '../../../../shared/models/media-response.interface';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-bundle',
@@ -31,450 +16,690 @@ export interface TravelPackage {
   templateUrl: './bundle.html',
   styleUrl: './bundle.css'
 })
-export class Bundle implements OnInit {
-  // Dados de exemplo expandidos para demonstrar filtros e paginação
-  allPackages: TravelPackage[] = [
-    {
-      id: '1',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 2400,
-      dataInicio: '2025-12-01',
-      dataFim: '2025-12-07',
-      destino: 'Recife',
-      localOrigem: 'sao-paulo',
-      localDestino: 'recife',
-      avaliacao: 4.9,
-      categoria: 'Praia',
-      descricao: 'Pacote completo para Recife com hospedagem e passeios',
-      incluso: ['Hospedagem', 'Café da manhã', 'City tour'],
-      maxViajantes: 4,
-      popularidade: 95,
-      relevancia: 90,
-      dataPublicacao: new Date('2025-01-15')
-    },
-    {
-      id: '2',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 3200,
-      dataInicio: '2025-02-15',
-      dataFim: '2025-02-22',
-      destino: 'Rio de Janeiro',
-      localOrigem: 'sao-paulo',
-      localDestino: 'rio-janeiro',
-      avaliacao: 4.7,
-      categoria: 'Cidade',
-      descricao: 'Explore o Rio de Janeiro com tudo incluído',
-      incluso: ['Hospedagem', 'Todas as refeições', 'Passeios'],
-      maxViajantes: 6,
-      popularidade: 88,
-      relevancia: 85,
-      dataPublicacao: new Date('2025-01-10')
-    },
-    {
-      id: '3',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 2800,
-      dataInicio: '2025-03-20',
-      dataFim: '2025-03-27',
-      destino: 'Fortaleza',
-      localOrigem: 'sao-paulo',
-      localDestino: 'fortaleza',
-      avaliacao: 4.8,
-      categoria: 'Praia',
-      descricao: 'Fortaleza e suas belas praias',
-      incluso: ['Hospedagem', 'Café da manhã', 'Transfer'],
-      maxViajantes: 5,
-      popularidade: 92,
-      relevancia: 88,
-      dataPublicacao: new Date('2025-01-20')
-    },
-    {
-      id: '4',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 4500,
-      dataInicio: '2025-04-10',
-      dataFim: '2025-04-17',
-      destino: 'Salvador',
-      localOrigem: 'rio-janeiro',
-      localDestino: 'salvador',
-      avaliacao: 4.6,
-      categoria: 'Cultura',
-      descricao: 'Salvador histórica e cultural',
-      incluso: ['Hospedagem', 'Guia turístico', 'Ingressos'],
-      maxViajantes: 8,
-      popularidade: 85,
-      relevancia: 92,
-      dataPublicacao: new Date('2025-01-25')
-    },
-    {
-      id: '5',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 1800,
-      dataInicio: '2025-05-05',
-      dataFim: '2025-05-10',
-      destino: 'Brasília',
-      localOrigem: 'sao-paulo',
-      localDestino: 'brasilia',
-      avaliacao: 4.3,
-      categoria: 'Negócios',
-      descricao: 'Brasília para viagens de negócios',
-      incluso: ['Hospedagem', 'Transfer', 'Wi-Fi'],
-      maxViajantes: 2,
-      popularidade: 70,
-      relevancia: 75,
-      dataPublicacao: new Date('2025-02-01')
-    },
-    {
-      id: '6',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 3800,
-      dataInicio: '2025-06-15',
-      dataFim: '2025-06-22',
-      destino: 'Manaus',
-      localOrigem: 'sao-paulo',
-      localDestino: 'manaus',
-      avaliacao: 4.9,
-      categoria: 'Aventura',
-      descricao: 'Aventura na Amazônia',
-      incluso: ['Hospedagem', 'Todas as refeições', 'Guia especializado'],
-      maxViajantes: 4,
-      popularidade: 96,
-      relevancia: 95,
-      dataPublicacao: new Date('2025-02-05')
-    },
-    {
-      id: '7',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 2100,
-      dataInicio: '2025-07-10',
-      dataFim: '2025-07-15',
-      destino: 'Natal',
-      localOrigem: 'recife',
-      localDestino: 'natal',
-      avaliacao: 4.5,
-      categoria: 'Praia',
-      descricao: 'Natal e suas dunas encantadoras',
-      incluso: ['Hospedagem', 'Café da manhã', 'Passeio de buggy'],
-      maxViajantes: 6,
-      popularidade: 82,
-      relevancia: 80,
-      dataPublicacao: new Date('2025-02-10')
-    },
-    {
-      id: '8',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 3500,
-      dataInicio: '2025-08-20',
-      dataFim: '2025-08-27',
-      destino: 'Florianópolis',
-      localOrigem: 'sao-paulo',
-      localDestino: 'florianopolis',
-      avaliacao: 4.8,
-      categoria: 'Praia',
-      descricao: 'Ilha da Magia com suas 42 praias',
-      incluso: ['Hospedagem', 'Café da manhã', 'Transfer', 'Seguro viagem'],
-      maxViajantes: 4,
-      popularidade: 90,
-      relevancia: 87,
-      dataPublicacao: new Date('2025-02-15')
-    },
-    {
-      id: '9',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 2900,
-      dataInicio: '2025-09-05',
-      dataFim: '2025-09-12',
-      destino: 'Porto Alegre',
-      localOrigem: 'sao-paulo',
-      localDestino: 'porto-alegre',
-      avaliacao: 4.4,
-      categoria: 'Cidade',
-      descricao: 'Porto Alegre e a cultura gaúcha',
-      incluso: ['Hospedagem', 'City tour', 'Degustação de vinhos'],
-      maxViajantes: 5,
-      popularidade: 78,
-      relevancia: 82,
-      dataPublicacao: new Date('2025-02-20')
-    },
-    {
-      id: '10',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 4200,
-      dataInicio: '2025-10-15',
-      dataFim: '2025-10-22',
-      destino: 'Belo Horizonte',
-      localOrigem: 'rio-janeiro',
-      localDestino: 'belo-horizonte',
-      avaliacao: 4.6,
-      categoria: 'Cultura',
-      descricao: 'BH e as cidades históricas mineiras',
-      incluso: ['Hospedagem', 'Café da manhã', 'Passeios históricos', 'Guia'],
-      maxViajantes: 6,
-      popularidade: 86,
-      relevancia: 89,
-      dataPublicacao: new Date('2025-02-25')
-    },
-    {
-      id: '11',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 1950,
-      dataInicio: '2025-11-08',
-      dataFim: '2025-11-13',
-      destino: 'Goiânia',
-      localOrigem: 'brasilia',
-      localDestino: 'goiania',
-      avaliacao: 4.2,
-      categoria: 'Negócios',
-      descricao: 'Goiânia para eventos corporativos',
-      incluso: ['Hospedagem', 'Transfer', 'Sala de reuniões'],
-      maxViajantes: 3,
-      popularidade: 65,
-      relevancia: 70,
-      dataPublicacao: new Date('2025-03-01')
-    },
-    {
-      id: '12',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 5200,
-      dataInicio: '2025-12-15',
-      dataFim: '2025-12-23',
-      destino: 'Fernando de Noronha',
-      localOrigem: 'recife',
-      localDestino: 'fernando-noronha',
-      avaliacao: 4.9,
-      categoria: 'Praia',
-      descricao: 'Paraíso ecológico de Fernando de Noronha',
-      incluso: ['Hospedagem', 'Todas as refeições', 'Mergulho', 'Taxa ambiental'],
-      maxViajantes: 2,
-      popularidade: 98,
-      relevancia: 97,
-      dataPublicacao: new Date('2025-03-05')
-    },
-    {
-      id: '13',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 3300,
-      dataInicio: '2025-08-10',
-      dataFim: '2025-08-17',
-      destino: 'Curitiba',
-      localOrigem: 'sao-paulo',
-      localDestino: 'curitiba',
-      avaliacao: 4.5,
-      categoria: 'Cidade',
-      descricao: 'Curitiba e seus parques urbanos',
-      incluso: ['Hospedagem', 'Café da manhã', 'City tour ecológico'],
-      maxViajantes: 4,
-      popularidade: 81,
-      relevancia: 84,
-      dataPublicacao: new Date('2025-03-10')
-    },
-    {
-      id: '14',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 2650,
-      dataInicio: '2025-07-25',
-      dataFim: '2025-07-30',
-      destino: 'João Pessoa',
-      localOrigem: 'natal',
-      localDestino: 'joao-pessoa',
-      avaliacao: 4.7,
-      categoria: 'Praia',
-      descricao: 'João Pessoa, onde o sol nasce primeiro',
-      incluso: ['Hospedagem', 'Café da manhã', 'Passeio de catamarã'],
-      maxViajantes: 5,
-      popularidade: 87,
-      relevancia: 85,
-      dataPublicacao: new Date('2025-03-15')
-    },
-    {
-      id: '15',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 4800,
-      dataInicio: '2025-06-20',
-      dataFim: '2025-06-28',
-      destino: 'Pantanal',
-      localOrigem: 'brasilia',
-      localDestino: 'pantanal',
-      avaliacao: 4.8,
-      categoria: 'Aventura',
-      descricao: 'Safari fotográfico no Pantanal',
-      incluso: ['Hospedagem', 'Todas as refeições', 'Guia especializado', 'Equipamentos'],
-      maxViajantes: 6,
-      popularidade: 93,
-      relevancia: 91,
-      dataPublicacao: new Date('2025-03-20')
-    },
-    {
-      id: '16',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 2300,
-      dataInicio: '2025-09-18',
-      dataFim: '2025-09-23',
-      destino: 'Maceió',
-      localOrigem: 'salvador',
-      localDestino: 'maceio',
-      avaliacao: 4.6,
-      categoria: 'Praia',
-      descricao: 'Maceió e suas águas cristalinas',
-      incluso: ['Hospedagem', 'Café da manhã', 'Passeio de jangada'],
-      maxViajantes: 4,
-      popularidade: 89,
-      relevancia: 86,
-      dataPublicacao: new Date('2025-03-25')
-    },
-    {
-      id: '17',
-      imagem: '/assets/imgs/gramado.jpg',
-      preco: 3700,
-      dataInicio: '2025-10-05',
-      dataFim: '2025-10-12',
-      destino: 'Gramado',
-      localOrigem: 'porto-alegre',
-      localDestino: 'gramado',
-      avaliacao: 4.8,
-      categoria: 'Romântico',
-      descricao: 'Gramado e Canela para casais',
-      incluso: ['Hospedagem', 'Café da manhã', 'Fondue', 'Passeios românticos'],
-      maxViajantes: 2,
-      popularidade: 94,
-      relevancia: 92,
-      dataPublicacao: new Date('2025-03-30')
-    },
-    {
-      id: '18',
-      imagem: '/assets/imgs/fortaleza.jpg',
-      preco: 2750,
-      dataInicio: '2025-11-20',
-      dataFim: '2025-11-25',
-      destino: 'Vitória',
-      localOrigem: 'belo-horizonte',
-      localDestino: 'vitoria',
-      avaliacao: 4.4,
-      categoria: 'Cidade',
-      descricao: 'Vitória e as montanhas capixabas',
-      incluso: ['Hospedagem', 'Café da manhã', 'City tour'],
-      maxViajantes: 5,
-      popularidade: 76,
-      relevancia: 78,
-      dataPublicacao: new Date('2025-04-01')
-    }
-  ];
+export class Bundle implements OnInit, OnDestroy {
+  @ViewChild(Filter) filterComponent!: Filter;
+  
+  // URL base do backend
+  private readonly BACKEND_BASE_URL = 'http://localhost:8080';
+  
+  // Subject para destruição de observables
+  private destroy$ = new Subject<void>();
+  
+  // Dados da API
+  allPackages: BundleClass[] = [];
+  filteredPackages: BundleClass[] = [];
+  packagesWithImages: any[] = [];
+  allPackagesWithImages: any[] = []; // Array completo como backup para filtragem
 
-  filteredPackages: TravelPackage[] = [];
   currentFilters: FilterCriteria = {
+    tipoFiltro: 'none',
     origem: '',
     destino: '',
     dataIda: '',
     dataVolta: '',
-    precoMaximo: 2000,
-    viajantes: 2,
+    precoMaximo: 0,
+    viajantes: 1,
     ordenacao: 'popular'
   };
+
+  // Propriedade para ordenação
+  currentSort = 'popular';
+
+  // Filtros pendentes do localStorage
+  pendingFilters: {origem: string, destino: string} | null = null;
 
   // Paginação
   currentPage = 1;
   pageSize = 6;
 
+  constructor(
+    private bundleService: BundleService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
   ngOnInit() {
-    // Adicionar pacotes extras para demonstrar paginação
-    this.allPackages = [...this.allPackages, ...this.generateAdditionalPackages()];
-    this.filteredPackages = [...this.allPackages];
-    this.applySorting('popular');
+    this.loadBundlesFromAPI();
+    this.checkLocalStorageFilters();
   }
 
+  checkLocalStorageFilters() {
+    console.log('🔍 Verificando filtros do localStorage...');
+    
+    const origem = localStorage.getItem('origem');
+    const destino = localStorage.getItem('destino');
+    
+    if (origem || destino) {
+      console.log('📍 Filtros encontrados no localStorage:', { origem, destino });
+      
+      // Armazenar os filtros para aplicar após carregamento
+      this.pendingFilters = {
+        origem: origem || '',
+        destino: destino || ''
+      };
+      
+      // Limpar localStorage após usar
+      localStorage.removeItem('origem');
+      localStorage.removeItem('destino');
+    }
+  }
+
+  applyLocalStorageFiltersAfterLoad() {
+    if (this.pendingFilters) {
+      console.log('🎯 Aplicando filtros pendentes do localStorage:', this.pendingFilters);
+      
+      // Configurar filtros automaticamente
+      this.currentFilters = {
+        ...this.currentFilters,
+        tipoFiltro: 'localizacao',
+        origem: this.pendingFilters.origem,
+        destino: this.pendingFilters.destino
+      };
+      
+      console.log('✅ Filtros aplicados automaticamente:', this.currentFilters);
+      
+      // Aguardar um pouco para garantir que o componente filter esteja carregado
+      setTimeout(() => {
+        this.syncFiltersWithFilterComponent();
+        this.applyFilters();
+      }, 1000);
+      
+      // Limpar filtros pendentes
+      this.pendingFilters = null;
+    }
+  }
+
+  syncFiltersWithFilterComponent() {
+    if (this.filterComponent) {
+      console.log('🔄 Sincronizando filtros com o componente Filter...');
+      this.filterComponent.filtros = { ...this.currentFilters };
+      console.log('✅ Filtros sincronizados com sucesso');
+    } else {
+      console.warn('⚠️ Componente Filter não está disponível ainda');
+    }
+  }
+
+  loadBundlesFromAPI() {
+    console.log('🔄 Iniciando carregamento de bundles da API...');
+    this.bundleService.getAvailableBundles().subscribe({
+      next: (bundles) => {
+        console.log('📦 Bundles recebidos da API:', bundles.length, bundles);
+        
+        if (!bundles || !Array.isArray(bundles) || bundles.length === 0) {
+          console.warn('⚠️ Nenhum bundle encontrado ou resposta inválida');
+          return;
+        }
+        
+        this.allPackages = bundles;
+        this.filteredPackages = [...bundles];
+        
+        // Inicializar packagesWithImages com os dados básicos dos bundles
+        this.packagesWithImages = bundles.map(bundle => ({
+          ...bundle,
+          image: 'assets/imgs/gramado.jpg', // Imagem padrão temporária
+          origin: 'Carregando origem...',
+          destination: 'Carregando destino...',
+          evaluation: this.getRatingFromRankConsistent(bundle.bundleRank, bundle.id),
+          duration: this.calculateDuration(bundle.initialDate, bundle.finalDate)
+        }));
+        
+        // Criar backup completo para filtragem
+        this.allPackagesWithImages = [...this.packagesWithImages];
+        
+        console.log('🏗️ Array packagesWithImages inicializado:', this.packagesWithImages.length, this.packagesWithImages);
+        
+        // Aplicar filtros do localStorage após dados iniciais carregados
+        this.applyLocalStorageFiltersAfterLoad();
+        
+        // Processar cada bundle para obter imagens e localização
+        bundles.forEach(bundle => {
+          console.log(`🔄 Iniciando processamento do bundle ${bundle.id}...`);
+          this.loadBundleImage(bundle);
+          this.loadBundleLocation(bundle);
+        });
+        
+        // Log final para verificar o estado do array
+        setTimeout(() => {
+          console.log('📊 Estado final do packagesWithImages após 2 segundos:', this.packagesWithImages);
+        }, 2000);
+        
+        this.applySorting('popular');
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar bundles:', error);
+      }
+    });
+  }
+
+  private loadBundleImage(bundle: BundleClass) {
+    console.log(`🖼️ Iniciando carregamento de imagem para bundle ${bundle.id}...`);
+    console.log(`🖼️ URL do endpoint: http://localhost:8080/api/medias/images/bundle/${bundle.id}`);
+    
+    this.bundleService.getBundleImage(bundle.id).subscribe({
+      next: (imageResponse: MediaResponse[]) => {
+        console.log(`🖼️ Resposta da API de imagem para bundle ${bundle.id}:`, imageResponse);
+        console.log(`🖼️ Tipo da resposta:`, typeof imageResponse, Array.isArray(imageResponse));
+        
+        let imageUrl = 'assets/imgs/gramado.jpg'; // Default
+        
+        if (imageResponse && Array.isArray(imageResponse) && imageResponse.length > 0) {
+          const rawImageUrl = imageResponse[0].mediaUrl;
+          imageUrl = this.processImageUrl(rawImageUrl);
+          console.log(`🖼️ URL original da API: ${rawImageUrl}`);
+          console.log(`🖼️ URL processada: ${imageUrl}`);
+        } else {
+          console.log(`🖼️ Resposta inválida ou vazia, usando imagem padrão`);
+        }
+        
+        const existingIndex = this.packagesWithImages.findIndex(p => p.id === bundle.id);
+        console.log(`🖼️ Index encontrado para bundle ${bundle.id}: ${existingIndex}`);
+        
+        if (existingIndex !== -1) {
+          console.log(`🖼️ Atualizando imagem do bundle ${bundle.id} - antes:`, this.packagesWithImages[existingIndex].image);
+          this.packagesWithImages[existingIndex].image = imageUrl;
+          
+          // Atualizar também no array backup
+          const backupIndex = this.allPackagesWithImages.findIndex(p => p.id === bundle.id);
+          if (backupIndex !== -1) {
+            this.allPackagesWithImages[backupIndex].image = imageUrl;
+          }
+          
+          console.log(`🖼️ Atualizando imagem do bundle ${bundle.id} - depois:`, this.packagesWithImages[existingIndex].image);
+          console.log(`🖼️ Backup atualizado. Total no backup:`, this.allPackagesWithImages.length);
+        } else {
+          console.warn(`🖼️ Bundle ${bundle.id} não encontrado no array packagesWithImages`);
+          console.log(`🖼️ Array atual:`, this.packagesWithImages.map(p => ({ id: p.id, title: p.bundleTitle })));
+        }
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error(`🖼️ Erro ao carregar imagem do bundle ${bundle.id}:`, error);
+        console.error(`🖼️ Status do erro:`, error.status);
+        console.error(`🖼️ Mensagem do erro:`, error.message);
+        
+        // Se for erro 404, pode ser que a imagem não exista no servidor
+        if (error.status === 404) {
+          console.warn(`🖼️ Imagem não encontrada no servidor para bundle ${bundle.id}`);
+        }
+        
+        // Se for erro de CORS ou conexão, pode ser problema de conectividade
+        if (error.status === 0) {
+          console.warn(`🖼️ Erro de conectividade com o servidor backend`);
+        }
+        
+        const existingIndex = this.packagesWithImages.findIndex(p => p.id === bundle.id);
+        if (existingIndex !== -1) {
+          this.packagesWithImages[existingIndex].image = 'assets/imgs/gramado.jpg';
+          
+          // Atualizar também no array backup
+          const backupIndex = this.allPackagesWithImages.findIndex(p => p.id === bundle.id);
+          if (backupIndex !== -1) {
+            this.allPackagesWithImages[backupIndex].image = 'assets/imgs/gramado.jpg';
+          }
+          
+          console.log(`🖼️ Imagem padrão definida para bundle ${bundle.id}`);
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private loadBundleLocation(bundle: BundleClass) {
+    console.log(`Carregando localização para bundle ${bundle.id}...`);
+    this.bundleService.getBundleLocation(bundle.id).subscribe({
+      next: (locationResponse) => {
+        console.log(`Resposta da localização para bundle ${bundle.id}:`, locationResponse);
+        const location = locationResponse.length > 0 ? locationResponse[0] : null;
+        const origin = location ? `${location.departure.city}, ${location.departure.states}` : 'Local de origem';
+        const destination = location ? `${location.destination.city}, ${location.destination.states}` : 'Destino';
+        
+        const existingIndex = this.packagesWithImages.findIndex(p => p.id === bundle.id);
+        if (existingIndex !== -1) {
+          this.packagesWithImages[existingIndex].origin = origin;
+          this.packagesWithImages[existingIndex].destination = destination;
+          
+          // Atualizar também no array backup
+          const backupIndex = this.allPackagesWithImages.findIndex(p => p.id === bundle.id);
+          if (backupIndex !== -1) {
+            this.allPackagesWithImages[backupIndex].origin = origin;
+            this.allPackagesWithImages[backupIndex].destination = destination;
+          }
+          
+          console.log(`Localização atualizada para bundle ${bundle.id}: ${origin} -> ${destination}`);
+          console.log(`📍 Backup atualizado. Total no backup:`, this.allPackagesWithImages.length);
+        }
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error(`Erro ao carregar localização do bundle ${bundle.id}:`, error);
+        const existingIndex = this.packagesWithImages.findIndex(p => p.id === bundle.id);
+        if (existingIndex !== -1) {
+          this.packagesWithImages[existingIndex].origin = 'Local de origem';
+          this.packagesWithImages[existingIndex].destination = 'Destino';
+          
+          // Atualizar também no array backup
+          const backupIndex = this.allPackagesWithImages.findIndex(p => p.id === bundle.id);
+          if (backupIndex !== -1) {
+            this.allPackagesWithImages[backupIndex].origin = 'Local de origem';
+            this.allPackagesWithImages[backupIndex].destination = 'Destino';
+          }
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private getEvaluationByRank(rank: string): number {
+    const rankEvaluations: { [key: string]: number } = {
+      'BRONZE': 3.2,
+      'SILVER': 3.8,
+      'GOLD': 4.3,
+      'PLATINUM': 4.9,
+      // Manter as versões em português para compatibilidade
+      'Bronze': 3.2,
+      'Prata': 3.8,
+      'Ouro': 4.3,
+      'Platina': 4.9
+    };
+    return rankEvaluations[rank] || 3.0;
+  }
+
+  private processImageUrl(rawImageUrl: string): string {
+    // Validação de entrada
+    if (!rawImageUrl || typeof rawImageUrl !== 'string' || rawImageUrl.trim() === '') {
+      console.warn('🖼️ URL de imagem inválida ou vazia, usando fallback');
+      return 'assets/imgs/gramado.jpg';
+    }
+    
+    const cleanUrl = rawImageUrl.trim();
+    
+    // Se a URL for relativa, adicionar a base URL do backend
+    if (cleanUrl.startsWith('/')) {
+      return `${this.BACKEND_BASE_URL}${cleanUrl}`;
+    } 
+    
+    // Se já for uma URL completa, usar como está
+    if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+      return cleanUrl;
+    } 
+    
+    // Se for um caminho sem barra inicial, adicionar barra e base URL
+    return `${this.BACKEND_BASE_URL}/${cleanUrl}`;
+  }
+
+  // Método de avaliação consistente (mesmo usado no card)
+  private getRatingFromRankConsistent(rank: string, bundleId: number): number {
+    switch (rank.toUpperCase()) {
+      case 'BRONZE': return 1;
+      case 'SILVER': 
+      case 'PRATA': return 2;
+      case 'GOLD': 
+      case 'OURO': return 3;
+      case 'PLATINUM': 
+      case 'PLATINA': 
+        return (bundleId % 2 === 0) ? 4 : 5;
+      default: return 3;
+    }
+  }
+
+  // Método para obter o texto da ordenação atual
+  getSortingDisplayText(): string {
+    switch (this.currentFilters.ordenacao) {
+      case 'popular': return 'Mais Popular';
+      case 'preco': return 'Menor Preço';
+      case 'avaliacao': return 'Melhor Avaliação';
+      default: return 'Mais Popular';
+    }
+  }
+
+  // Método para normalizar strings de localização para comparação
+  private normalizeLocation(location: string): string {
+    if (!location) return '';
+    return location.trim().toLowerCase()
+      .replace(/\s+/g, ' ') // Múltiplos espaços para um espaço
+      .replace(/,\s+/g, ', ') // Padronizar vírgula + espaço
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, ''); // Remover acentos
+  }
+
+  // Método para verificar se há filtros ativos
+  private hasActiveFilters(): boolean {
+    console.log('🔍 Verificando filtros ativos:');
+    console.log('   - Tipo de Filtro:', this.currentFilters.tipoFiltro);
+    console.log('   - Origem:', `"${this.currentFilters.origem}"`);
+    console.log('   - Destino:', `"${this.currentFilters.destino}"`);
+    console.log('   - Data Ida:', `"${this.currentFilters.dataIda}"`);
+    console.log('   - Data Volta:', `"${this.currentFilters.dataVolta}"`);
+    console.log('   - Preço Máximo:', this.currentFilters.precoMaximo);
+    console.log('   - Viajantes:', this.currentFilters.viajantes);
+    
+    // Se não há tipo de filtro selecionado ou é 'none', não há filtros ativos
+    if (!this.currentFilters.tipoFiltro || this.currentFilters.tipoFiltro === 'none') {
+      console.log('🔍 Resultado hasActiveFilters: false (nenhum tipo selecionado)');
+      return false;
+    }
+    
+    // Verificar se o tipo selecionado tem valores preenchidos
+    let hasActiveFilters = false;
+    
+    switch (this.currentFilters.tipoFiltro) {
+      case 'localizacao':
+        hasActiveFilters = !!(
+          (this.currentFilters.origem && this.currentFilters.origem.trim() !== '') ||
+          (this.currentFilters.destino && this.currentFilters.destino.trim() !== '')
+        );
+        break;
+      case 'data':
+        hasActiveFilters = !!(
+          (this.currentFilters.dataIda && this.currentFilters.dataIda.trim() !== '') ||
+          (this.currentFilters.dataVolta && this.currentFilters.dataVolta.trim() !== '')
+        );
+        break;
+      case 'preco':
+        hasActiveFilters = !!(this.currentFilters.precoMaximo && this.currentFilters.precoMaximo > 0);
+        break;
+      case 'viajantes':
+        hasActiveFilters = !!(this.currentFilters.viajantes && this.currentFilters.viajantes > 1);
+        break;
+    }
+    
+    console.log('🔍 Resultado hasActiveFilters:', hasActiveFilters);
+    return hasActiveFilters;
+  }
+
+  private calculateDuration(startDate: string, endDate: string): number {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  }
   onFilterChange(filters: FilterCriteria) {
+    console.log('🔄 Filtros recebidos no Bundle component:', filters);
+    console.log('📦 Pacotes antes da filtragem:', this.packagesWithImages.length);
+    console.log('📦 Array backup disponível:', this.allPackagesWithImages.length);
+    
+    // Debug: mostrar alguns pacotes de exemplo
+    if (this.allPackagesWithImages.length > 0) {
+      console.log('🔍 Exemplo de pacotes disponíveis:');
+      this.allPackagesWithImages.slice(0, 3).forEach((pkg, index) => {
+        console.log(`  ${index + 1}. ${pkg.bundleTitle} | Origem: "${pkg.origin}" | Destino: "${pkg.destination}"`);
+      });
+    }
+    
+    // Atualizar filtros
     this.currentFilters = filters;
-    this.applyFilters();
+    this.currentSort = filters.ordenacao;
+    
+    // Verificar se há filtros ativos
+    const hasActiveFilters = this.hasActiveFilters();
+    
+    if (!hasActiveFilters) {
+      // Se não há filtros ativos, mostrar todos os pacotes
+      console.log('📦 Nenhum filtro ativo, mostrando todos os pacotes');
+      this.packagesWithImages = [...this.allPackagesWithImages];
+    } else {
+      // Se há filtros ativos, aplicar filtragem
+      console.log('📦 Filtros ativos detectados, aplicando filtragem');
+      this.applyFilters();
+    }
+    
+    // Aplicar ordenação
     this.applySorting(filters.ordenacao);
-    this.currentPage = 1; // Reset para primeira página
+    
+    // Reset para primeira página
+    this.currentPage = 1;
+    
+    console.log('📦 Pacotes após processamento:', this.packagesWithImages.length);
+    this.cdr.detectChanges();
   }
 
   onSortChange(sortBy: string) {
+    console.log('🔄 Alteração apenas de ordenação:', sortBy);
+    console.log('📦 Estado antes da ordenação:');
+    console.log('   - packagesWithImages.length:', this.packagesWithImages.length);
+    console.log('   - allPackagesWithImages.length:', this.allPackagesWithImages.length);
+    
     this.currentFilters.ordenacao = sortBy;
+    this.currentSort = sortBy;
+    
+    // Verificar se o backup está correto e completo
+    if (this.allPackagesWithImages.length !== this.allPackages.length) {
+      console.warn('⚠️ Backup incompleto durante ordenação! Reconstruindo...');
+      this.rebuildPackagesWithImages();
+    }
+    
+    // Verificar se há filtros ativos
+    const hasActiveFilters = this.hasActiveFilters();
+    
+    if (!hasActiveFilters) {
+      // Se não há filtros ativos, usar todos os pacotes disponíveis
+      console.log('📦 Nenhum filtro ativo, usando todos os pacotes');
+      this.packagesWithImages = [...this.allPackagesWithImages];
+    } else {
+      // Se há filtros ativos, reaplicar filtros primeiro
+      console.log('📦 Filtros ativos detectados, reaplicando filtros');
+      this.applyFilters();
+    }
+    
+    // Aplicar ordenação
     this.applySorting(sortBy);
+    
+    console.log('📦 Estado após ordenação:');
+    console.log('   - packagesWithImages.length:', this.packagesWithImages.length);
+    this.cdr.detectChanges();
   }
 
   private applyFilters() {
-    this.filteredPackages = this.allPackages.filter(pkg => {
-      // Filtro de origem
-      if (this.currentFilters.origem && pkg.localOrigem !== this.currentFilters.origem) {
-        return false;
+    console.log('🔄 Aplicando filtros...');
+    console.log('📦 Total de pacotes disponíveis:', this.allPackagesWithImages.length);
+    console.log('🎯 Filtros aplicados:', this.currentFilters);
+    
+    // Log dos pacotes disponíveis para debug
+    if (this.allPackagesWithImages.length > 0) {
+      console.log('📍 Origens disponíveis:', this.allPackagesWithImages.map(p => p.origin).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i));
+      console.log('📍 Destinos disponíveis:', this.allPackagesWithImages.map(p => p.destination).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i));
+    }
+    
+    // Verificar se há dados para filtrar
+    if (!this.allPackagesWithImages || this.allPackagesWithImages.length === 0) {
+      console.warn('⚠️ Array allPackagesWithImages está vazio, não é possível aplicar filtros');
+      this.packagesWithImages = [];
+      return;
+    }
+    
+    // Sempre filtrar a partir do array completo backup
+    this.packagesWithImages = this.allPackagesWithImages.filter(pkg => {
+      console.log(`🔍 Analisando pacote: ${pkg.bundleTitle}`);
+      console.log(`📍 Origem do pacote: "${pkg.origin}"`);
+      console.log(`📍 Destino do pacote: "${pkg.destination}"`);
+      
+      // Aplicar apenas o tipo de filtro selecionado
+      switch (this.currentFilters.tipoFiltro) {
+        case 'localizacao':
+          return this.applyLocationFilter(pkg);
+        case 'preco':
+          return this.applyPriceFilter(pkg);
+        case 'viajantes':
+          return this.applyTravelersFilter(pkg);
+        case 'data':
+          return this.applyDateFilter(pkg);
+        case 'none':
+        default:
+          // Sem filtros, aprovar todos os pacotes
+          console.log(`✅ Pacote APROVADO (sem filtros): ${pkg.bundleTitle}`);
+          return true;
       }
-
-      // Filtro de destino
-      if (this.currentFilters.destino && pkg.localDestino !== this.currentFilters.destino) {
-        return false;
-      }
-
-      // Filtro de preço máximo
-      if (this.currentFilters.precoMaximo && pkg.preco > this.currentFilters.precoMaximo) {
-        return false;
-      }
-
-      // Filtro de número de viajantes
-      if (this.currentFilters.viajantes && pkg.maxViajantes < this.currentFilters.viajantes) {
-        return false;
-      }
-
-      // Filtro de data de ida (se o pacote tem data início definida)
-      if (this.currentFilters.dataIda && pkg.dataInicio) {
-        const dataIda = new Date(this.currentFilters.dataIda);
-        const dataInicioPkg = new Date(pkg.dataInicio);
-        if (dataInicioPkg < dataIda) {
-          return false;
-        }
-      }
-
-      // Filtro de data de volta (se o pacote tem data fim definida)
-      if (this.currentFilters.dataVolta && pkg.dataFim) {
-        const dataVolta = new Date(this.currentFilters.dataVolta);
-        const dataFimPkg = new Date(pkg.dataFim);
-        if (dataFimPkg > dataVolta) {
-          return false;
-        }
-      }
-
-      // Filtro de data (exemplo simples)
-      if (this.currentFilters.dataIda) {
-        const filterDate = new Date(this.currentFilters.dataIda);
-        const packageDate = new Date(pkg.dataInicio);
-        if (packageDate < filterDate) {
-          return false;
-        }
-      }
-
-      return true;
     });
 
-    this.applySorting(this.currentFilters.ordenacao);
+    console.log('✅ Pacotes após filtragem:', this.packagesWithImages.length);
+    
+    if (this.packagesWithImages.length === 0) {
+      console.log('⚠️ NENHUM PACOTE ENCONTRADO!');
+      console.log('💡 Dicas para encontrar pacotes:');
+      
+      if (this.currentFilters.origem) {
+        console.log(`📍 Você filtrou por ORIGEM: "${this.currentFilters.origem}"`);
+        console.log('📍 Origens disponíveis nos pacotes:', 
+          this.allPackagesWithImages.map(p => p.origin).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i));
+      }
+      
+      if (this.currentFilters.destino) {
+        console.log(`🎯 Você filtrou por DESTINO: "${this.currentFilters.destino}"`);
+        console.log('🎯 Destinos disponíveis nos pacotes:', 
+          this.allPackagesWithImages.map(p => p.destination).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i));
+      }
+    }
+    
+    console.log('📋 Pacotes aprovados:', this.packagesWithImages.map(p => ({
+      titulo: p.bundleTitle,
+      origem: p.origin,
+      destino: p.destination
+    })));
+    // Remover a chamada duplicada do applySorting aqui
+  }
+
+  // Métodos específicos para cada tipo de filtro
+  private applyLocationFilter(pkg: any): boolean {
+    // Filtro de origem (só aplicar se não estiver vazio)
+    if (this.currentFilters.origem && this.currentFilters.origem.trim() !== '') {
+      const origemSelecionada = this.normalizeLocation(this.currentFilters.origem);
+      const origemPacote = this.normalizeLocation(pkg.origin || '');
+      
+      console.log(`🔍 Comparando origem normalizada: "${origemSelecionada}" com "${origemPacote}"`);
+      
+      const matchExato = origemPacote === origemSelecionada;
+      const cidadeSelecionada = origemSelecionada.split(',')[0].trim();
+      const cidadePacote = origemPacote.split(',')[0].trim();
+      const matchCidade = cidadePacote === cidadeSelecionada;
+      const match = matchExato || matchCidade;
+      
+      if (!match) {
+        console.log(`🚫 Filtrado por origem: ${pkg.bundleTitle}`);
+        return false;
+      }
+    }
+
+    // Filtro de destino (só aplicar se não estiver vazio)
+    if (this.currentFilters.destino && this.currentFilters.destino.trim() !== '') {
+      const destinoSelecionado = this.normalizeLocation(this.currentFilters.destino);
+      const destinoPacote = this.normalizeLocation(pkg.destination || '');
+      
+      console.log(`🔍 Comparando destino normalizado: "${destinoSelecionado}" com "${destinoPacote}"`);
+      
+      const matchExato = destinoPacote === destinoSelecionado;
+      const cidadeSelecionada = destinoSelecionado.split(',')[0].trim();
+      const cidadePacote = destinoPacote.split(',')[0].trim();
+      const matchCidade = cidadePacote === cidadeSelecionada;
+      const match = matchExato || matchCidade;
+      
+      if (!match) {
+        console.log(`🚫 Filtrado por destino: ${pkg.bundleTitle}`);
+        return false;
+      }
+    }
+
+    console.log(`✅ Pacote APROVADO (localização): ${pkg.bundleTitle}`);
+    return true;
+  }
+
+  private applyPriceFilter(pkg: any): boolean {
+    if (this.currentFilters.precoMaximo && this.currentFilters.precoMaximo > 0 && pkg.initialPrice > this.currentFilters.precoMaximo) {
+      console.log(`🚫 Filtrado por preço: ${pkg.bundleTitle} (R$${pkg.initialPrice} > R$${this.currentFilters.precoMaximo})`);
+      return false;
+    }
+    console.log(`✅ Pacote APROVADO (preço): ${pkg.bundleTitle}`);
+    return true;
+  }
+
+  private applyTravelersFilter(pkg: any): boolean {
+    if (this.currentFilters.viajantes && this.currentFilters.viajantes > 1 && pkg.travelersNumber < this.currentFilters.viajantes) {
+      console.log(`🚫 Filtrado por viajantes: ${pkg.bundleTitle} (${pkg.travelersNumber} < ${this.currentFilters.viajantes})`);
+      return false;
+    }
+    console.log(`✅ Pacote APROVADO (viajantes): ${pkg.bundleTitle}`);
+    return true;
+  }
+
+  private applyDateFilter(pkg: any): boolean {
+    // Filtro de data de ida
+    if (this.currentFilters.dataIda && this.currentFilters.dataIda.trim() !== '' && pkg.initialDate) {
+      const dataIda = new Date(this.currentFilters.dataIda);
+      const dataInicioPkg = new Date(pkg.initialDate);
+      if (dataInicioPkg < dataIda) {
+        console.log(`🚫 Filtrado por data ida: ${pkg.bundleTitle}`);
+        return false;
+      }
+    }
+
+    // Filtro de data de volta
+    if (this.currentFilters.dataVolta && this.currentFilters.dataVolta.trim() !== '' && pkg.finalDate) {
+      const dataVolta = new Date(this.currentFilters.dataVolta);
+      const dataFimPkg = new Date(pkg.finalDate);
+      if (dataFimPkg > dataVolta) {
+        console.log(`🚫 Filtrado por data volta: ${pkg.bundleTitle}`);
+        return false;
+      }
+    }
+
+    console.log(`✅ Pacote APROVADO (data): ${pkg.bundleTitle}`);
+    return true;
   }
 
   private applySorting(sortBy: string) {
+    console.log(`🔄 Aplicando ordenação: ${sortBy}`);
+    
     switch (sortBy) {
       case 'popular':
-        this.filteredPackages.sort((a, b) => b.popularidade - a.popularidade);
+        // Ordenar por avaliação (do maior para menor) usando a mesma lógica do card
+        // FUTURO: Implementar ordenação por popularidade real (número de reservas)
+        this.packagesWithImages.sort((a, b) => {
+          const ratingA = this.getRatingFromRankConsistent(a.bundleRank, a.id);
+          const ratingB = this.getRatingFromRankConsistent(b.bundleRank, b.id);
+          return ratingB - ratingA;
+        });
+        console.log('📊 Ordenação aplicada: Mais Popular (melhores avaliações)');
         break;
+        
       case 'preco':
-        this.filteredPackages.sort((a, b) => a.preco - b.preco);
+        // Ordenar por preço (do menor para maior)
+        this.packagesWithImages.sort((a, b) => a.initialPrice - b.initialPrice);
+        console.log('💰 Ordenação aplicada: Menor Preço');
         break;
+        
       case 'avaliacao':
-        this.filteredPackages.sort((a, b) => b.avaliacao - a.avaliacao);
+        // Ordenar por avaliação (do maior para menor)
+        this.packagesWithImages.sort((a, b) => {
+          const ratingA = this.getRatingFromRankConsistent(a.bundleRank, a.id);
+          const ratingB = this.getRatingFromRankConsistent(b.bundleRank, b.id);
+          return ratingB - ratingA;
+        });
+        console.log('⭐ Ordenação aplicada: Melhor Avaliação');
         break;
+        
       default:
-        this.filteredPackages.sort((a, b) => b.popularidade - a.popularidade);
+        // Padrão: ordenar por avaliação
+        this.packagesWithImages.sort((a, b) => {
+          const ratingA = this.getRatingFromRankConsistent(a.bundleRank, a.id);
+          const ratingB = this.getRatingFromRankConsistent(b.bundleRank, b.id);
+          return ratingB - ratingA;
+        });
+        console.log('⚠️ Ordenação padrão aplicada');
         break;
     }
+    
+    console.log('✅ Ordenação concluída. Total de pacotes:', this.packagesWithImages.length);
   }
 
   // Métodos de paginação
   getTotalPages(): number {
-    return Math.ceil(this.filteredPackages.length / this.pageSize);
+    return Math.ceil(this.packagesWithImages.length / this.pageSize);
   }
 
-  getPaginatedPackages(): TravelPackage[] {
+  getPaginatedPackages(): any[] {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    return this.filteredPackages.slice(startIndex, endIndex);
+    return this.packagesWithImages.slice(startIndex, endIndex);
   }
 
   changePage(page: number | string) {
@@ -525,7 +750,7 @@ export class Bundle implements OnInit {
   }
 
   getDisplayEnd(): number {
-    return Math.min(this.currentPage * this.pageSize, this.filteredPackages.length);
+    return Math.min(this.currentPage * this.pageSize, this.packagesWithImages.length);
   }
 
   onPageSizeChange() {
@@ -537,11 +762,6 @@ export class Bundle implements OnInit {
       this.pageSize = 24;
     }
 
-    console.log(`Mudança de tamanho da página: ${previousPageSize} → ${this.pageSize}`);
-    console.log(`Total de pacotes: ${this.filteredPackages.length}`);
-    console.log(`Total de páginas antes: ${Math.ceil(this.filteredPackages.length / previousPageSize)}`);
-    console.log(`Total de páginas depois: ${this.getTotalPages()}`);
-
     // Calcular o índice do primeiro item da página atual
     const currentFirstItem = (this.currentPage - 1) * previousPageSize;
 
@@ -551,23 +771,48 @@ export class Bundle implements OnInit {
     // Garantir que a página esteja dentro dos limites válidos
     const totalPages = this.getTotalPages();
     this.currentPage = Math.max(1, Math.min(this.currentPage, totalPages));
-
-    console.log(`Página atual após mudança: ${this.currentPage}`);
   }
 
-  // Método adicional para debug
-  logPaginationState() {
-    console.log('=== Estado da Paginação ===');
-    console.log(`Total de pacotes: ${this.filteredPackages.length}`);
-    console.log(`Itens por página: ${this.pageSize}`);
-    console.log(`Página atual: ${this.currentPage}`);
-    console.log(`Total de páginas: ${this.getTotalPages()}`);
-    console.log(`Exibindo: ${this.getDisplayStart()}-${this.getDisplayEnd()}`);
-    console.log('===========================');
+  // Método para reconstruir o array de pacotes com imagens
+  private rebuildPackagesWithImages() {
+    console.log('🔧 Reconstruindo array packagesWithImages...');
+    
+    if (!this.allPackages || this.allPackages.length === 0) {
+      console.warn('⚠️ Array allPackages está vazio, não é possível reconstruir');
+      return;
+    }
+    
+    // Recriar o array a partir dos dados originais da API
+    this.packagesWithImages = this.allPackages.map(bundle => {
+      // Procurar se já existe dados processados para este bundle
+      const existingPackage = this.allPackagesWithImages.find(p => p.id === bundle.id);
+      
+      return {
+        ...bundle,
+        image: existingPackage?.image || 'assets/imgs/gramado.jpg',
+        origin: existingPackage?.origin || 'Local de origem',
+        destination: existingPackage?.destination || 'Destino',
+        evaluation: this.getRatingFromRankConsistent(bundle.bundleRank, bundle.id),
+        duration: this.calculateDuration(bundle.initialDate, bundle.finalDate)
+      };
+    });
+    
+    // Atualizar o backup
+    this.allPackagesWithImages = [...this.packagesWithImages];
+    
+    console.log('🔧 Array reconstruído com', this.packagesWithImages.length, 'pacotes');
   }
 
   clearAllFilters() {
+    console.log('🧹 Limpando todos os filtros');
+    console.log('📊 Estado antes da limpeza:');
+    console.log('   - packagesWithImages.length:', this.packagesWithImages.length);
+    console.log('   - allPackagesWithImages.length:', this.allPackagesWithImages.length);
+    console.log('   - allPackages.length:', this.allPackages.length);
+    
+    // Reset filters using correct interface
     this.currentFilters = {
+      tipoFiltro: 'none',
       origem: '',
       destino: '',
       dataIda: '',
@@ -576,174 +821,45 @@ export class Bundle implements OnInit {
       viajantes: 2,
       ordenacao: 'popular'
     };
-    this.applyFilters();
+    
+    // Reset sorting
+    this.currentSort = 'popular';
+    
+    // Reset pagination
     this.currentPage = 1;
-  }
-
-  // ===== MÉTODOS PREPARADOS PARA INTEGRAÇÃO COM BACKEND =====
-
-  /**
-   * Carrega pacotes do backend com filtros e paginação
-   * @param filters Critérios de filtro
-   * @param page Página atual
-   * @param pageSize Itens por página
-   */
-  async loadPackagesFromAPI(filters: FilterCriteria, page: number, pageSize: number): Promise<void> {
-    try {
-      // TODO: Substituir por chamada real da API
-      // const response = await this.packageService.getPackages(filters, page, pageSize);
-      // this.allPackages = response.data;
-      // this.filteredPackages = response.data;
-
-      // Por enquanto, usando dados mockados
-      console.log('Carregando pacotes da API com filtros:', filters);
-      console.log('Página:', page, 'Tamanho da página:', pageSize);
-
-    } catch (error) {
-      console.error('Erro ao carregar pacotes da API:', error);
-      // Fallback para dados mockados em caso de erro
-      this.loadMockData();
+    
+    // Reset filter component if available
+    if (this.filterComponent) {
+      this.filterComponent.resetFilters();
     }
-  }
-
-  /**
-   * Busca pacotes com base em critérios específicos
-   * @param searchTerm Termo de busca
-   * @param filters Filtros adicionais
-   */
-  async searchPackages(searchTerm: string, filters?: Partial<FilterCriteria>): Promise<void> {
-    try {
-      // TODO: Implementar busca na API
-      // const response = await this.packageService.searchPackages(searchTerm, filters);
-      // this.filteredPackages = response.data;
-
-      // Simulação com dados mockados
-      this.filteredPackages = this.allPackages.filter(pkg =>
-        pkg.destino.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pkg.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pkg.categoria.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
-      this.currentPage = 1;
-
-    } catch (error) {
-      console.error('Erro na busca de pacotes:', error);
+    
+    // Verificar se o backup está correto e completo
+    if (this.allPackagesWithImages.length !== this.allPackages.length) {
+      console.warn('⚠️ Backup incompleto! Reconstruindo...');
+      this.rebuildPackagesWithImages();
     }
+    
+    // Verificar se há filtros ativos após reset
+    const hasActiveFilters = this.hasActiveFilters();
+    console.log('🔍 Após reset - Filtros ativos?', hasActiveFilters);
+    
+    // Restaurar todos os pacotes do backup (sem aplicar filtros)
+    this.packagesWithImages = [...this.allPackagesWithImages];
+    console.log('📦 Pacotes restaurados do backup:', this.packagesWithImages.length);
+    
+    // Aplicar apenas a ordenação padrão
+    this.applySorting('popular');
+    
+    console.log('✅ Estado após limpeza:');
+    console.log('   - packagesWithImages.length:', this.packagesWithImages.length);
+    console.log('   - Pacotes exibidos:', this.packagesWithImages.map(p => ({ id: p.id, title: p.bundleTitle })));
+    
+    // Forçar detecção de mudanças
+    this.cdr.detectChanges();
   }
 
-  /**
-   * Obtém estatísticas dos pacotes para analytics
-   */
-  async getPackageStats(): Promise<any> {
-    try {
-      // TODO: Implementar chamada para API de estatísticas
-      // return await this.packageService.getStats();
-
-      // Dados mockados para demonstração
-      return {
-        totalPackages: this.allPackages.length,
-        averagePrice: this.allPackages.reduce((sum, pkg) => sum + pkg.preco, 0) / this.allPackages.length,
-        topDestinations: this.getTopDestinations(),
-        averageRating: this.allPackages.reduce((sum, pkg) => sum + pkg.avaliacao, 0) / this.allPackages.length
-      };
-
-    } catch (error) {
-      console.error('Erro ao obter estatísticas:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Carrega dados mockados (fallback)
-   */
-  private loadMockData(): void {
-    // Dados já estão carregados no array allPackages
-    this.filteredPackages = [...this.allPackages];
-    this.applySorting(this.currentFilters.ordenacao);
-  }
-
-  /**
-   * Obtém os destinos mais populares
-   */
-  private getTopDestinations(): string[] {
-    const destinationCounts = this.allPackages.reduce((acc, pkg) => {
-      acc[pkg.destino] = (acc[pkg.destino] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return Object.entries(destinationCounts)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 5)
-      .map(([destination]) => destination);
-  }
-
-  /**
-   * Atualiza um pacote específico (para uso futuro)
-   * @param packageId ID do pacote
-   * @param updatedData Dados atualizados
-   */
-  async updatePackage(packageId: string, updatedData: Partial<TravelPackage>): Promise<void> {
-    try {
-      // TODO: Implementar atualização na API
-      // await this.packageService.updatePackage(packageId, updatedData);
-
-      // Atualização local para demonstração
-      const index = this.allPackages.findIndex(pkg => pkg.id === packageId);
-      if (index !== -1) {
-        this.allPackages[index] = { ...this.allPackages[index], ...updatedData };
-        this.applyFilters(); // Reaplica filtros após atualização
-      }
-
-    } catch (error) {
-      console.error('Erro ao atualizar pacote:', error);
-    }
-  }
-
-  /**
-   * Remove um pacote (para uso futuro)
-   * @param packageId ID do pacote a ser removido
-   */
-  async deletePackage(packageId: string): Promise<void> {
-    try {
-      // TODO: Implementar remoção na API
-      // await this.packageService.deletePackage(packageId);
-
-      // Remoção local para demonstração
-      this.allPackages = this.allPackages.filter(pkg => pkg.id !== packageId);
-      this.applyFilters(); // Reaplica filtros após remoção
-
-    } catch (error) {
-      console.error('Erro ao remover pacote:', error);
-    }
-  }
-
-  // Adicionar mais pacotes para teste
-  private generateAdditionalPackages(): TravelPackage[] {
-    const additionalPackages: TravelPackage[] = [];
-    const baseDestinations = ['Campos do Jordão', 'Bonito', 'Jericoacoara', 'Arraial do Cabo', 'Paraty'];
-    const baseCategories = ['Aventura', 'Romântico', 'Família', 'Ecoturismo', 'Gastronômico'];
-
-    for (let i = 19; i <= 35; i++) {
-      additionalPackages.push({
-        id: i.toString(),
-        imagem: i % 2 === 0 ? '/assets/imgs/fortaleza.jpg' : '/assets/imgs/gramado.jpg',
-        preco: Math.floor(Math.random() * 3000) + 1500,
-        dataInicio: `2025-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
-        dataFim: `2025-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
-        destino: baseDestinations[Math.floor(Math.random() * baseDestinations.length)],
-        localOrigem: ['sao-paulo', 'rio-janeiro', 'brasilia'][Math.floor(Math.random() * 3)],
-        localDestino: baseDestinations[Math.floor(Math.random() * baseDestinations.length)].toLowerCase().replace(/\s+/g, '-'),
-        avaliacao: Math.round((Math.random() * 2 + 3) * 10) / 10,
-        categoria: baseCategories[Math.floor(Math.random() * baseCategories.length)],
-        descricao: `Pacote completo para ${baseDestinations[Math.floor(Math.random() * baseDestinations.length)]}`,
-        incluso: ['Hospedagem', 'Café da manhã', 'Transfer'],
-        maxViajantes: Math.floor(Math.random() * 6) + 2,
-        popularidade: Math.floor(Math.random() * 40) + 60,
-        relevancia: Math.floor(Math.random() * 30) + 70,
-        dataPublicacao: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1)
-      });
-    }
-
-    return additionalPackages;
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

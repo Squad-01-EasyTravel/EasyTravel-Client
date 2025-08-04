@@ -74,6 +74,20 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sorting-info {
+  color: #ff6b35;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sorting-info i {
+  color: #ff6b35;
 }
 
 .showing-text {
@@ -136,6 +150,16 @@
   font-size: 1rem;
   line-height: 1.6;
   margin: 0 0 2rem 0;
+}
+
+.empty-content p strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.empty-content p span {
+  display: inline-block;
+  margin: 0.2rem 0;
 }
 
 .btn-clear-filters {

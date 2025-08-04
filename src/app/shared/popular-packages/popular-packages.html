@@ -1,11 +1,14 @@
 <div id="popularPackagesCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
   <div class="carousel-inner">
-    <div *ngFor="let group of groupedPackages; let i = index" class="carousel-item" [class.active]="i === 0">
+    <div *ngFor="let group of groupedBundles; let i = index" class="carousel-item" [class.active]="i === 0">
       <div class="container">
         <div class="row justify-content-center">
-          <div *ngFor="let trip of group" class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 mb-4 d-flex justify-content-center">
+          <div *ngFor="let bundle of group" class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 mb-4 d-flex justify-content-center">
             <div class="card h-100" style="width: 100%; max-width: 300px;">
-              <img [src]="trip.imageUrl" class="card-img-top" alt="Imagem da viagem">
+              <img [src]="bundle.imageUrl || '/assets/imgs/gramado.jpg'" 
+                   class="card-img-top" 
+                   alt="Imagem do pacote {{ bundle.bundleTitle }}"
+                   (error)="handleImageError($event)">
 
               <!-- Badge Popular -->
               <span class="package-popular-badge">
@@ -13,43 +16,78 @@
                 Popular
               </span>
 
-              <span class="card-days">{{ trip.duration || '3 dias / 2 noites' }}</span>
+              <!-- Badge do Rank -->
+              <span class="package-benefit-badge" 
+                    [class]="'package-benefit-badge ' + getRankCssClass(bundle.bundleRank)">
+                <i class="fas fa-star"></i>
+                {{ getRankTranslation(bundle.bundleRank) }}
+              </span>
+
+              <span class="card-days">{{ getDurationInDays(bundle.initialDate, bundle.finalDate) }} dias</span>
 
               <div class="card-body">
-                <h5 class="card-title">Pacote de {{ trip.destination }}</h5>
-                <div class="card-rating">{{ trip.rating }}</div>
-                <div class="rating-stars">
-                  <ng-container *ngFor="let star of getStars(trip.rating)">
-                    <span [ngClass]="{
-                      'star': true,
-                      'full': star === 'full',
-                      'half': star === 'half',
-                      'empty': star === 'empty'
-                    }">★</span>
-                  </ng-container>
+                <h5 class="card-title">{{ bundle.bundleTitle }}</h5>
+                
+                <!-- Rota do pacote -->
+                <div class="card-route mb-2">
+                  <small class="text-primary">
+                    <i class="fas fa-route"></i>
+                    <strong>{{ formatRoute(bundle) }}</strong>
+                  </small>
                 </div>
-                <br>
-                <span class="card-subtitle">Saindo de {{ trip.origin }}</span>
+                
+                <!-- Avaliações mockadas -->
+                <div class="card-rating mb-3">
+                  <div class="d-flex align-items-center">
+                    <span class="rating-badge me-2">{{ getRatingFromRankConsistent(bundle.bundleRank, bundle.id) }}</span>
+                    <div class="stars-container">
+                      <span *ngFor="let filled of getStarsArray(getRatingFromRankConsistent(bundle.bundleRank, bundle.id))"
+                            class="star"
+                            [class.filled]="filled">
+                        <i class="fas fa-star"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <p class="card-description">{{ bundle.bundleDescription }}</p>
 
-                <!-- Informações adicionais -->
-                <div class="card-highlights" *ngIf="trip.highlights && trip.highlights.length > 0">
+                <!-- Informações do pacote -->
+                <div class="card-info">
                   <small class="text-muted">
-                    <i class="fas fa-check-circle text-success"></i>
-                    {{ trip.highlights[0] }}
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ formatDate(bundle.initialDate) }} - {{ formatDate(bundle.finalDate) }}
+                  </small>
+                  <br>
+                  <small class="text-muted">
+                    <i class="fas fa-users"></i>
+                    Vagas: {{ bundle.quantity }}
+                  </small>
+                  <br>
+                  <small class="text-muted">
+                    <i class="fas fa-user"></i>
+                    Para {{ bundle.travelersNumber }} pessoa(s)
                   </small>
                 </div>
 
                 <hr>
                 <div class="card-promo">
-                  <p class="card-promo-save" *ngIf="trip.discount">Economize R$ {{ calculateDiscount(trip.originalPrice, trip.price) | number:'1.0-0' }}</p>
-
                   <div class="card-price-block">
                     <p class="card-promo-people">Preço por pessoa</p>
-                    <p class="card-promo-old-price" *ngIf="trip.originalPrice">{{ formatPrice(trip.originalPrice) }}</p>
-                    <p class="card-new-price">{{ formatPrice(trip.price) }}</p>
+                    <p class="card-new-price">{{ formatPrice(bundle.initialPrice) }}</p>
                   </div>
                 </div>
                 <span class="card-tax">Taxas e impostos não inclusos</span>
+                
+                <!-- Status do pacote -->
+                <div class="card-status mt-2">
+                  <span class="badge" 
+                        [class.bg-success]="bundle.bundleStatus === 'AVAILABLE'"
+                        [class.bg-warning]="bundle.bundleStatus === 'LIMITED'"
+                        [class.bg-danger]="bundle.bundleStatus === 'UNAVAILABLE'">
+                    {{ bundle.bundleStatus === 'AVAILABLE' ? 'DISPONÍVEL' : bundle.bundleStatus }}
+                  </span>
+                </div>
                 <hr>
               </div>
             </div>
@@ -58,7 +96,6 @@
       </div>
     </div>
   </div>
-
   <button class="carousel-control-prev" type="button" data-bs-target="#popularPackagesCarousel" data-bs-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
     <span class="visually-hidden">Anterior</span>
@@ -70,7 +107,7 @@
 
   <!-- Indicadores -->
   <div class="carousel-indicators">
-    <button *ngFor="let group of groupedPackages; let i = index"
+    <button *ngFor="let group of groupedBundles; let i = index"
             type="button"
             data-bs-target="#popularPackagesCarousel"
             [attr.data-bs-slide-to]="i"

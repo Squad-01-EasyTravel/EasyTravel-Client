@@ -1,12 +1,19 @@
 export class BundleClass {
-
-    bundleTitle:string = ''
-    bundleDescription: string = ''
-    initialPrice: string = ''
-    bundleRank: string = ''
-    initialDate: string = ''
-    finalDate: string = ''
-    quantity: string = ''
-    travelersNumber: string = ''
-    bundleStatus: string = ''
+    id: number = 0;
+    bundleTitle: string = '';
+    bundleDescription: string = '';
+    initialPrice: number = 0;
+    bundleRank: string = '';
+    initialDate: string = '';
+    finalDate: string = '';
+    quantity: number = 0;
+    travelersNumber: number = 0;
+    bundleStatus: string = '';
+    imageUrl?: string; // Propriedade opcional para URL da imagem
+    
+    // Propriedades para rota
+    departureCity?: string; // Cidade de origem
+    departureState?: string; // Estado de origem
+    destinationCity?: string; // Cidade de destino
+    destinationState?: string; // Estado de destino
 }

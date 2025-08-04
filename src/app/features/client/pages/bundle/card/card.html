@@ -1,24 +1,36 @@
 <div class="card-container">
   <div class="card-image-wrapper">
-    <img [src]="pacote.imagem" class="card-img" [alt]="'Imagem de ' + pacote.destino">
+    <img 
+      [src]="pacote.image || 'assets/imgs/gramado.jpg'" 
+      class="card-img" 
+      [alt]="'Imagem de ' + pacote.destination"
+      (error)="onImageError($event)"
+      (load)="onImageLoad($event)">
     <div class="card-badge">
-      <span class="badge-category">{{pacote.categoria}}</span>
+      <span class="badge-category" 
+            [class]="'badge-category ' + getRankCssClass(pacote.bundleRank)">
+        <i class="fas fa-star"></i>
+        {{ getRankTranslation(pacote.bundleRank) }}
+      </span>
     </div>
     <div class="card-rating-overlay">
       <div class="rating-stars">
-        <i class="fas fa-star" *ngFor="let star of getStarArray(pacote.avaliacao)"></i>
-        <i class="fas fa-star-half-alt" *ngIf="hasPartialStar(pacote.avaliacao)"></i>
+        <span *ngFor="let filled of getStarsArray(getRatingFromRankConsistent(pacote.bundleRank, pacote.id))"
+              class="star"
+              [class.filled]="filled">
+          <i class="fas fa-star"></i>
+        </span>
       </div>
-      <span class="rating-number">{{pacote.avaliacao}}</span>
+      <span class="rating-number">{{ getRatingFromRankConsistent(pacote.bundleRank, pacote.id) }}</span>
     </div>
   </div>
 
   <div class="card-body">
     <div class="card-header">
-      <h3 class="card-destination">{{pacote.destino}}</h3>
+      <h3 class="card-destination">{{pacote.bundleTitle}}</h3>
       <div class="card-price">
         <span class="price-label">A partir de</span>
-        <span class="price-value">{{formatPrice(pacote.preco)}}</span>
+        <span class="price-value">{{formatPrice(pacote.initialPrice)}}</span>
         <span class="price-person">por pessoa</span>
       </div>
     </div>
@@ -26,34 +38,48 @@
     <div class="card-details">
       <div class="detail-item">
         <i class="fas fa-calendar-alt"></i>
-        <span>{{formatDate(pacote.dataInicio)}} - {{formatDate(pacote.dataFim)}}</span>
+        <span>{{formatDate(pacote.initialDate)}} - {{formatDate(pacote.finalDate)}}</span>
       </div>
 
       <div class="detail-item">
         <i class="fas fa-users"></i>
-        <span>Até {{pacote.maxViajantes}} viajantes</span>
+        <span>Até {{pacote.travelersNumber}} viajantes</span>
       </div>
 
       <div class="detail-item">
         <i class="fas fa-map-marker-alt"></i>
-        <span>Saída: {{pacote.localOrigem | titlecase}}</span>
+        <span>Saída: {{pacote.origin}}</span>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-map-marked-alt"></i>
+        <span>Destino: {{pacote.destination}}</span>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-clock"></i>
+        <span>{{pacote.duration}} dias</span>
       </div>
     </div>
 
     <div class="card-description">
-      <p>{{pacote.descricao}}</p>
+      <p>{{pacote.bundleDescription}}</p>
     </div>
 
-    <div class="card-includes" *ngIf="pacote.incluso && pacote.incluso.length > 0">
+    <div class="card-includes">
       <h4>Incluso no pacote:</h4>
       <ul class="includes-list">
-        <li *ngFor="let item of pacote.incluso.slice(0, 3)">
+        <li>
           <i class="fas fa-check"></i>
-          {{item}}
+          Hospedagem
         </li>
-        <li *ngIf="pacote.incluso.length > 3" class="more-items">
-          <i class="fas fa-plus"></i>
-          +{{pacote.incluso.length - 3}} outros itens
+        <li>
+          <i class="fas fa-check"></i>
+          Transfer
+        </li>
+        <li>
+          <i class="fas fa-check"></i>
+          Café da manhã
         </li>
       </ul>
     </div>

@@ -643,3 +643,95 @@
   opacity: 0.8;
   transform: scale(1.1);
 }
+
+/* Estilos para avaliações */
+.card-rating {
+  padding: 0.5rem 0;
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.rating-badge {
+  background-color: #28a745;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-width: 32px;
+  text-align: center;
+  display: inline-block;
+}
+
+.stars-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star {
+  color: #e0e0e0;
+  font-size: 12px;
+  transition: color 0.2s ease;
+}
+
+.star.filled {
+  color: #ffd700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge do Rank */
+.package-benefit-badge {
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  background: linear-gradient(135deg, #7FC023 0%, #6ba01b 100%);
+  color: white;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(127, 192, 35, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Estilos específicos para ranks */
+.package-benefit-badge.rank-gold {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+  color: #000 !important;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4) !important;
+}
+
+.package-benefit-badge.rank-silver {
+  background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%) !important;
+  color: #000 !important;
+  box-shadow: 0 2px 8px rgba(192, 192, 192, 0.4) !important;
+}
+
+.package-benefit-badge.rank-bronze {
+  background: linear-gradient(135deg, #CD7F32 0%, #A0522D 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4) !important;
+}
+
+.package-benefit-badge.rank-platinum {
+  background: linear-gradient(135deg, #87CEEB 0%, #5F9EA0 100%) !important;
+  color: #000 !important;
+  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.4) !important;
+}
+
+/* Rota do pacote */
+.card-route {
+  margin-bottom: 0.5rem;
+}
+
+.card-route small {
+  color: #007bff;
+  font-weight: 500;
+}
+
+.card-route i {
+  margin-right: 0.25rem;
+}

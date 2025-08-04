@@ -46,7 +46,9 @@ export class PackageService {
       description: 'Descubra as praias paradisíacas do Ceará',
       inclusions: ['Voo ida e volta', 'Hospedagem', 'City tour'],
       highlights: ['Praia de Iracema', 'Centro Dragão do Mar', 'Beach Park']
-    },
+    }
+    /* 
+    // Pacotes Custo-Benefício comentados temporariamente
     {
       id: 3,
       imageUrl: 'assets/imgs/gramado.jpg',
@@ -84,7 +86,7 @@ export class PackageService {
       highlights: ['Centro Histórico', 'Praia do Mutá', 'Arraial d\'Ajuda']
     },
 
-    // Pacotes Populares
+    // Pacotes Populares comentados temporariamente
     {
       id: 5,
       imageUrl: 'assets/imgs/fortaleza.jpg',
@@ -158,7 +160,7 @@ export class PackageService {
       highlights: ['Cataratas do Iguaçu', 'Parque das Aves', 'Marco das 3 Fronteiras', 'Usina de Itaipu']
     },
 
-    // Mais pacotes Custo-Benefício
+    // Mais pacotes Custo-Benefício comentados temporariamente
     {
       id: 9,
       imageUrl: 'assets/imgs/fortaleza.jpg',
@@ -232,7 +234,7 @@ export class PackageService {
       highlights: ['Cachoeira Santa Bárbara', 'Vale da Lua', 'Jardim de Maytrea']
     },
 
-    // Mais pacotes Populares
+    // Mais pacotes Populares comentados temporariamente
     {
       id: 13,
       imageUrl: 'assets/imgs/fortaleza.jpg',
@@ -305,6 +307,7 @@ export class PackageService {
       inclusions: ['Voo ida e volta', 'Hospedagem 5*', 'Desert Safari', 'Dubai Mall'],
       highlights: ['Burj Khalifa', 'Palm Jumeirah', 'Dubai Mall', 'Desert Safari']
     }
+    */
   ];
 
   constructor(private assetService: AssetService) {
