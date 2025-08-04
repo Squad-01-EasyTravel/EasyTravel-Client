@@ -1,23 +1,261 @@
-<div class="admin-dashboard-content">
-  <h2>Bem-vindo ao Dashboard do Administrador</h2>
-  <p>Aqui você pode visualizar estatísticas, gráficos e informações administrativas.</p>
-<div class="filters mb-4 d-flex flex-wrap gap-2">
-  <button 
-    *ngFor="let metric of metrics" 
-    (click)="selectMetric(metric.key)" 
-    class="btn btn-outline-primary"
-    [class.active]="selectedMetric === metric.key"
-    [class.btn-primary]="selectedMetric === metric.key"
-    [class.btn-outline-primary]="selectedMetric !== metric.key"
-  >
-    {{ metric.label }}
-  </button>
-</div>
- 
-  <canvas id="myChart"></canvas>
-  <div class="d-flex justify-content-end mt-3">
-    <button class="btn btn-success" (click)="exportExcel()">
-      <i class="bi bi-file-earmark-excel"></i> Exportar Excel
-    </button>
+<div class="d-flex">
+  <div class="container-fluid">
+    <!-- Hero Header Section -->
+    <div class="hero-section position-relative mb-4">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="container position-relative">
+        <div class="row align-items-center py-5">
+          <div class="col-lg-8">
+            <div class="hero-content text-white">
+              <!-- Badge animado -->
+              <span
+                class="hero-badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill mb-3 d-inline-flex align-items-center">
+                <i class="fas fa-chart-bar me-2 text-warning"></i>
+                <span class="fw-semibold">Dashboard Administrativo</span>
+              </span>
+
+              <!-- Título com gradiente -->
+              <h1 class="hero-title display-3 fw-bold mb-3">
+                Analytics & <span class="text-gradient">Relatórios</span>
+              </h1>
+
+              <!-- Subtítulo -->
+              <p class="hero-description lead mb-4 opacity-75">
+                Visualize dados em tempo real, analise tendências e tome decisões estratégicas com nossa plataforma de business intelligence
+              </p>
+
+              <!-- Estatísticas melhoradas com cores -->
+              <div class="row g-3 text-center hero-stats">
+                <div class="col-3">
+                  <div class="stats-card stats-revenue bg-primary bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">R$ 387K</h3>
+                    <small class="stats-label fw-semibold">Receita Total</small>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="stats-card stats-bookings bg-success bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">485</h3>
+                    <small class="stats-label fw-semibold">Reservas</small>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="stats-card stats-users bg-info bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">1.247</h3>
+                    <small class="stats-label fw-semibold">Usuários Ativos</small>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="stats-card stats-rating bg-warning bg-opacity-90 text-dark rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">4.8★</h3>
+                    <small class="stats-label fw-semibold">Avaliação Média</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 text-center">
+            <div class="hero-image-container">
+              <div class="floating-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="floating-icon delay-1">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="floating-icon delay-2">
+                <i class="fas fa-money-bill-wave"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-main-content">
+      <div class="container">
+        <!-- Section Title -->
+        <div class="section-header text-center mb-5">
+          <h2 class="section-title fw-bold">Relatórios Detalhados</h2>
+          <p class="section-description text-muted">Análise completa dos dados de negócio em tempo real</p>
+          <!-- Botão temporário para debug -->
+          <button class="btn btn-outline-primary btn-sm mt-2" (click)="recreateCharts()">
+            <i class="fas fa-refresh me-2"></i>Recriar Gráficos
+          </button>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid row g-4">
+          <!-- Chart 1 - Faturamento por Pacote -->
+          <div class="col-lg-6 col-md-6">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="chart-title mb-0">
+                    <i class="fas fa-money-bill-wave me-2 text-primary"></i>
+                    Faturamento por Pacote
+                  </h5>
+                  <button class="btn btn-outline-success btn-sm" (click)="exportChart('faturamentoPorPacote')">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart1"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 2 - Receita Total por Mês -->
+          <div class="col-lg-6 col-md-6">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="chart-title mb-0">
+                    <i class="fas fa-chart-line me-2 text-success"></i>
+                    Receita Total por Mês
+                  </h5>
+                  <button class="btn btn-outline-success btn-sm" (click)="exportChart('receitaTotalPorMes')">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart2"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 3 - Reservas Ativas por Rank -->
+          <div class="col-lg-6 col-md-6">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="chart-title mb-0">
+                    <i class="fas fa-medal me-2 text-warning"></i>
+                    Reservas por Rank
+                  </h5>
+                  <button class="btn btn-outline-success btn-sm" (click)="exportChart('reservasAtivasPorRank')">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart3"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 4 - Usuários por Método de Pagamento -->
+          <div class="col-lg-6 col-md-6">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="chart-title mb-0">
+                    <i class="fas fa-credit-card me-2 text-info"></i>
+                    Métodos de Pagamento
+                  </h5>
+                  <button class="btn btn-outline-success btn-sm" (click)="exportChart('usuariosPorMetodoPagamento')">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart4"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 5 - Total de Reservas por Pacote -->
+          <div class="col-lg-6 col-md-6">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="chart-title mb-0">
+                    <i class="fas fa-suitcase me-2 text-primary"></i>
+                    Reservas por Pacote
+                  </h5>
+                  <button class="btn btn-outline-success btn-sm" (click)="exportChart('totalReservasPorPacote')">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart5"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 6 - Vendas por Cidade de Destino -->
+          <div class="col-lg-6 col-md-6">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="chart-title mb-0">
+                    <i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                    Vendas por Cidade
+                  </h5>
+                  <button class="btn btn-outline-success btn-sm" (click)="exportChart('vendasPorCidadeDestino')">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart6"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 7 - Reservas Canceladas por Mês -->
+          <div class="col-lg-6 col-md-6">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="chart-title mb-0">
+                    <i class="fas fa-times-circle me-2 text-danger"></i>
+                    Cancelamentos por Mês
+                  </h5>
+                  <button class="btn btn-outline-success btn-sm" (click)="exportChart('reservasCanceladasPorMes')">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart7"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 8 - Vendas por Pagamento -->
+          <div class="col-lg-6 col-md-6">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="chart-title mb-0">
+                    <i class="fas fa-dollar-sign me-2 text-success"></i>
+                    Vendas por Pagamento
+                  </h5>
+                  <button class="btn btn-outline-success btn-sm" (click)="exportChart('vendasPorPagamento')">
+                    <i class="fas fa-file-excel me-1"></i>
+                    Excel
+                  </button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="chart8"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>
