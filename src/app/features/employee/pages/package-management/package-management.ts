@@ -16,10 +16,8 @@ interface TravelPackage {
   travelersNumber: number;
   bundleStatus: string;
   imageUrl?: string;
-  videoUrl?: string;
   available?: boolean;
   createdAt?: Date;
-  additionalInfo?: string;
   destination?: string;
   origin?: string;
 }
@@ -49,12 +47,9 @@ export class PackageManagementComponent implements OnInit {
     initialDate: '',
     finalDate: '',
     quantity: 0,
+    travelersNumber: 1,
     imageUrl: '',
-    videoUrl: '',
-    available: true,
-    additionalInfo: '',
-    destination: '',
-    origin: ''
+    available: true
   };
 
   // Propriedades para upload de imagem
@@ -71,22 +66,7 @@ export class PackageManagementComponent implements OnInit {
 
   constructor(private service: BundleService) {}
 
-  bundleArray: BundleClass[] = [];
-
   ngOnInit(): void {
-    console.log('Iniciando carregamento dos bundles...');
-    this.service.getAllBundles().subscribe({
-      next: (res) => {
-        this.bundleArray = res;
-        console.log('Bundles carregados com sucesso:', this.bundleArray);
-        console.log('Quantidade de bundles:', this.bundleArray.length);
-      },
-      error: (error) => {
-        console.error('Erro ao carregar bundles:', error);
-        console.log('Status do erro:', error.status);
-        console.log('Mensagem do erro:', error.message);
-      }
-    });
     this.loadPackages();
   }
 
@@ -135,7 +115,6 @@ export class PackageManagementComponent implements OnInit {
       travelersNumber: bundle.travelersNumber,
       bundleStatus: bundle.bundleStatus,
       imageUrl: bundle.imageUrl || '/assets/imgs/fortaleza.jpg', // Imagem padrão se não tiver
-      videoUrl: '',
       available: bundle.bundleStatus === 'AVAILABLE',
       createdAt: new Date(),
       destination: bundle.destinationCity && bundle.destinationState 
@@ -264,12 +243,9 @@ export class PackageManagementComponent implements OnInit {
       initialDate: '',
       finalDate: '',
       quantity: 0,
+      travelersNumber: 1,
       imageUrl: '',
-      videoUrl: '',
-      available: true,
-      additionalInfo: '',
-      destination: '',
-      origin: ''
+      available: true
     };
 
     // Resetar variáveis de upload
@@ -532,9 +508,8 @@ export class PackageManagementComponent implements OnInit {
       this.newPackage.bundleRank &&
       this.newPackage.initialDate &&
       this.newPackage.finalDate &&
-      this.newPackage.quantity !== undefined && this.newPackage.quantity >= 0 &&
-      this.newPackage.destination &&
-      this.newPackage.origin &&
+      this.newPackage.quantity !== undefined && 
+      this.newPackage.quantity >= 0 &&
       hasImage
     );
   }
