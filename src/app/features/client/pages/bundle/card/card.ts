@@ -34,7 +34,10 @@ export class Card implements OnInit {
   }
 
   showDetails(): void {
-    this.router.navigate(['/bundles/', this.pacote.id]);
+    this.router.navigate(['/bundles/details-bundle', this.pacote.id]).then(() => {
+      // Garantir que a página comece do topo
+      window.scrollTo(0, 0);
+    });
   }
 
   onImageError(event: any): void {

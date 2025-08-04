@@ -67,6 +67,15 @@ export class Home implements OnInit {
     this.router.navigate(['/bundles']);
   }
 
+  // Método para navegar para detalhes do pacote
+  verDetalhes(packageId: number) {
+    console.log('🔗 Navegando para detalhes do pacote ID:', packageId);
+    this.router.navigate(['/bundles/details-bundle', packageId]).then(() => {
+      // Garantir que a página comece do topo
+      window.scrollTo(0, 0);
+    });
+  }
+
 
 
 }

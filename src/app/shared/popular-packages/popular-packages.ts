@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Trip } from '../models/trip.interface';
 import { PackageService } from '../services/package.service';
 import { BundleService } from '../services/bundle-service';
@@ -24,7 +25,8 @@ export class PopularPackages implements OnInit, AfterViewInit {
   constructor(
     private packageService: PackageService,
     private bundleService: BundleService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -318,6 +320,15 @@ export class PopularPackages implements OnInit, AfterViewInit {
       case 'PRATA': return 'rank-silver';
       default: return '';
     }
+  }
+
+  // Método para navegar para detalhes do pacote
+  verDetalhes(packageId: number) {
+    console.log('🔗 PopularPackages - Navegando para detalhes do pacote ID:', packageId);
+    this.router.navigate(['/bundles/details-bundle', packageId]).then(() => {
+      // Garantir que a página comece do topo
+      window.scrollTo(0, 0);
+    });
   }
 
 }

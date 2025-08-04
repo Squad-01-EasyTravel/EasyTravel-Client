@@ -35,21 +35,22 @@
       <!-- Imagem Principal -->
       <div class="mb-4">
         <img
-          [src]="pacote?.imagemPrincipal || 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop'"
-          class="img-fluid w-100 rounded" style="height: 300px; object-fit: cover;" [alt]="pacote?.titulo">
+          [src]="bundleImageUrl || 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop'"
+          class="img-fluid w-100 rounded" style="height: 300px; object-fit: cover;" [alt]="bundleClass.bundleTitle"
+          (error)="onImageError()">
       </div>
 
       <!-- Informações do Pacote -->
       <div class="card mb-4">
         <div class="card-body">
-          <h3 class="card-title fw-bold mb-3">{{ pacote?.titulo || 'Recife - São Paulo' }}</h3>
+          <h3 class="card-title fw-bold mb-3">{{ bundleClass.bundleTitle || 'Carregando...' }}</h3>
           <h4 class="text-primary fw-bold mb-3">R$ {{bundleClass.initialPrice}}</h4>
 
           <!-- Avaliação -->
           <div class="d-flex align-items-center mb-4">
             <div class="me-3">
-              <i class="bi bi-star-fill text-warning" *ngFor="let star of getStarsArray(pacote?.avaliacao || 5)"></i>
-              <span class="ms-2 fw-bold">{{ pacote?.avaliacao || '5.0' }}</span>
+              <i class="bi bi-star-fill text-warning" *ngFor="let star of getStarsArray()"></i>
+              <span class="ms-2 fw-bold">{{ calculatedRating }}.0</span>
             </div>
           </div>
 
@@ -62,7 +63,7 @@
                 </div>
                 <div>
                   <small class="text-muted d-block">Data de Partida</small>
-                  <strong>{{bundleClass.initialDate}}</strong>
+                  <strong>{{ formattedDepartureDate || 'Data não informada' }}</strong>
                 </div>
               </div>
 
@@ -72,7 +73,7 @@
                 </div>
                 <div>
                   <small class="text-muted d-block">Data de Retorno</small>
-                  <strong>{{bundleClass.finalDate}}</strong>
+                  <strong>{{ formattedReturnDate || 'Data não informada' }}</strong>
                 </div>
               </div>
 
@@ -82,7 +83,7 @@
                 </div>
                 <div>
                   <small class="text-muted d-block">Duração</small>
-                  <strong>{{ pacote?.duracao || '7 dias' }}</strong>
+                  <strong>{{ calculatedDuration || 'Calculando duração...' }}</strong>
                 </div>
               </div>
             </div>
@@ -94,7 +95,7 @@
                 </div>
                 <div>
                   <small class="text-muted d-block">Local de Partida</small>
-                  <strong>{{ pacote?.localPartida || 'Aeroporto Internacional do Recife / Guararapes' }}</strong>
+                  <strong>{{ departureLocation || 'Carregando local de partida...' }}</strong>
                 </div>
               </div>
 
@@ -104,7 +105,7 @@
                 </div>
                 <div>
                   <small class="text-muted d-block">Local de Destino</small>
-                  <strong>{{ pacote?.localDestino || 'Aeroporto Internacional de Guarulhos (GRU)' }}</strong>
+                  <strong>{{ destinationLocation || 'Carregando local de destino...' }}</strong>
                 </div>
               </div>
             </div>
@@ -115,9 +116,7 @@
             <h6 class="fw-bold mb-3">O que está incluso:</h6>
             <div class="incluso-content">
               <p class="text-muted mb-0">
-                {{ pacote?.descricaoIncluso || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                ullamco laboris nisi ut aliquip ex ea commodo consequat.' }}
+                {{ pacote?.descricaoIncluso || 'Explore o melhor da sua viagem com nosso pacote completo que inclui hospedagem confortável, transfer de ida e volta, café da manhã delicioso e uma experiência inesquecível. Desfrute de todos os serviços inclusos sem preocupações adicionais.' }}
               </p>
             </div>
           </div>
@@ -167,7 +166,7 @@
         </div>
         <div class="card-body">
           <!-- Resumo das avaliações -->
-          <div class="row mb-4">
+          <!-- <div class="row mb-4">
             <div class="col-12">
               <h6 class="fw-bold mb-3">Resumo de avaliações</h6>
               <div class="avaliacoes-resumo">
@@ -183,7 +182,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- Comentários individuais -->
           <div class="comentarios-lista">
@@ -228,54 +227,55 @@
           <!-- Nota geral do pacote -->
           <div class="text-center border-top pt-4">
             <div class="nota-geral">
-              <h3 class="display-5 fw-bold text-primary mb-2">{{ pacote?.avaliacao || '5.0' }}</h3>
+               <h3 class="display-5 fw-bold text-primary mb-2">{{ calculatedRating }}.0</h3> 
               <div class="mb-2">
-                <i class="bi bi-star-fill text-warning"
-                  *ngFor="let star of getStarsArray(pacote?.avaliacao || 5)"></i>
+                 <i class="bi bi-star-fill text-warning"
+                  *ngFor="let star of getStarsArray()"></i> 
               </div>
-              <p class="text-muted mb-0">{{ pacote?.totalAvaliacoes || '1000' }} COMENTÁRIOS</p>
+              <!-- <p class="text-muted mb-0">{{ pacote?.totalAvaliacoes || '1000' }} COMENTÁRIOS</p> -->
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Sidebar - Resumo e Reserva -->
+    <!-- 
+    // Sidebar - Resumo e Reserva 
     <div class="col-lg-4">
       <div class="card sticky-top" style="top: 100px;">
         <div class="card-body">
           <h5 class="card-title fw-bold mb-3">Resumo da Viagem</h5>
 
-          <!-- Preço -->
+          // Preço 
           <div class="text-center mb-4">
             <span class="text-muted">A partir de</span>
-            <h3 class="fw-bold text-primary">R$ {{ pacote?.preco || '2.400' }}</h3>
+            <h3 class="fw-bold text-primary">R$ {{ bundleClass.initialPrice || '2.400' }}</h3>
             <small class="text-muted">por pessoa</small>
           </div>
 
-          <!-- Informações resumidas -->
+          // Informações resumidas 
           <div class="mb-3">
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Destino:</span>
-              <strong>{{ pacote?.destino || 'Recife - São Paulo' }}</strong>
+              <strong>{{ destinationLocation || 'Carregando destino...' }}</strong>
             </div>
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Duração:</span>
-              <strong>{{ pacote?.duracao || '7 dias' }}</strong>
+              <strong>{{ calculatedDuration || 'Calculando duração...' }}</strong>
             </div>
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Saída:</span>
-              <strong>{{ pacote?.dataIda || '06/03/2024' }}</strong>
+              <strong>{{ formattedDepartureDate || 'Data não informada' }}</strong>
             </div>
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Retorno:</span>
-              <strong>{{ pacote?.dataVolta || '13/03/2024' }}</strong>
+              <strong>{{ formattedReturnDate || 'Data não informada' }}</strong>
             </div>
           </div>
 
           <hr>
 
-          <!-- Formulário de reserva -->
+          // Formulário de reserva
           <form (ngSubmit)="realizarReserva()">
             <div class="mb-3">
               <label class="form-label">Número de pessoas</label>
@@ -302,7 +302,7 @@
 
           <hr>
 
-          <!-- Contato -->
+          // Contato 
           <div class="text-center">
             <p class="mb-2">Dúvidas? Fale conosco!</p>
             <button class="btn btn-outline-primary btn-sm">
@@ -312,7 +312,8 @@
         </div>
       </div>
     </div>
-  </div>
+    -->
+  </div> 
 </div>
 
 <app-footer></app-footer>
