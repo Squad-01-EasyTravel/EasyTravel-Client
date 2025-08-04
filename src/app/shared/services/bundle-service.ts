@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MediaResponse } from '../models/media-response.interface';
 import { BundleLocationResponse } from '../models/bundle-location-response.interface';
+import { Location } from '../models/location.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -36,5 +37,11 @@ export class BundleService {
   getBundleLocation(bundleId: number): Observable<BundleLocationResponse[]> {
     const url = `http://localhost:8080/api/bundle-locations/bundle/${bundleId}`;
     return this.http.get<BundleLocationResponse[]>(url);
+  }
+
+  // Buscar todos os locais disponíveis
+  getLocations(): Observable<Location[]> {
+    const url = `http://localhost:8080/api/locations`;
+    return this.http.get<Location[]>(url);
   }
 }

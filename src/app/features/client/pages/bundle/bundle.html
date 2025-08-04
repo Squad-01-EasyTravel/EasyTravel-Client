@@ -5,7 +5,7 @@
   <div class="bundle-content">
     <!-- Sidebar com Filtros -->
     <aside class="filter-sidebar">
-      <app-filter></app-filter>
+      <app-filter (filterChange)="onFilterChange($event)" (sortChange)="onSortChange($event)"></app-filter>
     </aside>
 
     <!-- Área principal de conteúdo -->
@@ -21,6 +21,10 @@
         </div>
 
         <div class="view-options">
+          <span class="sorting-info">
+            <i class="fas fa-sort"></i>
+            Ordenado por: {{getSortingDisplayText()}}
+          </span>
           <span class="showing-text">
             Mostrando {{getDisplayStart()}}-{{getDisplayEnd()}} de {{packagesWithImages.length}}
           </span>
@@ -42,7 +46,15 @@
             <i class="fas fa-map-marked-alt"></i>
           </div>
           <h3>Nenhum pacote encontrado</h3>
-          <p>Tente ajustar os filtros para encontrar pacotes que atendam aos seus critérios.</p>
+          <p *ngIf="currentFilters.origem || currentFilters.destino">
+            Não encontramos pacotes que correspondam aos filtros selecionados:<br>
+            <span *ngIf="currentFilters.origem"><strong>Origem:</strong> {{currentFilters.origem}}<br></span>
+            <span *ngIf="currentFilters.destino"><strong>Destino:</strong> {{currentFilters.destino}}<br></span>
+            Tente ajustar os filtros ou limpar todas as seleções.
+          </p>
+          <p *ngIf="!currentFilters.origem && !currentFilters.destino">
+            Tente ajustar os filtros para encontrar pacotes que atendam aos seus critérios.
+          </p>
           <button class="btn-clear-filters" (click)="clearAllFilters()">
             <i class="fas fa-refresh"></i>
             Limpar Filtros
@@ -104,7 +116,7 @@
               Página {{currentPage}} de {{getTotalPages()}}
             </span>
             <span class="items-info">
-              ({{getDisplayStart()}}-{{getDisplayEnd()}} de {{filteredPackages.length}} itens)
+              ({{getDisplayStart()}}-{{getDisplayEnd()}} de {{packagesWithImages.length}} itens)
             </span>
           </div>
 
@@ -131,7 +143,7 @@
 
 
               <span class="items-info">
-                ({{filteredPackages.length}} itens)
+                ({{packagesWithImages.length}} itens)
               </span>
             </div>
           </div>

@@ -50,6 +50,30 @@
   transform: scale(1.05);
 }
 
+/* ===== SELETOR DE TIPO DE FILTRO ===== */
+.filter-type-selector {
+  margin-top: 0.5rem;
+}
+
+.filter-type-select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid #e0e6ed;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c3e50;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.filter-type-select:focus {
+  outline: none;
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
 /* ===== SEÇÕES DO FILTRO ===== */
 .filter-section {
   padding: 1.5rem;

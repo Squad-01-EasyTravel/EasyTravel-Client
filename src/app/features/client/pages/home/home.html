@@ -41,32 +41,22 @@
                     <label class="search-label">Local de Partida</label>
                     <select class="search-select" [(ngModel)]="origemSelecionada">
                       <option value="">Selecione sua cidade</option>
-                      <option value="sao-paulo">São Paulo, SP</option>
-                      <option value="rio-janeiro">Rio de Janeiro, RJ</option>
-                      <option value="belo-horizonte">Belo Horizonte, MG</option>
-                      <option value="brasilia">Brasília, DF</option>
-                      <option value="salvador">Salvador, BA</option>
-                      <option value="fortaleza">Fortaleza, CE</option>
-                      <option value="recife">Recife, PE</option>
-                      <option value="porto-alegre">Porto Alegre, RS</option>
-                      <option value="curitiba">Curitiba, PR</option>
-                      <option value="manaus">Manaus, AM</option>
+                      <option 
+                        *ngFor="let location of locations" 
+                        [value]="getLocationValue(location)">
+                        {{formatLocation(location)}}
+                      </option>
                     </select>
                   </div>
                   <div class="search-field">
                     <label class="search-label">Local de Destino</label>
                     <select class="search-select" [(ngModel)]="destinoSelecionada">
                       <option value="">Para onde você quer ir?</option>
-                      <option value="lisboa">Lisboa, Portugal</option>
-                      <option value="paris">Paris, França</option>
-                      <option value="roma">Roma, Itália</option>
-                      <option value="madrid">Madrid, Espanha</option>
-                      <option value="londres">Londres, Inglaterra</option>
-                      <option value="amsterdam">Amsterdam, Holanda</option>
-                      <option value="barcelona">Barcelona, Espanha</option>
-                      <option value="praga">Praga, República Tcheca</option>
-                      <option value="viena">Viena, Áustria</option>
-                      <option value="budapest">Budapeste, Hungria</option>
+                      <option 
+                        *ngFor="let location of locations" 
+                        [value]="getLocationValue(location)">
+                        {{formatLocation(location)}}
+                      </option>
                     </select>
                   </div>
                 </div>
