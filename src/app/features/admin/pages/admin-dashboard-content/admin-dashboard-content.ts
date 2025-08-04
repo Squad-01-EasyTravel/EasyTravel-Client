@@ -593,11 +593,29 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       case 'vendasPorPagamento':
         chartLabel = 'Vendas por Pagamento';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
+          console.log('📊 Dashboard - Dados vendas por pagamento para gráfico:', apiDataForMetric);
+          
+          // Mapeamento dos métodos de pagamento
+          const paymentMethodLabels: { [key: number]: string } = {
+            0: 'Cartão de Crédito',
+            1: 'Cartão de Débito', 
+            2: 'PIX',
+            3: 'Boleto'
+          };
+
           chartData = {
-            labels: apiDataForMetric.map((item: any) => item.metodo || 'N/A'),
+            labels: apiDataForMetric.map((item: any) => {
+              const label = paymentMethodLabels[item.paymentMethod] || item.metodo || `Método ${item.paymentMethod}` || 'N/A';
+              console.log('🏷️ Dashboard - Label pagamento:', label, 'para item:', item);
+              return label;
+            }),
             datasets: [{
               label: chartLabel,
-              data: apiDataForMetric.map((item: any) => item.quantidade || item.total || 0),
+              data: apiDataForMetric.map((item: any) => {
+                const value = item.totalRevenue || item.totalTransactions || item.quantidade || item.total || 0;
+                console.log('💳 Dashboard - Valor vendas pagamento:', value, 'para item:', item);
+                return value;
+              }),
               backgroundColor: ['#FF7900', '#7FC023', '#6AAE20', '#FF5722', '#2196F3']
             }]
           };
