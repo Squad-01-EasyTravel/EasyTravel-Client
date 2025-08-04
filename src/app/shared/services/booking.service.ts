@@ -1,109 +1,250 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Observable, of, forkJoin } from 'rxjs';
+import { delay, map, switchMap, catchError } from 'rxjs/operators';
 import { BookedTrip } from '../models/booked-trip.interface';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CurrentUser } from '@/app/features/client/pages/booking/classe/current-user';
-import { HttpHeaders } from '@angular/common/http';
+import { Reservation } from '../models/reservation.interface';
+import { MediaResponse } from '../models/media-response.interface';
+import { BundleLocationResponse } from '../models/bundle-location-response.interface';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
 
-  private baseUrl = "http://localhost:8080/api/reservations";
-  constructor(private http: HttpClient) {}
+  private baseUrl = "http://localhost:8080/api";
+  private readonly BACKEND_BASE_URL = 'http://localhost:8080';
+  
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   getCurrentUser(id: string): Observable<CurrentUser> {
-  const url = `${this.baseUrl}/${id}`;
-  
-  return this.http.get<CurrentUser>(url);}
-
-  // Simula busca de pacotes do usuário no back-end
-  getUserBookings(): Observable<BookedTrip[]> {
-
-    const mockData: BookedTrip[] = [
-      {
-        id: '1',
-        imageUrl: '/assets/imgs/fortaleza.jpg',
-        origin: 'Recife',
-        destination: 'São Paulo',
-        departureDate: '2025-08-15',
-        returnDate: '2025-08-22',
-        status: 'Confirmado',
-        orderId: '#123456',
-        price: 2500,
-        duration: 7,
-        paymentMethod: 'Cartão de Crédito',
-        rating: 4.5,
-        description: 'Pacote completo incluindo hospedagem em hotel 4 estrelas, traslados e city tour.'
-      },
-      {
-        id: '2',
-        imageUrl: '/assets/imgs/gramado.jpg',
-        origin: 'Rio de Janeiro',
-        destination: 'Salvador',
-        departureDate: '2025-09-10',
-        returnDate: '2025-09-17',
-        status: 'Confirmado',
-        orderId: '#234567',
-        price: 1800,
-        duration: 7,
-        paymentMethod: 'PIX',
-        rating: 4.2,
-        description: 'Viagem para Salvador com hospedagem na orla, passeios históricos e gastronômicos.'
-      },
-      {
-        id: '3',
-        imageUrl: '/assets/imgs/fortaleza.jpg',
-        origin: 'São Paulo',
-        destination: 'Fortaleza',
-        departureDate: '2025-10-25',
-        returnDate: '2025-11-01',
-        status: 'Pendente',
-        orderId: '#345678',
-        price: 2200,
-        duration: 7,
-        description: 'Pacote para Fortaleza com hospedagem em resort all-inclusive.'
-      },
-      {
-        id: '4',
-        imageUrl: '/assets/imgs/gramado.jpg',
-        origin: 'Brasília',
-        destination: 'Porto Alegre',
-        departureDate: '2025-12-20',
-        returnDate: '2025-12-27',
-        status: 'Confirmado',
-        orderId: '#456789',
-        price: 3000,
-        duration: 7,
-        paymentMethod: 'Boleto Bancário',
-        rating: 4.8,
-        description: 'Pacote para Porto Alegre incluindo hospedagem e passeios pela região.'
-      },
-      {
-        id: '5',
-        imageUrl: '/assets/imgs/fortaleza.jpg',
-        origin: 'Manaus',
-        destination: 'Curitiba',
-        departureDate: '2026-01-15',
-        returnDate: '2026-01-22',
-        status: 'Pendente',
-        orderId: '#567890',
-        price: 2800,
-        duration: 7,
-        description: 'Viagem para Curitiba com foco em ecoturismo e gastronomia local.'
-      }
-    ];
-
-    // Simula delay da requisição HTTP
-    return of(mockData).pipe(delay(500));
+    const url = `${this.baseUrl}/reservations/${id}`;
+    return this.http.get<CurrentUser>(url);
   }
 
-  // Métodos para futuras integrações com back-end
-  cancelBooking(bookingId: string): Observable<boolean> {
-    console.log(`Cancelando pacote ${bookingId}`);
-    return of(true).pipe(delay(1000));
+  // Buscar reservas do usuário autenticado via API
+  getMyReservations(): Observable<BookedTrip[]> {
+    // Verificar se o usuário está autenticado
+    if (!this.authService.isAuthenticated()) {
+      console.error('Usuário não autenticado para acessar reservas');
+      return of([]);
+    }
+
+    const url = `${this.baseUrl}/reservations/my`;
+    const token = this.authService.getToken();
+    
+    console.log('🔄 Carregando reservas...');
+    
+    // Vamos adicionar o header manualmente para debug
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    
+    return this.http.get<Reservation[]>(url, { headers }).pipe(
+      switchMap(reservations => {
+        if (!reservations || reservations.length === 0) {
+          return of([]);
+        }
+
+        const bookedTrips = this.mapReservationsToBookedTrips(reservations);
+        
+        // Para cada reserva, buscar imagem e localização do pacote
+        const enrichedTrips$ = bookedTrips.map(trip => {
+          if (trip.bundleId) {
+            return forkJoin({
+              image: this.getBundleImage(trip.bundleId).pipe(
+                catchError((error) => {
+                  console.warn(`Erro ao carregar imagem para bundle ${trip.bundleId}:`, error);
+                  return of([]);
+                })
+              ),
+              location: this.getBundleLocation(trip.bundleId).pipe(
+                catchError((error) => {
+                  console.warn(`Erro ao carregar localização para bundle ${trip.bundleId}:`, error);
+                  return of([]);
+                })
+              )
+            }).pipe(
+              map(({ image, location }) => {
+                // Atualizar imagem
+                if (image.length > 0) {
+                  // Processar a URL da imagem corretamente
+                  const rawImageUrl = image[0].mediaUrl;
+                  trip.imageUrl = this.processImageUrl(rawImageUrl);
+                  console.log(`🖼️ URL original da API: ${rawImageUrl}`);
+                  console.log(`🖼️ URL processada: ${trip.imageUrl}`);
+                } else {
+                  trip.imageUrl = 'assets/imgs/fortaleza.jpg'; // Imagem padrão
+                }
+                
+                // Atualizar origem e destino
+                if (location.length > 0) {
+                  const bundleLocation = location[0];
+                  trip.origin = bundleLocation.departure ? bundleLocation.departure.city : 'Origem não informada';
+                  trip.destination = bundleLocation.destination ? bundleLocation.destination.city : 'Destino não informado';
+                } else {
+                  trip.origin = 'Origem não informada';
+                  trip.destination = 'Destino não informado';
+                }
+                
+                return trip;
+              }),
+              catchError((error) => {
+                console.warn(`Erro ao processar trip ${trip.id}:`, error);
+                // Retorna o trip com dados padrão em caso de erro
+                trip.imageUrl = 'assets/imgs/fortaleza.jpg';
+                trip.origin = 'Origem não informada';
+                trip.destination = 'Destino não informado';
+                return of(trip);
+              })
+            );
+          } else {
+            // Se não tem bundleId, retorna o trip como está
+            trip.imageUrl = 'assets/imgs/fortaleza.jpg';
+            trip.origin = 'Origem não informada';
+            trip.destination = 'Destino não informado';
+            return of(trip);
+          }
+        });
+        
+        return forkJoin(enrichedTrips$);
+      }),
+      catchError((error) => {
+        console.error('Erro ao buscar reservas:', error);
+        
+        if (error.status === 403) {
+          console.error('Acesso negado - verifique se o token JWT é válido e se o usuário tem permissão');
+        } else if (error.status === 401) {
+          console.error('Não autorizado - token inválido ou expirado');
+        } else {
+          console.error('Erro desconhecido:', error.message);
+        }
+        
+        return of([]); // Retorna array vazio em caso de erro
+      })
+    );
+  }
+
+  // Buscar imagem do pacote
+  private getBundleImage(bundleId: number): Observable<MediaResponse[]> {
+    const url = `${this.baseUrl}/medias/images/bundle/${bundleId}`;
+    return this.http.get<MediaResponse[]>(url);
+  }
+
+  // Buscar localização do pacote
+  private getBundleLocation(bundleId: number): Observable<BundleLocationResponse[]> {
+    const url = `${this.baseUrl}/bundle-locations/bundle/${bundleId}`;
+    return this.http.get<BundleLocationResponse[]>(url);
+  }
+
+  // Mapear dados da API para o formato usado na interface
+  private mapReservationsToBookedTrips(reservations: Reservation[]): BookedTrip[] {
+    return reservations.map(reservation => ({
+      id: reservation.id.toString(),
+      imageUrl: '', // Será preenchida via API de imagens
+      origin: '', // Será preenchida via API de localizações do pacote
+      destination: '', // Será preenchida via API de localizações do pacote
+      departureDate: this.formatDateToString(reservation.bundle.initialDate),
+      returnDate: this.formatDateToString(reservation.bundle.finalDate),
+      status: this.mapReservationStatus(reservation.reservStatus),
+      orderId: `#${reservation.id}`,
+      price: reservation.bundle.initialPrice,
+      duration: this.calculateDuration(reservation.bundle.initialDate, reservation.bundle.finalDate),
+      paymentMethod: '', // Será implementado conforme necessário
+      rating: 0, // Será implementado conforme necessário
+      description: reservation.bundle.bundleDescription,
+      bundleId: reservation.bundleId // Adicionar para buscar imagem e localização
+    }));
+  }
+
+  private mapReservationStatus(status: string): 'Confirmado' | 'Pendente' | 'Cancelado' {
+    const upperStatus = status?.toUpperCase();
+    switch (upperStatus) {
+      case 'CONFIRMED':
+      case 'CONFIRMADO': 
+        return 'Confirmado';
+      case 'PENDING':
+      case 'PENDENTE': 
+        return 'Pendente';
+      case 'CANCELLED':
+      case 'CANCELED':
+      case 'CANCELADO': 
+        return 'Cancelado';
+      default: 
+        console.warn(`Status de reserva desconhecido: ${status}, usando 'Pendente' como padrão`);
+        return 'Pendente';
+    }
+  }
+
+  private formatDateToString(dateString: string): string {
+    try {
+      if (!dateString) return new Date().toISOString().split('T')[0];
+      const date = new Date(dateString);
+      return isNaN(date.getTime()) ? new Date().toISOString().split('T')[0] : date.toISOString().split('T')[0];
+    } catch (error) {
+      console.warn('Erro ao formatar data:', dateString, error);
+      return new Date().toISOString().split('T')[0];
+    }
+  }
+
+  private calculateDuration(startDate: string, endDate: string): number {
+    try {
+      if (!startDate || !endDate) return 1;
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return 1;
+      
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const duration = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return duration > 0 ? duration : 1;
+    } catch (error) {
+      console.warn('Erro ao calcular duração:', startDate, endDate, error);
+      return 1;
+    }
+  }
+
+  // Cancelar reserva via API
+  cancelBooking(bookingId: string): Observable<any> {
+    if (!this.authService.isAuthenticated()) {
+      console.error('Usuário não autenticado para cancelar reserva');
+      return of(null);
+    }
+
+    const url = `${this.baseUrl}/reservations/${bookingId}/cancel/my`;
+    const token = this.authService.getToken();
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    console.log(`🚫 Cancelando reserva ${bookingId}...`);
+    
+    return this.http.patch(url, {}, { headers }).pipe(
+      map((response: any) => {
+        console.log('✅ Reserva cancelada com sucesso:', response);
+        return response;
+      }),
+      catchError((error) => {
+        console.error('❌ Erro ao cancelar reserva:', error);
+        
+        if (error.status === 403) {
+          console.error('Acesso negado - verifique se o token JWT é válido');
+        } else if (error.status === 401) {
+          console.error('Não autorizado - token inválido ou expirado');
+        } else if (error.status === 404) {
+          console.error('Reserva não encontrada');
+        } else {
+          console.error('Erro desconhecido:', error.message);
+        }
+        
+        throw error; // Re-throw para que o componente possa tratar
+      })
+    );
   }
 
   confirmPayment(bookingId: string): Observable<boolean> {
@@ -114,5 +255,29 @@ export class BookingService {
   downloadVoucher(bookingId: string): Observable<Blob> {
     console.log(`Baixando voucher do pacote ${bookingId}`);
     return of(new Blob(['Voucher content'], { type: 'application/pdf' })).pipe(delay(1000));
+  }
+
+  // Método para processar URLs de imagem (igual ao usado em bundle.ts)
+  private processImageUrl(rawImageUrl: string): string {
+    // Validação de entrada
+    if (!rawImageUrl || typeof rawImageUrl !== 'string' || rawImageUrl.trim() === '') {
+      console.warn('🖼️ URL de imagem inválida ou vazia, usando fallback');
+      return 'assets/imgs/fortaleza.jpg';
+    }
+    
+    const cleanUrl = rawImageUrl.trim();
+    
+    // Se a URL for relativa, adicionar a base URL do backend
+    if (cleanUrl.startsWith('/')) {
+      return `${this.BACKEND_BASE_URL}${cleanUrl}`;
+    } 
+    
+    // Se já for uma URL completa, usar como está
+    if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+      return cleanUrl;
+    } 
+    
+    // Se for um caminho sem barra inicial, adicionar barra e base URL
+    return `${this.BACKEND_BASE_URL}/${cleanUrl}`;
   }
 }

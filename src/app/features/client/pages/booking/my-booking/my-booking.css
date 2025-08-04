@@ -1249,3 +1249,123 @@
     width: 100%;
   }
 }
+
+/* ===== LOADING STYLES ===== */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  width: 100%;
+}
+
+.loading-spinner {
+  text-align: center;
+  color: #ff6b35;
+}
+
+.loading-spinner i {
+  margin-bottom: 15px;
+  color: #ff6b35;
+}
+
+.loading-spinner p {
+  margin: 0;
+  font-size: 16px;
+  color: #666;
+}
+
+/* ===== WARNING MODAL STYLES ===== */
+.warning-modal-content {
+  background: white;
+  border-radius: 15px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.warning-modal-header {
+  padding: 25px 30px 20px;
+  background: linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%);
+  color: white;
+  position: relative;
+  text-align: center;
+}
+
+.warning-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.9;
+}
+
+.warning-icon i {
+  color: white;
+}
+
+.warning-modal-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.warning-modal-body {
+  padding: 25px 30px;
+  text-align: center;
+}
+
+.warning-message {
+  color: #555;
+  line-height: 1.6;
+  font-size: 16px;
+  margin: 0;
+}
+
+.warning-modal-footer {
+  padding: 20px 30px;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+  background-color: #f8f9fa;
+}
+
+.warning-modal-footer .btn {
+  min-width: 120px;
+  padding: 12px 24px;
+  font-weight: 500;
+}
+
+/* Animação para o modal de aviso */
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive para Warning Modal */
+@media (max-width: 768px) {
+  .warning-modal-content {
+    margin: 20px;
+    max-width: calc(100% - 40px);
+  }
+  
+  .warning-modal-header,
+  .warning-modal-body,
+  .warning-modal-footer {
+    padding: 20px;
+  }
+  
+  .warning-icon {
+    font-size: 2.5rem;
+  }
+  
+  .warning-modal-title {
+    font-size: 1.3rem;
+  }
+}
