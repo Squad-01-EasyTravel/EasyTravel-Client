@@ -11,8 +11,8 @@ import { Location } from '../models/location.interface';
 })
 export class BundleService {
 
-  private baseUrl = "/api/bundles";
-  private mediaUrl = "/api/medias";
+  private baseUrl = "http://localhost:8080/api/bundles";
+  private mediaUrl = "http://localhost:8080/api/medias";
   constructor(private http: HttpClient) {}
 
   // Buscar todos os pacotes disponíveis
@@ -48,4 +48,18 @@ export class BundleService {
   getAllBundles(): Observable<BundleClass[]> {
     return this.http.get<BundleClass[]>(this.baseUrl);
   }
+
+  // Atualizar bundle existente
+  updateBundle(id: number, bundle: Partial<BundleClass>): Observable<BundleClass> {
+    const url = `${this.baseUrl}/${id}`;
+    return this.http.put<BundleClass>(url, bundle);
+  }
+
+  // Excluir bundle por ID
+  deleteBundle(id: number): Observable<void> {
+    const url = `${this.baseUrl}/${id}`;
+    return this.http.delete<void>(url);
+  }
+
+  
 }
