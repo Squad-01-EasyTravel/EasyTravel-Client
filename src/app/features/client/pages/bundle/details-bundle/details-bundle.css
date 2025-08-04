@@ -110,6 +110,16 @@
   max-width: 1200px;
 }
 
+/* Estilo para coluna centralizada */
+.container .justify-content-center > .col-lg-10 {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
 /* Imagem principal - mantendo tamanho e funcionalidade */
 .img-fluid.w-100.rounded {
   border-radius: 20px !important;
@@ -560,6 +570,13 @@
 
   .container {
     padding: 0 15px;
+  }
+
+  /* Ajustes responsivos para coluna centralizada */
+  .container .justify-content-center > .col-lg-10 {
+    margin: 0.5rem;
+    padding: 1.5rem;
+    border-radius: 15px;
   }
 
   .card-body {

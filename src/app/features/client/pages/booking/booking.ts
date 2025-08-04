@@ -117,6 +117,11 @@ export class Booking implements OnInit {
     }
   ];
 
+  // Propriedades para dados REAIS da API (igual à página home)
+  bundleImageUrl: string = '';
+  bundleLocationName: string = '';
+  realBundleData: any = null;
+
   // Informações dos viajantes extras para o pacote único
   travelersInfoByPackage: { [packageId: string]: TravelerInfo[] } = {};
   totalPrice: string = '0,00';
@@ -174,17 +179,25 @@ export class Booking implements OnInit {
   currentBundle: BundleClass = new BundleClass();
 
   ngOnInit(): void {
+    console.log('🚀 Iniciando ngOnInit...');
+    
     // Verificar se há dados de reserva vindos da navegação
     const navigationState = this.router.getCurrentNavigation()?.extras?.state || history.state;
     if (navigationState && navigationState['reservationData']) {
       this.reservationData = navigationState['reservationData'];
       console.log('📦 Dados da reserva recebidos:', this.reservationData);
-      this.populatePackageFromReservation();
       
-      // Se temos dados da reserva, inicializar diretamente sem fazer outras requisições
-      this.initializeTravelersForCurrentPackage();
-      this.calculateTotalPrice();
-      this.loadBookingData();
+      // Se temos bundleId, buscar dados REAIS da API (igual à página home)
+      if (this.reservationData && this.reservationData.bundleId) {
+        console.log('🔍 BundleId encontrado, buscando dados REAIS da API:', this.reservationData.bundleId);
+        this.loadRealBundleData(this.reservationData.bundleId);
+      } else {
+        console.log('⚠️ Sem bundleId, usando dados da reserva com rating/rank mockados');
+        this.populatePackageFromReservation();
+        this.initializeTravelersForCurrentPackage();
+        this.calculateTotalPrice();
+        this.loadBookingData();
+      }
       return; // Sair aqui para evitar outras requisições desnecessárias
     }
 
@@ -615,5 +628,133 @@ export class Booking implements OnInit {
     this.router.navigate(['/payment'], {
       state: { bookingData: bookingData }
     });
+  }
+
+  // NOVOS MÉTODOS: Carregar dados REAIS da API (baseado na lógica da página home)
+  
+  // MÉTODO: Carregar dados REAIS da API baseado no bundleId
+  private loadRealBundleData(bundleId: number): void {
+    console.log('🌐 Carregando dados reais do bundle:', bundleId);
+    
+    this.bundleService.getBundleById(bundleId.toString()).subscribe({
+      next: (bundle) => {
+        console.log('✅ Bundle carregado da API:', bundle);
+        this.realBundleData = bundle;
+        
+        // Carregar imagem e localização em paralelo
+        Promise.all([
+          this.loadBundleImage(bundleId),
+          this.loadBundleLocation(bundleId)
+        ]).then(() => {
+          // Após carregar tudo, popular o pacote com dados REAIS + rating/rank mockados
+          this.populatePackageFromRealBundle(bundle);
+        });
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar bundle da API:', error);
+        // Fallback: usar dados da reserva
+        this.populatePackageFromReservation();
+        this.initializeTravelersForCurrentPackage();
+        this.calculateTotalPrice();
+        this.loadBookingData();
+      }
+    });
+  }
+
+  // MÉTODO: Carregar imagem do bundle (igual à página home)
+  private loadBundleImage(bundleId: number): Promise<string> {
+    return new Promise((resolve) => {
+      this.bundleService.getBundleImage(bundleId).subscribe({
+        next: (mediaResponse) => {
+          let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
+          
+          if (mediaData && mediaData.mediaUrl) {
+            this.bundleImageUrl = `http://localhost:8080${mediaData.mediaUrl}`;
+            console.log('🖼️ Imagem do bundle carregada:', this.bundleImageUrl);
+          } else {
+            this.bundleImageUrl = '/assets/imgs/fortaleza.jpg';
+            console.log('🖼️ Usando imagem padrão');
+          }
+          resolve(this.bundleImageUrl);
+        },
+        error: (error) => {
+          console.error('❌ Erro ao carregar imagem:', error);
+          this.bundleImageUrl = '/assets/imgs/fortaleza.jpg';
+          resolve(this.bundleImageUrl);
+        }
+      });
+    });
+  }
+
+  // MÉTODO: Carregar localização do bundle (igual à página home)
+  private loadBundleLocation(bundleId: number): Promise<string> {
+    return new Promise((resolve) => {
+      this.bundleService.getBundleLocation(bundleId).subscribe({
+        next: (locationResponse) => {
+          if (locationResponse && locationResponse.length > 0) {
+            const location = locationResponse[0];
+            // Usar destination.city ou departure.city como nome da localização
+            this.bundleLocationName = location.destination?.city || location.departure?.city || 'Destino Incrível';
+            console.log('📍 Localização do bundle carregada:', this.bundleLocationName);
+          } else {
+            this.bundleLocationName = 'Destino Incrível';
+            console.log('📍 Usando localização padrão');
+          }
+          resolve(this.bundleLocationName);
+        },
+        error: (error) => {
+          console.error('❌ Erro ao carregar localização:', error);
+          this.bundleLocationName = 'Destino Incrível';
+          resolve(this.bundleLocationName);
+        }
+      });
+    });
+  }
+
+  // MÉTODO: Popular pacote com dados REAIS da API + rating/rank mockados
+  private populatePackageFromRealBundle(bundle: any): void {
+    console.log('📋 Populando pacote com dados REAIS da API:', bundle);
+    
+    // Calcular rating mockado baseado no rank (igual à página home)
+    const mockRating = this.getRatingFromRankConsistent(bundle.bundleRank, bundle.id);
+    console.log('⭐ Rating mockado calculado:', mockRating, 'baseado no rank:', bundle.bundleRank);
+    
+    this.packageList = [{
+      id: bundle.id.toString(),
+      title: this.bundleLocationName || bundle.bundleName || (this.reservationData ? this.reservationData.title : 'Pacote Incrível'),
+      category: bundle.bundleRank, // Rank REAL da API
+      imageUrl: this.bundleImageUrl || '/assets/imgs/fortaleza.jpg',
+      rating: mockRating, // Rating MOCKADO baseado no rank
+      startDate: this.reservationData ? this.reservationData.startDate : '15/08/2024',
+      endDate: this.reservationData ? this.reservationData.endDate : '22/08/2024',
+      travelers: this.reservationData ? this.reservationData.travelers : 1,
+      duration: bundle.duration || (this.reservationData ? this.reservationData.duration : 7),
+      description: bundle.description || (this.reservationData ? this.reservationData.description : 'Pacote de viagem incrível com tudo incluso'),
+      includes: [
+        'Hospedagem em hotel 4 estrelas',
+        'Café da manhã incluído', 
+        'Transfer aeroporto-hotel',
+        'Seguro viagem'
+      ],
+      basePrice: this.formatPrice(bundle.bundlePrice || (this.reservationData ? this.reservationData.price : 2000)),
+      extraPrice: '0,00',
+      discount: '0,00',
+      extraServices: false,
+      selected: true
+    }];
+
+    this.selectedPackageData = this.packageList[0];
+    
+    console.log('✅ Pacote populado com dados REAIS da API:');
+    console.log('📄 Título REAL:', this.bundleLocationName);
+    console.log('🏷️ Rank REAL:', bundle.bundleRank);
+    console.log('⭐ Rating MOCKADO:', mockRating);
+    console.log('🖼️ Imagem REAL:', this.bundleImageUrl);
+    console.log('📍 Localização REAL:', this.bundleLocationName);
+    console.log('💰 Preço REAL:', bundle.bundlePrice);
+    
+    this.initializeTravelersForCurrentPackage();
+    this.calculateTotalPrice();
+    this.loadBookingData();
   }
 }
