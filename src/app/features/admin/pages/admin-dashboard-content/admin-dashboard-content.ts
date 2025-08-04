@@ -530,12 +530,21 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       case 'vendasPorCidadeDestino':
         chartLabel = 'Vendas por Cidade';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
+          console.log('📊 Dashboard - Dados vendas por cidade para gráfico:', apiDataForMetric);
           chartData = {
-            labels: apiDataForMetric.map((item: any) => item.cidade || 'N/A'),
+            labels: apiDataForMetric.map((item: any) => {
+              const label = item.destination || item.cidade || 'N/A';
+              console.log('🏷️ Dashboard - Label cidade:', label, 'para item:', item);
+              return label;
+            }),
             datasets: [{
               label: chartLabel,
-              data: apiDataForMetric.map((item: any) => item.total || item.quantidade || 0),
-              backgroundColor: ['#FF7900', '#7FC023', '#6AAE20', '#FF5722', '#2196F3', '#9C27B0']
+              data: apiDataForMetric.map((item: any) => {
+                const value = item.totalVendas || item.total || item.quantidade || 0;
+                console.log('🏙️ Dashboard - Valor vendas cidade:', value, 'para item:', item);
+                return value;
+              }),
+              backgroundColor: ['#FF7900', '#7FC023', '#6AAE20', '#FF5722', '#2196F3', '#9C27B0', '#FFC107', '#E91E63', '#00BCD4', '#795548']
             }]
           };
         } else {
