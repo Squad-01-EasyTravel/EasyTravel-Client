@@ -4,6 +4,67 @@
   margin: 0;
 }
 
+/* Centralização dos Relatórios Detalhados */
+.dashboard-main-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+  z-index: 1; /* Menor que sidebar */
+}
+
+.charts-wrapper {
+  padding: 0 1rem;
+  margin: 0 auto;
+}
+
+/* Responsividade para centralização */
+@media (min-width: 1201px) {
+  .charts-wrapper {
+    max-width: 1200px !important;
+    margin-left: 140px; /* Offset simples para sidebar 280px */
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 993px) {
+  .charts-wrapper {
+    max-width: 1000px !important;
+    margin-left: 130px; /* Offset para sidebar 260px */
+  }
+}
+
+@media (max-width: 992px) and (min-width: 769px) {
+  .charts-wrapper {
+    max-width: 900px !important;
+    margin-left: 120px; /* Offset para sidebar 240px */
+  }
+}
+
+@media (max-width: 768px) and (min-width: 577px) {
+  .charts-wrapper {
+    max-width: 100% !important;
+    padding: 0 2rem;
+    margin-left: 0; /* Reset para tablets */
+  }
+
+  .dashboard-main-content {
+    padding: 1rem 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .charts-wrapper {
+    max-width: 100% !important;
+    padding: 0 1rem;
+    margin-left: 0; /* Reset para mobile */
+  }
+
+  .dashboard-main-content {
+    padding: 1rem 0;
+    z-index: 1;
+  }
+}
+
 /* =================================
    HERO SECTION STYLES
 ================================= */
@@ -13,6 +74,7 @@
   min-height: 60vh;
   display: flex;
   align-items: center;
+  z-index: 1; /* Menor que sidebar para evitar sobreposição */
 }
 
 .hero-bg {
@@ -33,6 +95,17 @@
   bottom: 0;
   background: rgba(255, 121, 0, 0.15);
   z-index: 2;
+}
+
+/* Garantir que conteúdo fique abaixo da sidebar */
+.hero-content {
+  position: relative;
+  z-index: 10; /* Abaixo da sidebar mas acima do background */
+}
+
+.chart-card {
+  position: relative;
+  z-index: 10; /* Abaixo da sidebar */
 }
 
 .hero-bg::before {
@@ -451,5 +524,15 @@
   .btn-outline-success {
     font-size: 0.75rem;
     padding: 0.3rem 0.6rem;
+  }
+
+  /* Ajuste para navbar fixa no topo */
+  .hero-section {
+    margin-top: 120px; /* Espaço para navbar */
+    min-height: 40vh;
+  }
+
+  .dashboard-main-content {
+    padding-top: 1rem; /* Reduzir padding superior */
   }
 }

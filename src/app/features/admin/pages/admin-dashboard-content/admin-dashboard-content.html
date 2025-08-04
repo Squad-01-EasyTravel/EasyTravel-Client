@@ -73,19 +73,20 @@
 
     <!-- Main Dashboard Content -->
     <div class="dashboard-main-content">
-      <div class="container">
-        <!-- Section Title -->
-        <div class="section-header text-center mb-5">
-          <h2 class="section-title fw-bold">Relatórios Detalhados</h2>
-          <p class="section-description text-muted">Análise completa dos dados de negócio em tempo real</p>
-          <!-- Botão temporário para debug -->
-          <button class="btn btn-outline-primary btn-sm mt-2" (click)="recreateCharts()">
-            <i class="fas fa-refresh me-2"></i>Recriar Gráficos
-          </button>
-        </div>
+      <div class="container-fluid">
+        <div class="charts-wrapper" style="max-width: 1200px; width: 100%;">
+          <!-- Section Title -->
+          <div class="section-header text-center mb-5">
+            <h2 class="section-title fw-bold">Relatórios Detalhados</h2>
+            <p class="section-description text-muted">Análise completa dos dados de negócio em tempo real</p>
+            <!-- Botão temporário para debug -->
+            <button class="btn btn-outline-primary btn-sm mt-2" (click)="recreateCharts()">
+              <i class="fas fa-refresh me-2"></i>Recriar Gráficos
+            </button>
+          </div>
 
-        <!-- Charts Grid -->
-        <div class="charts-grid row g-4">
+          <!-- Charts Grid -->
+          <div class="charts-grid row g-4">
           <!-- Chart 1 - Faturamento por Pacote -->
           <div class="col-lg-6 col-md-6">
             <div class="chart-card">
@@ -253,8 +254,8 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
-
       </div>
     </div>
   </div>

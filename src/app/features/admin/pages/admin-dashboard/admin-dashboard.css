@@ -1,0 +1,118 @@
+/* Layout principal admin com sidebar fixa */
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Botão de menu mobile - OCULTO NO DESKTOP */
+.mobile-menu-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  border: 2px solid rgba(255, 107, 53, 0.3);
+  color: #fff;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: none; /* OCULTO POR PADRÃO */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10000;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-menu-btn:hover {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.mobile-menu-btn i {
+  font-size: 1.5rem;
+}
+
+/* Overlay para sidebar mobile - OCULTO NO DESKTOP */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  display: none; /* OCULTO POR PADRÃO */
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Responsividade para o layout admin */
+@media (max-width: 1200px) {
+  .main-content {
+    margin-left: 260px;
+  }
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 240px;
+  }
+}
+
+/* MOBILE E TABLET - FORÇAR VISUALIZAÇÃO DO HAMBÚRGUER */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  /* FORÇAR BOTÃO HAMBÚRGUER A APARECER */
+  .mobile-menu-btn {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  /* FORÇAR OVERLAY A FUNCIONAR */
+  .sidebar-overlay {
+    display: block !important;
+  }
+}
+
+/* MOBILE PEQUENO - GARANTIR QUE HAMBÚRGUER APARECE */
+@media (max-width: 576px) {
+  .mobile-menu-btn {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    top: 0.8rem;
+    left: 0.8rem;
+  }
+}
+
+/* Para remover espaçamentos com hero sections */
+.main-content > * {
+  margin: 0;
+  padding: 0;
+}
+
+.main-content router-outlet + * {
+  margin: 0;
+  padding: 0;
+}
