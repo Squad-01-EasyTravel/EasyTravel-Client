@@ -210,10 +210,32 @@
                     </div>
                   </div>
                   <div class="col-6">
-                    <div class="detail-pill bg-light rounded-pill p-2 text-center">
-                      <i class="fas fa-ticket-alt text-warning d-block mb-1"></i>
-                      <small class="fw-semibold d-block">{{ package.quantity }} vagas</small>
-                      <small class="text-muted" style="font-size: 0.7rem;">Disponível</small>
+                    <div class="detail-pill bg-light rounded-pill p-2 text-center position-relative">
+                      <i class="fas fa-ticket-alt text-warning d-block mb-2"></i>
+                      
+                      <!-- Container dos controles de quantidade -->
+                      <div class="quantity-controls d-flex align-items-center justify-content-center mb-1">
+                        <button class="btn-quantity btn-quantity-minus" 
+                                (click)="changeQuantity(package, -1)"
+                                [disabled]="package.quantity <= 0"
+                                [class.disabled]="package.quantity <= 0"
+                                title="Diminuir vagas">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                        
+                        <div class="quantity-display">
+                          <span class="quantity-number fw-bold">{{ package.quantity }}</span>
+                          <small class="quantity-label d-block">vagas</small>
+                        </div>
+                        
+                        <button class="btn-quantity btn-quantity-plus" 
+                                (click)="changeQuantity(package, 1)"
+                                title="Aumentar vagas">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                      </div>
+                      
+                      <small class="text-muted" style="font-size: 0.65rem;">Disponível</small>
                     </div>
                   </div>
                 </div>
