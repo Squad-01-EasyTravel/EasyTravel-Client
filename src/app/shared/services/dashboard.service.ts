@@ -26,8 +26,9 @@ export interface UsuariosPorMetodoPagamento {
 }
 
 export interface ReservasPorPacote {
-  pacote: string;
+  pacoteId: number;
   totalReservas: number;
+  bundleTitle?: string; // Adicionado para armazenar o título do bundle
 }
 
 export interface ReservasSemPagamento {
@@ -50,8 +51,23 @@ export interface ReceitaPorMes {
 }
 
 export interface FaturamentoPorPacote {
-  pacote: string;
+  pacoteId: number;
   faturamento: number;
+  bundleTitle?: string; // Adicionado para armazenar o título do bundle
+}
+
+// Interface para resposta da API de bundles
+export interface Bundle {
+  id: number;
+  bundleTitle: string;
+  bundleDescription: string;
+  initialPrice: number;
+  bundleRank: string;
+  initialDate: string;
+  finalDate: string;
+  quantity: number;
+  travelersNumber: number;
+  bundleStatus: string;
 }
 
 @Injectable({
@@ -59,6 +75,7 @@ export interface FaturamentoPorPacote {
 })
 export class DashboardService {
   private baseUrl = 'http://localhost:8080/api/dashboard';
+  private bundlesUrl = 'http://localhost:8080/api/bundles';
 
   constructor(
     private http: HttpClient,
@@ -225,6 +242,22 @@ export class DashboardService {
       tap(data => console.log('✅ DashboardService - Faturamento por pacote:', data)),
       catchError(error => {
         console.error('❌ DashboardService - Erro faturamento por pacote:', error);
+        throw error;
+      })
+    );
+  }
+
+  // GET /api/bundles/{id} - Buscar bundle por ID para obter bundleTitle
+  getBundleById(bundleId: number): Observable<Bundle> {
+    const url = `${this.bundlesUrl}/${bundleId}`;
+    console.log('🎯 DashboardService - Buscando bundle por ID:', bundleId, 'URL:', url);
+
+    return this.http.get<Bundle>(url, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(data => console.log('✅ DashboardService - Bundle encontrado:', data)),
+      catchError(error => {
+        console.error('❌ DashboardService - Erro ao buscar bundle:', error);
         throw error;
       })
     );

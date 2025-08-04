@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { DashboardService } from '../../../../shared/services/dashboard.service';
 import { AuthService } from '../../../../shared/services/auth.service';
 import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-dashboard-content',
@@ -148,17 +150,63 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     this.dashboardService.getTotalReservasPorPacote().subscribe({
       next: (data) => {
         console.log('✅ Dashboard - Total reservas por pacote recebidas:', data);
-        this.apiData['totalReservasPorPacote'] = data;
-        this.renderChartWithApiData('totalReservasPorPacote');
-
-        // Próximo endpoint
-        this.loadReservasCanceladasPorMes();
+        
+        // Buscar bundleTitles para cada item
+        this.loadBundleTitlesForReservas(data);
       },
       error: (error) => {
         console.error('❌ Dashboard - Erro ao carregar total reservas por pacote:', error);
         this.renderEmptyChart('totalReservasPorPacote');
 
         // Continua para próximo endpoint
+        this.loadReservasCanceladasPorMes();
+      }
+    });
+  }
+
+  loadBundleTitlesForReservas(reservasData: any[]) {
+    console.log('🎯 Dashboard - Buscando bundleTitles para reservas...');
+    
+    if (!reservasData || reservasData.length === 0) {
+      console.log('⚠️ Dashboard - Sem dados de reservas, renderizando vazio');
+      this.renderEmptyChart('totalReservasPorPacote');
+      this.loadReservasCanceladasPorMes();
+      return;
+    }
+
+    const bundleRequests = reservasData.map(item => {
+      const bundleId = item.pacoteId || item.pacote;
+      console.log('🎯 Dashboard - Buscando bundle ID:', bundleId, 'para item:', item);
+      
+      return this.dashboardService.getBundleById(bundleId).pipe(
+        tap(bundle => {
+          console.log('✅ Dashboard - Bundle encontrado:', bundle.bundleTitle, 'para ID:', bundleId);
+          item.bundleTitle = bundle.bundleTitle;
+        }),
+        catchError(error => {
+          console.error('❌ Dashboard - Erro ao buscar bundle ID:', bundleId, error);
+          item.bundleTitle = `Pacote ${bundleId}`;
+          return of(null);
+        })
+      );
+    });
+
+    // Aguardar todas as requisições de bundles
+    forkJoin(bundleRequests).subscribe({
+      next: () => {
+        console.log('🎉 Dashboard - Todos os bundleTitles carregados para reservas:', reservasData);
+        this.apiData['totalReservasPorPacote'] = reservasData;
+        this.renderChartWithApiData('totalReservasPorPacote');
+        
+        // Próximo endpoint
+        this.loadReservasCanceladasPorMes();
+      },
+      error: (error) => {
+        console.error('❌ Dashboard - Erro ao carregar bundleTitles para reservas:', error);
+        this.apiData['totalReservasPorPacote'] = reservasData;
+        this.renderChartWithApiData('totalReservasPorPacote');
+        
+        // Continua mesmo com erro
         this.loadReservasCanceladasPorMes();
       }
     });
@@ -232,15 +280,60 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     this.dashboardService.getFaturamentoPorPacote().subscribe({
       next: (data) => {
         console.log('✅ Dashboard - Faturamento por pacote recebido:', data);
-        this.apiData['faturamentoPorPacote'] = data;
-        this.renderChartWithApiData('faturamentoPorPacote');
-
-        console.log('🎉 Dashboard - Todos os dados foram carregados!');
+        
+        // Buscar bundleTitles para cada item
+        this.loadBundleTitlesForFaturamento(data);
       },
       error: (error) => {
         console.error('❌ Dashboard - Erro ao carregar faturamento por pacote:', error);
         this.renderEmptyChart('faturamentoPorPacote');
 
+        console.log('⚠️ Dashboard - Carregamento finalizado com alguns erros.');
+      }
+    });
+  }
+
+  loadBundleTitlesForFaturamento(faturamentoData: any[]) {
+    console.log('🎯 Dashboard - Buscando bundleTitles para faturamento...');
+    
+    if (!faturamentoData || faturamentoData.length === 0) {
+      console.log('⚠️ Dashboard - Sem dados de faturamento, renderizando vazio');
+      this.renderEmptyChart('faturamentoPorPacote');
+      console.log('🎉 Dashboard - Todos os dados foram carregados!');
+      return;
+    }
+
+    const bundleRequests = faturamentoData.map(item => {
+      const bundleId = item.pacoteId || item.pacote;
+      console.log('🎯 Dashboard - Buscando bundle ID:', bundleId, 'para item:', item);
+      
+      return this.dashboardService.getBundleById(bundleId).pipe(
+        tap(bundle => {
+          console.log('✅ Dashboard - Bundle encontrado:', bundle.bundleTitle, 'para ID:', bundleId);
+          item.bundleTitle = bundle.bundleTitle;
+        }),
+        catchError(error => {
+          console.error('❌ Dashboard - Erro ao buscar bundle ID:', bundleId, error);
+          item.bundleTitle = `Pacote ${bundleId}`;
+          return of(null);
+        })
+      );
+    });
+
+    // Aguardar todas as requisições de bundles
+    forkJoin(bundleRequests).subscribe({
+      next: () => {
+        console.log('🎉 Dashboard - Todos os bundleTitles carregados para faturamento:', faturamentoData);
+        this.apiData['faturamentoPorPacote'] = faturamentoData;
+        this.renderChartWithApiData('faturamentoPorPacote');
+        
+        console.log('🎉 Dashboard - Todos os dados foram carregados!');
+      },
+      error: (error) => {
+        console.error('❌ Dashboard - Erro ao carregar bundleTitles para faturamento:', error);
+        this.apiData['faturamentoPorPacote'] = faturamentoData;
+        this.renderChartWithApiData('faturamentoPorPacote');
+        
         console.log('⚠️ Dashboard - Carregamento finalizado com alguns erros.');
       }
     });
@@ -308,11 +401,20 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       case 'faturamentoPorPacote':
         chartLabel = 'Faturamento por Pacote';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
+          console.log('📊 Dashboard - Dados faturamento para gráfico:', apiDataForMetric);
           chartData = {
-            labels: apiDataForMetric.map((item: any) => item.pacote || item.nome || 'N/A'),
+            labels: apiDataForMetric.map((item: any) => {
+              const label = item.bundleTitle || item.pacote || item.nome || `Pacote ${item.pacoteId || 'N/A'}`;
+              console.log('🏷️ Dashboard - Label faturamento:', label, 'para item:', item);
+              return label;
+            }),
             datasets: [{
               label: chartLabel,
-              data: apiDataForMetric.map((item: any) => item.faturamento || item.valor || 0),
+              data: apiDataForMetric.map((item: any) => {
+                const value = item.faturamento || item.valor || 0;
+                console.log('💰 Dashboard - Valor faturamento:', value, 'para item:', item);
+                return value;
+              }),
               backgroundColor: ['#FF7900', '#7FC023', '#6AAE20', '#FF5722', '#2196F3', '#9C27B0']
             }]
           };
@@ -391,11 +493,20 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       case 'totalReservasPorPacote':
         chartLabel = 'Reservas por Pacote';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
+          console.log('📊 Dashboard - Dados reservas para gráfico:', apiDataForMetric);
           chartData = {
-            labels: apiDataForMetric.map((item: any) => item.pacote || item.nome || 'N/A'),
+            labels: apiDataForMetric.map((item: any) => {
+              const label = item.bundleTitle || item.pacote || item.nome || `Pacote ${item.pacoteId || 'N/A'}`;
+              console.log('🏷️ Dashboard - Label reservas:', label, 'para item:', item);
+              return label;
+            }),
             datasets: [{
               label: chartLabel,
-              data: apiDataForMetric.map((item: any) => item.totalReservas || item.quantidade || 0),
+              data: apiDataForMetric.map((item: any) => {
+                const value = item.totalReservas || item.quantidade || 0;
+                console.log('📈 Dashboard - Valor reservas:', value, 'para item:', item);
+                return value;
+              }),
               backgroundColor: ['#FF7900', '#7FC023', '#6AAE20', '#FF5722', '#2196F3', '#9C27B0']
             }]
           };
