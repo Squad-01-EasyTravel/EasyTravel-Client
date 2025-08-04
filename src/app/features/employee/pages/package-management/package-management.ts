@@ -145,6 +145,28 @@ export class PackageManagementComponent implements OnInit {
     }
   }
 
+  private convertRankToBackend(rank: string): string {
+    // Converter rank do frontend de volta para formato do backend
+    const normalizedRank = rank.toUpperCase();
+    
+    switch (normalizedRank) {
+      case 'OURO':
+        return 'GOLD';
+      case 'PRATA':
+        return 'SILVER';
+      case 'BRONZE':
+        return 'BRONZE';
+      case 'PLATINA':
+        return 'PLATINUM';
+      case 'GOLD':
+        return 'GOLD';
+      case 'SILVER':
+        return 'SILVER';
+      default:
+        return 'BRONZE';
+    }
+  }
+
   getAvailablePackagesCount(): number {
     return this.packages.filter(p => p.available).length;
   }
@@ -380,38 +402,97 @@ export class PackageManagementComponent implements OnInit {
   }
 
   deletePackage(id: number): void {
-    if (confirm('Tem certeza que deseja excluir este pacote?')) {
+    if (confirm('Tem certeza que deseja excluir este pacote? Esta ação não pode ser desfeita.')) {
       console.log('🗑️ Excluindo pacote ID:', id);
       
-      // Aqui você implementaria a chamada para API de delete
-      // this.service.deleteBundle(id).subscribe({...})
-      
-      this.packages = this.packages.filter(p => p.id !== id);
+      // Fazer chamada para API de delete
+      this.service.deleteBundle(id).subscribe({
+        next: () => {
+          console.log('✅ Pacote excluído com sucesso da API');
+          
+          // Remover da lista local
+          this.packages = this.packages.filter(p => p.id !== id);
 
-      // Ajustar página se necessário
-      const totalPages = this.getTotalPages();
-      if (this.currentPage > totalPages && totalPages > 0) {
-        this.currentPage = totalPages;
-      }
-      
-      // Recarregar dados da API após excluir
-      console.log('🔄 Recarregando dados da API após exclusão...');
-      this.loadPackages();
+          // Ajustar página se necessário
+          const totalPages = this.getTotalPages();
+          if (this.currentPage > totalPages && totalPages > 0) {
+            this.currentPage = totalPages;
+          }
+          
+          // Recarregar dados da API para garantir sincronização
+          console.log('🔄 Recarregando dados da API após exclusão...');
+          this.loadPackages();
+          
+          // Mostrar mensagem de sucesso
+          alert('Pacote excluído com sucesso!');
+        },
+        error: (error) => {
+          console.error('❌ Erro ao excluir pacote:', error);
+          console.log('Status do erro:', error.status);
+          console.log('Mensagem do erro:', error.message);
+          
+          // Mostrar mensagem de erro
+          if (error.status === 404) {
+            alert('Pacote não encontrado. Pode já ter sido excluído.');
+            // Recarregar dados para sincronizar
+            this.loadPackages();
+          } else if (error.status === 403) {
+            alert('Você não tem permissão para excluir este pacote.');
+          } else {
+            alert('Erro ao excluir pacote. Tente novamente.');
+          }
+        }
+      });
     }
   }
 
   toggleAvailability(packageItem: TravelPackage): void {
     console.log('🔄 Alterando disponibilidade do pacote ID:', packageItem.id);
     
-    // Aqui você implementaria a chamada para API de update status
-    // this.service.updateBundleStatus(packageItem.id, !packageItem.available).subscribe({...})
+    // Determinar o novo status
+    const newStatus = packageItem.available ? 'UNAVAILABLE' : 'AVAILABLE';
+    console.log(`📋 Alterando status de ${packageItem.bundleStatus} para ${newStatus}`);
     
-    packageItem.available = !packageItem.available;
-    packageItem.bundleStatus = packageItem.available ? 'AVAILABLE' : 'UNAVAILABLE';
+    // Converter rank de volta para formato do backend
+    const backendRank = this.convertRankToBackend(packageItem.bundleRank);
     
-    // Recarregar dados da API após alterar status
-    console.log('🔄 Recarregando dados da API após alterar status...');
-    setTimeout(() => this.loadPackages(), 500); // Pequeno delay para dar tempo da API processar
+    // Preparar dados para update (todos os campos obrigatórios)
+    const updateData = {
+      bundleTitle: packageItem.bundleTitle,
+      bundleDescription: packageItem.bundleDescription,
+      initialPrice: packageItem.initialPrice,
+      bundleRank: backendRank, // Usar o rank convertido para o backend
+      initialDate: packageItem.initialDate,
+      finalDate: packageItem.finalDate,
+      quantity: packageItem.quantity,
+      travelersNumber: packageItem.travelersNumber,
+      bundleStatus: newStatus
+    };
+    
+    console.log('📤 Enviando dados para API:', updateData);
+    
+    // Fazer chamada para API
+    this.service.updateBundle(packageItem.id, updateData).subscribe({
+      next: (updatedBundle) => {
+        console.log('✅ Bundle atualizado com sucesso:', updatedBundle);
+        
+        // Atualizar localmente
+        packageItem.available = newStatus === 'AVAILABLE';
+        packageItem.bundleStatus = newStatus;
+        
+        // Recarregar dados da API para garantir sincronização
+        console.log('🔄 Recarregando dados da API após alterar status...');
+        this.loadPackages();
+      },
+      error: (error) => {
+        console.error('❌ Erro ao alterar status do bundle:', error);
+        console.log('Status do erro:', error.status);
+        console.log('Mensagem do erro:', error.message);
+        
+        // Em caso de erro, reverter as alterações locais
+        alert('Erro ao alterar disponibilidade do pacote. Tente novamente.');
+      }
+    });
   }
 
   // ===== MÉTODOS PARA UPLOAD DE IMAGEM =====
