@@ -11,8 +11,8 @@ import { Location } from '../models/location.interface';
 })
 export class BundleService {
 
-  private baseUrl = "http://localhost:8080/api/bundles";
-  private mediaUrl = "http://localhost:8080/api/medias";
+  private baseUrl = "/api/bundles";
+  private mediaUrl = "/api/medias";
   constructor(private http: HttpClient) {}
 
   // Buscar todos os pacotes disponíveis
@@ -43,5 +43,9 @@ export class BundleService {
   getLocations(): Observable<Location[]> {
     const url = `http://localhost:8080/api/locations`;
     return this.http.get<Location[]>(url);
+  }
+
+  getAllBundles(): Observable<BundleClass[]> {
+    return this.http.get<BundleClass[]>(this.baseUrl);
   }
 }
