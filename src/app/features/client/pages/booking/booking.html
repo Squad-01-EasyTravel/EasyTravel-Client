@@ -1,6 +1,8 @@
 <app-navbar></app-navbar>
 
-<button (click)="showCurrentUser()"> Clica aqui</button>
+<button (click)="showCurrentUser()" style="margin: 10px; padding: 8px 16px; background-color: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;">
+  🔍 Debug: Ver dados atuais
+</button>
 
 <!-- Hero Section -->
 <section class="hero-section">
@@ -58,35 +60,37 @@
           <div class="packages-container">
             <div class="package-card">
               <div class="selected-package-card">
+                <!-- Usando dados da API com rank e rating calculados -->
                 <div class="package-image-container">
-                  <img [src]=" '/assets/imgs/fortaleza.jpg'"
+                  <img [src]="currentPackage.imageUrl"
                        class="package-image"
-                       [alt]="currentBundle.bundleTitle">
+                       [alt]="currentPackage.title">
                   <div class="package-badge">
                     <i class="fas fa-star"></i>
-                    {{currentBundle.bundleRank}}
+                    {{getFinalRatingFromBundle()}}
                   </div>
                 </div>
 
                 <div class="package-details">
                   <div class="package-header">
-                    <h3 class="package-title">{{currentBundle.bundleTitle}}</h3>
-                    <div class="package-category">{{currentBundle.bundleRank}}</div>
+                    <h3 class="package-title">{{currentPackage.title}}</h3>
+                    <!-- Rank com cor e tradução baseados na API -->
+                    <div class="package-category" [ngClass]="getRankClass(getFinalCategoryFromBundle())">{{getRankInPortuguese(getFinalCategoryFromBundle())}}</div>
                   </div>
 
                   <div class="package-info">
                     <div class="info-item">
                       <i class="fas fa-calendar-alt"></i>
-                      <span>{{currentBundle.initialDate}} - {{currentBundle.finalDate}}</span>
+                      <span>{{currentPackage.startDate}} - {{currentPackage.endDate}}</span>
                     </div>
                     <div class="info-item">
                       <i class="fas fa-users"></i>
-                      <span>{{currentBundle.travelersNumber}} viajantes</span>
+                      <span>{{currentPackage.travelers}} viajantes</span>
                       <div class="traveler-controls">
                         <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.travelers - 1)">
                           <i class="fas fa-minus"></i>
                         </button>
-                        <span class="traveler-count">{{currentBundle.travelersNumber}}</span>
+                        <span class="traveler-count">{{currentPackage.travelers}}</span>
                         <button type="button" class="btn-traveler-adjust" (click)="updateTravelerCount(currentPackage.travelers + 1)">
                           <i class="fas fa-plus"></i>
                         </button>
@@ -94,12 +98,12 @@
                     </div>
                     <div class="info-item">
                       <i class="fas fa-clock"></i>
-                      <span>{{currentPackage.duration || 7}} dias</span>
+                      <span>{{currentPackage.duration}} dias</span>
                     </div>
                   </div>
 
                   <div class="package-description">
-                    <p>{{currentBundle.bundleDescription}}</p>
+                    <p>{{currentPackage.description}}</p>
                   </div>
 
                   <div class="package-includes">
@@ -114,7 +118,7 @@
 
                   <div class="package-price-summary">
                     <div class="price-item">
-                      <span class="price-label">Preço total ({{currentBundle.travelersNumber}} pessoas)</span>
+                      <span class="price-label">Preço total ({{currentPackage.travelers}} pessoas)</span>
                       <span class="price-value">R$ {{getFormattedBasePrice(currentPackage)}}</span>
                     </div>
                   </div>

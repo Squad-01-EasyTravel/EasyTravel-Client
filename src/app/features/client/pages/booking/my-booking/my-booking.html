@@ -26,13 +26,22 @@
     <div class="booking-content">
       <!-- Cards de Pacotes -->
       <div class="packages-section">
-        <div class="packages-grid">
-          <!-- Cards dinâmicos baseados nos dados -->
+        <!-- Loading indicator -->
+        <div *ngIf="isLoading" class="loading-container">
+          <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p>Carregando suas reservas...</p>
+          </div>
+        </div>
+
+        <div class="packages-grid" *ngIf="!isLoading">
+          <!-- Cards dinâmicos baseados nos dados da API -->
           <div class="package-card" *ngFor="let trip of paginatedTrips">
             <div class="package-image-container">
               <img [src]="trip.imageUrl"
                    class="package-image"
-                   [alt]="trip.origin + ' - ' + trip.destination">
+                   [alt]="trip.origin + ' - ' + trip.destination"
+                   (error)="onImageError($event)">
               <div class="package-status-badge" [ngClass]="getStatusBadgeClass(trip.status)">
                 <i [class]="getStatusIcon(trip.status)"></i>
                 {{trip.status}}
@@ -102,13 +111,18 @@
           </div>
 
           <!-- Mensagem quando não há pacotes -->
-          <div *ngIf="paginatedTrips.length === 0" class="empty-state">
+          <div *ngIf="!isLoading && paginatedTrips.length === 0" class="empty-state">
             <div class="empty-state-icon">
               <i class="fas fa-suitcase"></i>
             </div>
-            <h3 class="empty-state-title">Nenhum pacote encontrado</h3>
+            <h3 class="empty-state-title">Nenhuma reserva encontrada</h3>
             <p class="empty-state-description">
-              Não encontramos pacotes com os filtros selecionados. Tente ajustar os filtros ou explore nossos pacotes disponíveis.
+              <span *ngIf="selectedStatus !== 'Todos' || selectedDepartureDate || selectedReturnDate">
+                Não encontramos reservas com os filtros selecionados. Tente ajustar os filtros.
+              </span>
+              <span *ngIf="selectedStatus === 'Todos' && !selectedDepartureDate && !selectedReturnDate">
+                Você ainda não possui nenhuma reserva. Explore nossos pacotes disponíveis.
+              </span>
             </p>
             <a href="/bundles" class="btn btn-primary-custom">
               <i class="fas fa-search"></i>
@@ -193,6 +207,32 @@
     </nav>
   </div>
 </section>
+
+<!-- Modal de Aviso -->
+<div class="modal-overlay" *ngIf="isWarningModalOpen" (click)="closeWarningModal()">
+  <div class="warning-modal-content" (click)="$event.stopPropagation()">
+    <div class="warning-modal-header">
+      <div class="warning-icon">
+        <i [class]="warningIcon"></i>
+      </div>
+      <h3 class="warning-modal-title">{{warningTitle}}</h3>
+      <button class="modal-close-btn" (click)="closeWarningModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="warning-modal-body">
+      <p class="warning-message">{{warningMessage}}</p>
+    </div>
+
+    <div class="warning-modal-footer">
+      <button class="btn btn-primary-custom" (click)="closeWarningModal()">
+        <i class="fas fa-check"></i>
+        Entendi
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal de Detalhes -->
 <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">

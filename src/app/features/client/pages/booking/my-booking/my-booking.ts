@@ -4,6 +4,8 @@ import { Navbar } from '@/app/shared/navbar/navbar';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BookingService } from '@/app/shared/services/booking.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-my-booking',
@@ -12,80 +14,9 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './my-booking.css'
 })
 export class MyBooking implements OnInit {
-  // Dados de exemplo que virão do back-end
-  allBookedTrips: BookedTrip[] = [
-    {
-      id: '1',
-      imageUrl: '/assets/imgs/fortaleza.jpg',
-      origin: 'Recife',
-      destination: 'São Paulo',
-      departureDate: '2025-08-15',
-      returnDate: '2025-08-22',
-      status: 'Confirmado',
-      orderId: '#123456',
-      price: 2500,
-      duration: 7,
-      paymentMethod: 'Cartão de Crédito',
-      rating: 4.5,
-      description: 'Pacote completo incluindo hospedagem em hotel 4 estrelas, traslados e city tour.'
-    },
-    {
-      id: '2',
-      imageUrl: '/assets/imgs/gramado.jpg',
-      origin: 'Rio de Janeiro',
-      destination: 'Salvador',
-      departureDate: '2025-09-10',
-      returnDate: '2025-09-17',
-      status: 'Confirmado',
-      orderId: '#234567',
-      price: 1800,
-      duration: 7,
-      paymentMethod: 'PIX',
-      rating: 4.2,
-      description: 'Viagem para Salvador com hospedagem na orla, passeios históricos e gastronômicos.'
-    },
-    {
-      id: '3',
-      imageUrl: '/assets/imgs/fortaleza.jpg',
-      origin: 'São Paulo',
-      destination: 'Fortaleza',
-      departureDate: '2025-10-25',
-      returnDate: '2025-11-01',
-      status: 'Pendente',
-      orderId: '#345678',
-      price: 2200,
-      duration: 7,
-      description: 'Pacote para Fortaleza com hospedagem em resort all-inclusive.'
-    },
-    {
-      id: '4',
-      imageUrl: '/assets/imgs/gramado.jpg',
-      origin: 'Brasília',
-      destination: 'Recife',
-      departureDate: '2025-12-05',
-      returnDate: '2025-12-12',
-      status: 'Cancelado',
-      orderId: '#456789',
-      price: 1950,
-      duration: 7,
-      description: 'Viagem para Recife com foco em praias e cultura local.'
-    },
-    {
-      id: '5',
-      imageUrl: '/assets/imgs/fortaleza.jpg',
-      origin: 'Belo Horizonte',
-      destination: 'Rio de Janeiro',
-      departureDate: '2025-11-18',
-      returnDate: '2025-11-25',
-      status: 'Confirmado',
-      orderId: '#567890',
-      price: 1600,
-      duration: 7,
-      paymentMethod: 'Boleto Bancário',
-      rating: 4.8,
-      description: 'Pacote para Rio de Janeiro incluindo Cristo Redentor, Pão de Açúcar e praias.'
-    }
-  ];
+  // Dados que virão da API
+  allBookedTrips: BookedTrip[] = [];
+  isLoading: boolean = true;
 
   // Propriedades para filtros e paginação
   filteredTrips: BookedTrip[] = [];
@@ -98,13 +29,40 @@ export class MyBooking implements OnInit {
   isModalOpen: boolean = false;
   selectedTrip: BookedTrip | null = null;
 
+  // Modal de aviso
+  isWarningModalOpen: boolean = false;
+  warningTitle: string = '';
+  warningMessage: string = '';
+  warningIcon: string = '';
+
   // Paginação
   currentPage: number = 1;
   itemsPerPage: number = 3;
   totalPages: number = 0;
 
+  constructor(private bookingService: BookingService, private router: Router) {}
+
   ngOnInit(): void {
-    this.applyFilters();
+    this.loadMyReservations();
+  }
+
+  // Carregar reservas do usuário via API
+  loadMyReservations(): void {
+    this.isLoading = true;
+    this.bookingService.getMyReservations().subscribe({
+      next: (bookings) => {
+        this.allBookedTrips = bookings;
+        this.isLoading = false;
+        this.applyFilters();
+      },
+      error: (error) => {
+        console.error('Erro ao carregar reservas:', error);
+        this.isLoading = false;
+        // Em caso de erro, pode exibir uma mensagem ou usar dados de fallback
+        this.allBookedTrips = [];
+        this.applyFilters();
+      }
+    });
   }
 
   // Aplicar filtros
@@ -207,14 +165,51 @@ export class MyBooking implements OnInit {
 
   // Métodos para ações dos botões
   viewDetails(trip: BookedTrip) {
-    if (trip.status === 'Confirmado') {
+    if (trip.status === 'Cancelado') {
+      // Mostrar modal de aviso para pacotes cancelados
+      this.showWarningModal(
+        'Pacote Cancelado',
+        'Este pacote foi cancelado. Não é possível visualizar os detalhes completos de pacotes cancelados. Entre em contato com o suporte se precisar de mais informações.',
+        'fas fa-times-circle'
+      );
+    } else if (trip.status === 'Confirmado') {
       this.selectedTrip = trip;
       this.isModalOpen = true;
+    } else if (trip.status === 'Pendente') {
+      // Modal de aviso para pacotes pendentes
+      this.showWarningModal(
+        'Pagamento Pendente',
+        'Este pacote está com pagamento pendente. Detalhes completos disponíveis apenas para pacotes confirmados. Confirme o pagamento para acessar todas as informações.',
+        'fas fa-clock'
+      );
     } else {
-      console.log('Ver detalhes básicos do pacote:', trip);
-      // Para status não confirmados, pode mostrar informações básicas ou uma mensagem
-      alert('Detalhes completos disponíveis apenas para pacotes confirmados.');
+      this.showWarningModal(
+        'Acesso Restrito',
+        'Detalhes completos disponíveis apenas para pacotes confirmados.',
+        'fas fa-info-circle'
+      );
     }
+  }
+
+  // Mostrar modal de aviso
+  showWarningModal(title: string, message: string, icon: string) {
+    this.warningTitle = title;
+    this.warningMessage = message;
+    this.warningIcon = icon;
+    this.isWarningModalOpen = true;
+  }
+
+  // Fechar modal de aviso
+  closeWarningModal() {
+    this.isWarningModalOpen = false;
+    this.warningTitle = '';
+    this.warningMessage = '';
+    this.warningIcon = '';
+  }
+
+  // Tratar erro de carregamento de imagem
+  onImageError(event: any): void {
+    event.target.src = '/assets/imgs/fortaleza.jpg'; // Imagem padrão
   }
 
   closeModal() {
@@ -240,24 +235,65 @@ export class MyBooking implements OnInit {
   }
 
   confirmPayment(trip: BookedTrip) {
-    console.log('Confirmar pagamento do pacote:', trip);
-    // Simular atualização do status
-    const tripIndex = this.allBookedTrips.findIndex(t => t.id === trip.id);
-    if (tripIndex !== -1) {
-      this.allBookedTrips[tripIndex].status = 'Confirmado';
-      this.applyFilters();
-    }
+    console.log('🔄 Redirecionando para página de pagamento com dados da reserva:', trip);
+    
+    // Navegar para a página booking com os dados da reserva
+    this.router.navigate(['/booking'], {
+      state: {
+        reservationData: {
+          id: trip.id,
+          bundleId: trip.bundleId,
+          title: `${trip.origin} - ${trip.destination}`,
+          imageUrl: trip.imageUrl,
+          startDate: trip.departureDate,
+          endDate: trip.returnDate,
+          travelers: 1, // Pode ser ajustado conforme necessário
+          duration: trip.duration,
+          description: trip.description,
+          price: trip.price,
+          orderId: trip.orderId,
+          status: trip.status
+        }
+      }
+    });
   }
 
   cancelTrip(trip: BookedTrip) {
     if (confirm('Tem certeza que deseja cancelar este pacote?')) {
-      console.log('Cancelar pacote:', trip);
-      // Simular atualização do status
-      const tripIndex = this.allBookedTrips.findIndex(t => t.id === trip.id);
-      if (tripIndex !== -1) {
-        this.allBookedTrips[tripIndex].status = 'Cancelado';
-        this.applyFilters();
-      }
+      console.log('🚫 Iniciando cancelamento do pacote:', trip);
+      
+      this.bookingService.cancelBooking(trip.id).subscribe({
+        next: (response) => {
+          console.log('✅ Reserva cancelada com sucesso:', response);
+          
+          // Atualizar o status local imediatamente
+          const tripIndex = this.allBookedTrips.findIndex(t => t.id === trip.id);
+          if (tripIndex !== -1) {
+            this.allBookedTrips[tripIndex].status = 'Cancelado';
+            this.applyFilters();
+          }
+          
+          // Mostrar mensagem de sucesso
+          alert('Pacote cancelado com sucesso!');
+        },
+        error: (error) => {
+          console.error('❌ Erro ao cancelar pacote:', error);
+          
+          let errorMessage = 'Erro ao cancelar o pacote. Tente novamente.';
+          
+          if (error.status === 403) {
+            errorMessage = 'Você não tem permissão para cancelar esta reserva.';
+          } else if (error.status === 401) {
+            errorMessage = 'Sua sessão expirou. Faça login novamente.';
+          } else if (error.status === 404) {
+            errorMessage = 'Reserva não encontrada.';
+          } else if (error.status === 400) {
+            errorMessage = 'Esta reserva não pode ser cancelada.';
+          }
+          
+          alert(errorMessage);
+        }
+      });
     }
   }
 
