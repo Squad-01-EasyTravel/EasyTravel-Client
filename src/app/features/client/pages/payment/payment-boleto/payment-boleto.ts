@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class PaymentBoleto {
   @Output() formValidation = new EventEmitter<boolean>();
+  @Output() formData = new EventEmitter<any>();
   boletoForm: FormGroup;
 
   constructor(private fb: FormBuilder) {
@@ -27,5 +28,13 @@ export class PaymentBoleto {
     this.boletoForm.statusChanges.subscribe(status => {
       this.formValidation.emit(status === 'VALID');
     });
+
+    // Emite os dados do formulário sempre que mudar
+    this.boletoForm.valueChanges.subscribe(formValue => {
+      this.formData.emit(formValue);
+    });
+
+    // Emitir dados iniciais
+    this.formData.emit(this.boletoForm.value);
   }
 }

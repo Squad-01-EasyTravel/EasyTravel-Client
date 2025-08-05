@@ -71,6 +71,17 @@
                 </div>
               </div>
 
+              <div class="package-info" *ngIf="trip.duration || trip.maxTravelers">
+                <div class="info-item" *ngIf="trip.duration">
+                  <i class="fas fa-clock"></i>
+                  <span>{{trip.duration}} dias</span>
+                </div>
+                <div class="info-item" *ngIf="trip.maxTravelers">
+                  <i class="fas fa-users"></i>
+                  <span>Máx. {{trip.maxTravelers}} viajantes</span>
+                </div>
+              </div>
+
               <div class="package-actions">
                 <button class="btn btn-primary-custom" (click)="viewDetails(trip)">
                   <i class="fas fa-eye"></i>
@@ -287,11 +298,24 @@
               </div>
             </div>
             <div class="detail-item">
+              <i class="fas fa-users detail-icon"></i>
+              <div>
+                <span class="detail-label">Máx. Viajantes</span>
+                <span class="detail-value">{{selectedTrip.maxTravelers || 'N/A'}} pessoas</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
               <i class="fas fa-credit-card detail-icon"></i>
               <div>
                 <span class="detail-label">Forma de Pagamento</span>
                 <span class="detail-value">{{selectedTrip.paymentMethod}}</span>
               </div>
+            </div>
+            <div class="detail-item">
+              <!-- Célula vazia para layout -->
             </div>
           </div>
 

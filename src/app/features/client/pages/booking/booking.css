@@ -265,8 +265,21 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.user-profile-card .detail-label i {
+  margin-right: 0.5rem;
+  width: 16px;
+  text-align: center;
+  color: #ff6b35;
+}
+
 .user-profile-card .detail-value {
   color: white;
+}
+
+.user-profile-card .detail-value.phone-number {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 .booking-main-container {
   background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
@@ -425,11 +438,91 @@
   transform: scale(1.1);
 }
 
+.btn-traveler-adjust:disabled {
+  background: #f5f5f5;
+  color: #bbb;
+  border-color: #ddd;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-traveler-adjust:disabled:hover {
+  background: #f5f5f5;
+  color: #bbb;
+  border-color: #ddd;
+  transform: none;
+}
+
 .traveler-count {
   font-weight: 600;
   color: #2c3e50;
   min-width: 20px;
   text-align: center;
+}
+
+.traveler-limit-info {
+  display: block;
+  color: #7f8c8d;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-left: 1.5rem;
+}
+
+.traveler-help-text {
+  display: block;
+  color: #95a5a6;
+  font-size: 0.7rem;
+  margin-top: 0.2rem;
+  margin-left: 1.5rem;
+  font-style: italic;
+}
+
+/* Mensagem informativa sobre adicionar viajantes */
+.traveler-info-message {
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.info-message-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.info-message-content .fas.fa-info-circle {
+  color: #3498db;
+  font-size: 1.2rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.message-text {
+  flex: 1;
+}
+
+.message-text strong {
+  color: #2c3e50;
+  font-size: 0.95rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.message-text p {
+  color: #5a6c7d;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.message-text p strong {
+  color: #ff6b35;
+  font-weight: 600;
+  display: inline;
+  margin: 0;
 }
 
 .package-description {
@@ -1068,7 +1161,9 @@
   .package-travelers-section {
     padding: 1.5rem;
   }
-}@media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
   .hero-section {
     min-height: 50vh;
   }
@@ -1198,4 +1293,859 @@
   background: linear-gradient(135deg, #87CEEB 0%, #5F9EA0 100%) !important;
   color: #000 !important;
   box-shadow: 0 2px 8px rgba(135, 206, 235, 0.4) !important;
+}
+
+/* ===== ESTILOS PARA VIAJANTES CADASTRADOS ===== */
+.registered-traveler {
+  background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+  border: 2px solid #28a745;
+  position: relative;
+  overflow: hidden;
+}
+
+.registered-traveler::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
+}
+
+.registered-badge {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+/* ===== ESTILOS PARA CONFIRMAÇÃO DE EXCLUSÃO NO CARD ===== */
+.traveler-delete-confirmation {
+  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+  border: 2px solid #e53e3e;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delete-confirmation-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.delete-warning-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.delete-warning-icon i {
+  font-size: 1.8rem;
+  color: #e53e3e;
+}
+
+.delete-confirmation-text h6 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #742a2a;
+}
+
+.delete-confirmation-text p {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.delete-confirmation-text .warning-text {
+  color: #e53e3e;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.delete-confirmation-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.btn-confirm-delete {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.btn-confirm-delete:hover {
+  background: linear-gradient(135deg, #c53030 0%, #9c1c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(229, 62, 62, 0.4);
+}
+
+.btn-cancel-delete {
+  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(113, 128, 150, 0.3);
+}
+
+.btn-cancel-delete:hover {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(113, 128, 150, 0.4);
+}
+
+.traveler-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.traveler-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-edit-traveler {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.btn-edit-traveler:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.btn-edit-traveler i {
+  font-size: 0.9rem;
+}
+
+.btn-delete-traveler {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-delete-traveler:hover {
+  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-delete-traveler i {
+  font-size: 0.9rem;
+}
+
+/* ===== ESTILOS PARA FORMULÁRIO DE EDIÇÃO ===== */
+.traveler-edit-form {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  margin-top: 12px;
+}
+
+.traveler-edit-form .form-row {
+  margin-bottom: 16px;
+}
+
+.traveler-edit-form .form-row:last-of-type {
+  margin-bottom: 20px;
+}
+
+.traveler-edit-form label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.traveler-edit-form label i {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.traveler-edit-form .form-input,
+.traveler-edit-form .form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.traveler-edit-form .form-input:focus,
+.traveler-edit-form .form-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid #dee2e6;
+}
+
+.btn-save-edit {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-save-edit:hover {
+  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.btn-cancel-edit {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+.btn-cancel-edit:hover {
+  background: linear-gradient(135deg, #5a6268 0%, #4e555b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+}
+
+/* ===== ESTILOS PARA MODAL DE CONFIRMAÇÃO DE EXCLUSÃO ===== */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+.delete-confirmation-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  margin: 0 !important;
+  border: none !important;
+  outline: none !important;
+  text-align: left !important;
+  background: transparent !important;
+  pointer-events: auto !important;
+}
+
+.delete-confirmation-modal * {
+  box-sizing: border-box !important;
+}
+
+.delete-confirmation-modal.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.delete-confirmation-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(4px);
+  z-index: 1 !important;
+  cursor: pointer;
+}
+
+.delete-confirmation-content {
+  position: relative !important;
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4) !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  min-width: 320px !important;
+  overflow: hidden !important;
+  transform: scale(0.8) !important;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  z-index: 2 !important;
+  margin: 0 !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  font-family: inherit !important;
+  color: #333 !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.delete-confirmation-modal.show .delete-confirmation-content {
+  transform: scale(1) !important;
+}
+
+.delete-confirmation-header {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+  color: white !important;
+  padding: 20px 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  border-radius: 16px 16px 0 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.delete-confirmation-header i {
+  font-size: 1.5rem !important;
+  color: #fff !important;
+  margin: 0 !important;
+}
+
+.delete-confirmation-header h3 {
+  margin: 0 !important;
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.delete-confirmation-body {
+  padding: 24px !important;
+  text-align: center !important;
+  background: white !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.delete-confirmation-body p {
+  margin: 0 0 16px 0 !important;
+  font-size: 1rem !important;
+  color: #495057 !important;
+  line-height: 1.5 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.delete-confirmation-body p:last-child {
+  margin-bottom: 0;
+}
+
+.warning-text {
+  color: #dc3545 !important;
+  font-weight: 600;
+  font-size: 0.9rem !important;
+}
+
+.delete-confirmation-actions {
+  padding: 20px 24px;
+  background: #f8f9fa;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-confirm-delete {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-confirm-delete:hover {
+  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-cancel-delete {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+.btn-cancel-delete:hover {
+  background: linear-gradient(135deg, #5a6268 0%, #4e555b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+}
+
+/* ===== ESTILOS PARA NOTIFICAÇÃO DE SUCESSO DE EXCLUSÃO ===== */
+.delete-success-notification {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10001;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-success-notification.show {
+  opacity: 1;
+}
+
+.delete-success-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.delete-success-content {
+  position: relative;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 24px 32px;
+  box-shadow: 0 20px 60px rgba(40, 167, 69, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  min-width: 380px;
+  max-width: 450px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transform: scale(0.8);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.delete-success-notification.show .delete-success-content {
+  transform: scale(1);
+}
+
+.delete-success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+
+.delete-success-icon i {
+  font-size: 1.8rem;
+  color: white;
+}
+
+.delete-success-text h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.delete-success-text p {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+  .delete-confirmation-modal {
+    padding: 10px !important;
+  }
+  
+  .delete-confirmation-content {
+    width: 95% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  
+  .delete-confirmation-actions {
+    flex-direction: column;
+  }
+  
+  .btn-confirm-delete,
+  .btn-cancel-delete {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .delete-success-content {
+    min-width: 300px;
+    max-width: 90vw;
+    padding: 20px 24px;
+  }
+  
+  /* Responsividade para confirmação no card */
+  .traveler-delete-confirmation {
+    padding: 16px;
+    margin: 12px 0;
+  }
+  
+  .delete-confirmation-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn-confirm-delete,
+  .btn-cancel-delete {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .delete-warning-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .delete-warning-icon i {
+    font-size: 1.5rem;
+  }
+  
+  .delete-confirmation-text h6 {
+    font-size: 1.1rem;
+  }
+  
+  .delete-success-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .delete-success-icon i {
+    font-size: 1.5rem;
+  }
+  
+  .delete-success-text h4 {
+    font-size: 1.2rem;
+  }
+  
+  .delete-success-text p {
+    font-size: 0.9rem;
+  }
+}
+
+.traveler-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #155724;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.traveler-title i {
+  color: #28a745;
+  font-size: 1rem;
+}
+
+.traveler-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  color: #495057;
+  min-width: 120px;
+  font-size: 0.9rem;
+}
+
+.detail-label i {
+  color: #28a745;
+  font-size: 0.85rem;
+  width: 14px;
+  text-align: center;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #155724;
+  font-size: 0.9rem;
+}
+
+/* Responsivo para viajantes cadastrados */
+@media (max-width: 768px) {
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .detail-label {
+    min-width: unset;
+  }
+  
+  .registered-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+}
+
+/* ===== ESTILOS PARA DROPDOWN DE TIPO DE DOCUMENTO ===== */
+.form-label-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.form-label-with-icon i {
+  color: #007bff;
+  font-size: 1rem;
+}
+
+.label-help {
+  color: #6c757d;
+  font-weight: 400;
+  font-size: 0.8rem;
+  margin-left: auto;
+  font-style: italic;
+}
+
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  position: relative;
+  background-image: none;
+}
+
+.select-dropdown:hover {
+  border-color: #007bff;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.select-dropdown:focus {
+  outline: none;
+  border-color: #007bff;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.select-dropdown:valid {
+  border-color: #28a745;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fff9 100%);
+}
+
+.select-dropdown:invalid {
+  border-color: #dc3545;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 0.9rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.select-wrapper:hover .select-arrow {
+  color: #007bff;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.select-dropdown:focus + .select-arrow {
+  color: #007bff;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.select-dropdown:valid + .select-arrow {
+  color: #28a745;
+}
+
+/* Estilos para as opções do select */
+.select-dropdown option {
+  background: #ffffff;
+  color: #2c3e50;
+  padding: 0.5rem;
+  font-weight: 500;
+}
+
+.select-dropdown option:hover {
+  background: #007bff;
+  color: #ffffff;
+}
+
+.select-dropdown option[value=""] {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Responsivo para dropdown */
+@media (max-width: 768px) {
+  .select-dropdown {
+    padding: 0.6rem 2rem 0.6rem 0.6rem;
+    font-size: 0.9rem;
+  }
+  
+  .select-arrow {
+    right: 10px;
+    font-size: 0.8rem;
+  }
 }
