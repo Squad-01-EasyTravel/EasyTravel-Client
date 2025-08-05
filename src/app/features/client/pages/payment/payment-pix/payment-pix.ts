@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class PaymentPix {
   @Output() formValidation = new EventEmitter<boolean>();
+  @Output() formData = new EventEmitter<any>();
   pixForm: FormGroup;
 
   constructor(private fb: FormBuilder) {
@@ -27,5 +28,13 @@ export class PaymentPix {
     this.pixForm.statusChanges.subscribe(status => {
       this.formValidation.emit(status === 'VALID');
     });
+
+    // Emite os dados do formulário sempre que mudar
+    this.pixForm.valueChanges.subscribe(formValue => {
+      this.formData.emit(formValue);
+    });
+
+    // Emitir dados iniciais
+    this.formData.emit(this.pixForm.value);
   }
 }

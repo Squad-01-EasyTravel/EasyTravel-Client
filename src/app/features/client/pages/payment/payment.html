@@ -11,9 +11,15 @@
            <app-payment-card (paymentMethodSelected)="onPaymentMethodSelected($event)"></app-payment-card>
         </div>
         <div class="payment-section">
-           <app-payment-credit *ngIf="selectedPaymentMethod === 'credito'" (formValidation)="onCreditFormValidation($event)"></app-payment-credit>
-           <app-payment-pix *ngIf="selectedPaymentMethod === 'pix'" (formValidation)="onPixFormValidation($event)"></app-payment-pix>
-           <app-payment-boleto *ngIf="selectedPaymentMethod === 'boleto'" (formValidation)="onBoletoFormValidation($event)"></app-payment-boleto>
+           <app-payment-credit *ngIf="selectedPaymentMethod === 'credito'" 
+             (formValidation)="onCreditFormValidation($event)"
+             (formData)="onCreditFormData($event)"></app-payment-credit>
+           <app-payment-pix *ngIf="selectedPaymentMethod === 'pix'" 
+             (formValidation)="onPixFormValidation($event)"
+             (formData)="onPixFormData($event)"></app-payment-pix>
+           <app-payment-boleto *ngIf="selectedPaymentMethod === 'boleto'" 
+             (formValidation)="onBoletoFormValidation($event)"
+             (formData)="onBoletoFormData($event)"></app-payment-boleto>
         </div>
         <div class="payment-section">
            <app-payment-button 

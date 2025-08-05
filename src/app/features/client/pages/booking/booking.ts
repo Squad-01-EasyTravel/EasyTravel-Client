@@ -141,6 +141,7 @@ export class Booking implements OnInit {
   // Informações dos viajantes extras para o pacote único
   travelersInfoByPackage: { [packageId: string]: TravelerInfo[] } = {};
   totalPrice: string = '0,00';
+  totalPriceNumeric: number = 0; // Valor total numérico em reais para envio ao backend
 
   // Propriedade getter para facilitar o acesso ao pacote atual
   get currentPackage(): SelectedPackage {
@@ -1097,12 +1098,17 @@ export class Booking implements OnInit {
     
     console.log(`💰 Cálculo: ${realTravelerCount} × R$ ${basePricePerPerson.toFixed(2)} = R$ ${total.toFixed(2)}`);
 
+    // Armazenar o valor total numérico para envio ao backend (em reais)
+    this.totalPriceNumeric = Math.round(total * 100) / 100; // Arredondar para 2 casas decimais
+    
+    // Formatar para exibição na interface
     this.totalPrice = total.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
     
-    console.log(`✅ Preço final: R$ ${this.totalPrice}`);
+    console.log(`✅ Preço final formatado: R$ ${this.totalPrice}`);
+    console.log(`🔢 Preço final numérico (reais): ${this.totalPriceNumeric}`);
   }  
 
   loadBookingData(): void {
@@ -1118,7 +1124,14 @@ export class Booking implements OnInit {
 
   goToPayment(): void {
     if (!this.allTravelersCompleted()) {
-      alert('Por favor, preencha todos os dados dos viajantes antes de continuar.');
+      alert('Por favor, preencha todos os dados dos viajantes que você adicionou antes de continuar.');
+      return;
+    }
+
+    // Obter o ID da reserva
+    const reservationId = this.reservationData?.id;
+    if (!reservationId) {
+      alert('Erro: ID da reserva não encontrado. Não é possível prosseguir com o pagamento.');
       return;
     }
 
@@ -1126,11 +1139,17 @@ export class Booking implements OnInit {
       package: this.currentPackage,
       userProfile: this.userProfile,
       travelersInfo: this.travelersInfoByPackage[this.currentPackage.id] || [],
-      totalPrice: this.totalPrice,
+      registeredTravelers: this.registeredTravelers,
+      totalPrice: this.totalPrice, // Valor formatado para exibição
+      totalPriceNumeric: this.totalPriceNumeric, // Valor numérico em reais para API
+      reservationId: parseInt(reservationId), // ID da reserva para o pagamento
       bookingDate: new Date().toISOString()
     };
 
-    console.log('Going to payment with:', bookingData);
+    console.log('💳 Navegando para pagamento com dados completos:', bookingData);
+    console.log('🔢 ID da reserva:', reservationId);
+    console.log('💰 Valor total (formatado):', this.totalPrice);
+    console.log('🔢 Valor total (numérico - reais):', this.totalPriceNumeric);
 
     // Navegar para a página de pagamento
     this.router.navigate(['/payment'], {
