@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FilterSearchReview } from "../../components/filter-search/filter-search-review";
 
 interface ReviewComment {
   pacote: string;
@@ -11,7 +10,7 @@ interface ReviewComment {
 
 @Component({
   selector: 'app-review-management',
-  imports: [CommonModule, FormsModule, FilterSearchReview],
+  imports: [CommonModule, FormsModule],
   templateUrl: './review-management.html',
   styleUrl: './review-management.css'
 })
@@ -224,53 +223,4 @@ export class ReviewManagement {
     }
   }
 
-  // Função para exportar avaliações
-  exportReviews(): void {
-    try {
-      // Prepara os dados para exportação
-      const exportData = {
-        timestamp: new Date().toISOString(),
-        totalClients: this.usuarios.length,
-        totalComments: this.getTotalComments(),
-        averageRating: this.getAverageRating(),
-        reviews: this.usuarios.map(usuario => ({
-          clientId: usuario.id,
-          clientName: usuario.nome,
-          totalComments: usuario.comentarios.length,
-          comments: usuario.comentarios.map(comentario => ({
-            package: comentario.pacote,
-            date: comentario.data,
-            text: comentario.texto
-          }))
-        }))
-      };
-
-      // Converte para JSON
-      const jsonData = JSON.stringify(exportData, null, 2);
-
-      // Cria um blob com os dados
-      const blob = new Blob([jsonData], { type: 'application/json' });
-
-      // Cria um link temporário para download
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `avaliacoes_${new Date().toISOString().split('T')[0]}.json`;
-
-      // Trigger do download
-      document.body.appendChild(link);
-      link.click();
-
-      // Limpa o link temporário
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      // Feedback para o usuário
-      alert('Avaliações exportadas com sucesso!');
-
-    } catch (error) {
-      console.error('Erro ao exportar avaliações:', error);
-      alert('Erro ao exportar avaliações. Tente novamente.');
-    }
-  }
 }

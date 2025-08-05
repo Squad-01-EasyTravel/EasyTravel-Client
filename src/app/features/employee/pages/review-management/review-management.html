@@ -1,13 +1,11 @@
-<div class="d-flex">
-  <div class="container-fluid">
-    <!-- Hero Header Section com Bootstrap -->
-    <div class="hero-section position-relative mb-4">
-      <div class="hero-bg"></div>
-      <div class="hero-overlay"></div>
-      <div class="container position-relative">
-        <div class="row align-items-center py-5">
-          <div class="col-lg-8">
-            <div class="hero-content text-white">
+<!-- Hero Header Section com Bootstrap -->
+<div class="hero-section position-relative mb-4">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="container-fluid position-relative">
+    <div class="row align-items-center py-3">
+      <div class="col-lg-8">
+        <div class="hero-content text-white">
               <!-- Badge animado -->
               <span class="hero-badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill mb-3 d-inline-flex align-items-center">
                 <i class="fas fa-star me-2 text-warning"></i>
@@ -47,36 +45,17 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-4 text-center">
-            <div class="hero-action">
-              <button class="btn-create-main btn btn-light btn-lg px-5 py-3 shadow-lg rounded-4 fw-bold"
-                (click)="exportReviews()">
-                <i class="fas fa-download me-2"></i>
-                Exportar Avaliações
-              </button>
-              <div class="hero-decorations mt-4">
-                <div class="floating-element element-1">
-                  <i class="fas fa-comments"></i>
-                </div>
-                <div class="floating-element element-2">
-                  <i class="fas fa-star"></i>
-                </div>
-                <div class="floating-element element-3">
-                  <i class="fas fa-users"></i>
-                </div>
-              </div>
+          <div class="col-lg-4 d-none d-lg-flex justify-content-center align-items-center">
+            <div class="hero-visual">
+              <!-- Ícones removidos para consistência -->
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Search and Filter Section -->
-    <div class="container mb-4">
-      <app-filter-search-review></app-filter-search-review>
-    </div>
 
-    <!-- Grid de Avaliações -->
+<!-- Grid de Avaliações -->
     <div class="container reviews-section" *ngIf="usuarios.length > 0">
       <!-- Informações da paginação -->
       <div class="pagination-info-section mb-4">
@@ -470,5 +449,3 @@
         </div>
       </div>
     </div>
-  </div>
-</div>

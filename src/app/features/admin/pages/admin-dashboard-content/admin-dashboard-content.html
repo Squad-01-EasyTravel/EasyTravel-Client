@@ -1,13 +1,11 @@
-<div class="d-flex">
-  <div class="container-fluid">
-    <!-- Hero Header Section -->
-    <div class="hero-section position-relative mb-4">
-      <div class="hero-bg"></div>
-      <div class="hero-overlay"></div>
-      <div class="container position-relative">
-        <div class="row align-items-center py-5">
-          <div class="col-lg-8">
-            <div class="hero-content text-white">
+<!-- Hero Header Section - LARGURA TOTAL -->
+<div class="hero-section position-relative mb-4">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="container-fluid position-relative">
+    <div class="row align-items-center py-5">
+      <div class="col-lg-8">
+        <div class="hero-content text-white">
               <!-- Badge animado -->
               <span
                 class="hero-badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill mb-3 d-inline-flex align-items-center">
@@ -54,17 +52,9 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-4 text-center">
-            <div class="hero-image-container">
-              <div class="floating-icon">
-                <i class="fas fa-chart-line"></i>
-              </div>
-              <div class="floating-icon delay-1">
-                <i class="fas fa-users"></i>
-              </div>
-              <div class="floating-icon delay-2">
-                <i class="fas fa-money-bill-wave"></i>
-              </div>
+          <div class="col-lg-4 d-none d-lg-flex justify-content-center align-items-center">
+            <div class="hero-visual">
+              <i class="fas fa-chart-bar display-1 text-white opacity-50"></i>
             </div>
           </div>
         </div>
@@ -72,21 +62,19 @@
     </div>
 
     <!-- Main Dashboard Content -->
-    <div class="dashboard-main-content">
+    <div class="dashboard-main-content bg-light py-5">
       <div class="container-fluid">
-        <div class="charts-wrapper" style="max-width: 1200px; width: 100%;">
-          <!-- Section Title -->
-          <div class="section-header text-center mb-5">
-            <h2 class="section-title fw-bold">Relatórios Detalhados</h2>
-            <p class="section-description text-muted">Análise completa dos dados de negócio em tempo real</p>
-            <!-- Botão temporário para debug -->
-            <button class="btn btn-outline-primary btn-sm mt-2" (click)="recreateCharts()">
-              <i class="fas fa-refresh me-2"></i>Recriar Gráficos
-            </button>
-          </div>
+        <!-- Section Title -->
+        <div class="text-center mb-5">
+          <h2 class="fw-bold mb-3">Relatórios Detalhados</h2>
+          <p class="text-muted mb-4">Análise completa dos dados de negócio em tempo real</p>
+          <button class="btn btn-outline-primary btn-sm" (click)="recreateCharts()">
+            <i class="fas fa-refresh me-2"></i>Recriar Gráficos
+          </button>
+        </div>
 
-          <!-- Charts Grid -->
-          <div class="charts-grid row g-4">
+        <!-- Charts Grid -->
+        <div class="row g-4">
           <!-- Chart 1 - Faturamento por Pacote -->
           <div class="col-lg-6 col-md-6">
             <div class="chart-card">
@@ -254,9 +242,6 @@
               </div>
             </div>
           </div>
-          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>

@@ -35,6 +35,9 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
   selectedMetric = this.metrics[0].key;
   charts: { [key: string]: Chart } = {};
 
+  // Timeout para debounce do resize
+  private resizeTimeout: any;
+
   // Dados da API
   apiData: { [key: string]: any } = {};
 
@@ -150,7 +153,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     this.dashboardService.getTotalReservasPorPacote().subscribe({
       next: (data) => {
         console.log('✅ Dashboard - Total reservas por pacote recebidas:', data);
-        
+
         // Buscar bundleTitles para cada item
         this.loadBundleTitlesForReservas(data);
       },
@@ -166,7 +169,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
 
   loadBundleTitlesForReservas(reservasData: any[]) {
     console.log('🎯 Dashboard - Buscando bundleTitles para reservas...');
-    
+
     if (!reservasData || reservasData.length === 0) {
       console.log('⚠️ Dashboard - Sem dados de reservas, renderizando vazio');
       this.renderEmptyChart('totalReservasPorPacote');
@@ -177,7 +180,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     const bundleRequests = reservasData.map(item => {
       const bundleId = item.pacoteId || item.pacote;
       console.log('🎯 Dashboard - Buscando bundle ID:', bundleId, 'para item:', item);
-      
+
       return this.dashboardService.getBundleById(bundleId).pipe(
         tap(bundle => {
           console.log('✅ Dashboard - Bundle encontrado:', bundle.bundleTitle, 'para ID:', bundleId);
@@ -197,7 +200,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
         console.log('🎉 Dashboard - Todos os bundleTitles carregados para reservas:', reservasData);
         this.apiData['totalReservasPorPacote'] = reservasData;
         this.renderChartWithApiData('totalReservasPorPacote');
-        
+
         // Próximo endpoint
         this.loadReservasCanceladasPorMes();
       },
@@ -205,7 +208,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
         console.error('❌ Dashboard - Erro ao carregar bundleTitles para reservas:', error);
         this.apiData['totalReservasPorPacote'] = reservasData;
         this.renderChartWithApiData('totalReservasPorPacote');
-        
+
         // Continua mesmo com erro
         this.loadReservasCanceladasPorMes();
       }
@@ -280,7 +283,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     this.dashboardService.getFaturamentoPorPacote().subscribe({
       next: (data) => {
         console.log('✅ Dashboard - Faturamento por pacote recebido:', data);
-        
+
         // Buscar bundleTitles para cada item
         this.loadBundleTitlesForFaturamento(data);
       },
@@ -295,7 +298,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
 
   loadBundleTitlesForFaturamento(faturamentoData: any[]) {
     console.log('🎯 Dashboard - Buscando bundleTitles para faturamento...');
-    
+
     if (!faturamentoData || faturamentoData.length === 0) {
       console.log('⚠️ Dashboard - Sem dados de faturamento, renderizando vazio');
       this.renderEmptyChart('faturamentoPorPacote');
@@ -306,7 +309,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     const bundleRequests = faturamentoData.map(item => {
       const bundleId = item.pacoteId || item.pacote;
       console.log('🎯 Dashboard - Buscando bundle ID:', bundleId, 'para item:', item);
-      
+
       return this.dashboardService.getBundleById(bundleId).pipe(
         tap(bundle => {
           console.log('✅ Dashboard - Bundle encontrado:', bundle.bundleTitle, 'para ID:', bundleId);
@@ -326,14 +329,14 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
         console.log('🎉 Dashboard - Todos os bundleTitles carregados para faturamento:', faturamentoData);
         this.apiData['faturamentoPorPacote'] = faturamentoData;
         this.renderChartWithApiData('faturamentoPorPacote');
-        
+
         console.log('🎉 Dashboard - Todos os dados foram carregados!');
       },
       error: (error) => {
         console.error('❌ Dashboard - Erro ao carregar bundleTitles para faturamento:', error);
         this.apiData['faturamentoPorPacote'] = faturamentoData;
         this.renderChartWithApiData('faturamentoPorPacote');
-        
+
         console.log('⚠️ Dashboard - Carregamento finalizado com alguns erros.');
       }
     });
@@ -465,11 +468,11 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
         chartLabel = 'Reservas Ativas por Rank';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
           console.log('📊 Dashboard - Dados reservas por rank para gráfico:', apiDataForMetric);
-          
+
           // Mapeamento dos ranks para display mais amigável
           const rankLabels: { [key: number]: string } = {
             1: '1º Lugar - Ouro',
-            2: '2º Lugar - Prata', 
+            2: '2º Lugar - Prata',
             3: '3º Lugar - Bronze',
             4: '4º Lugar'
           };
@@ -502,11 +505,11 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
         chartLabel = 'Usuários por Método';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
           console.log('📊 Dashboard - Dados usuários por método de pagamento para gráfico:', apiDataForMetric);
-          
+
           // Mapeamento dos métodos de pagamento
           const paymentMethodLabels: { [key: number]: string } = {
             0: 'Cartão de Crédito',
-            1: 'Cartão de Débito', 
+            1: 'Cartão de Débito',
             2: 'PIX',
             3: 'Boleto'
           };
@@ -630,11 +633,11 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
         chartLabel = 'Vendas por Pagamento';
         if (apiDataForMetric && Array.isArray(apiDataForMetric)) {
           console.log('📊 Dashboard - Dados vendas por pagamento para gráfico:', apiDataForMetric);
-          
+
           // Mapeamento dos métodos de pagamento
           const paymentMethodLabels: { [key: number]: string } = {
             0: 'Cartão de Crédito',
-            1: 'Cartão de Débito', 
+            1: 'Cartão de Débito',
             2: 'PIX',
             3: 'Boleto'
           };
@@ -679,12 +682,23 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        resizeDelay: 100, // DELAY PARA RESIZE
+        devicePixelRatio: window.devicePixelRatio || 1, // MELHORA QUALIDADE
         animation: {
           duration: 1000,
           easing: 'easeInOutQuart'
         },
         layout: {
-          padding: 10
+          padding: {
+            top: 10,
+            right: 15,
+            bottom: 10,
+            left: 15
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
         },
         plugins: {
           legend: {
@@ -764,7 +778,7 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     };
 
     const exportMethod = exportMethods[metricKey];
-    
+
     if (exportMethod) {
       // Chama o método de exportação correspondente
       exportMethod().subscribe({
@@ -773,19 +787,19 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          
+
           // Define o nome do arquivo baseado na métrica
           const fileName = `${metricKey}_${new Date().toISOString().split('T')[0]}.xlsx`;
           link.download = fileName;
-          
+
           // Adiciona ao DOM, clica e remove
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-          
+
           // Limpa a URL temporária
           window.URL.revokeObjectURL(url);
-          
+
           console.log(`✅ Download concluído: ${fileName}`);
         },
         error: (error: any) => {
@@ -820,14 +834,39 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
     };
   }
 
-  // Listener para redimensionamento da janela
+  // Listener para redimensionamento da janela - VERSÃO MELHORADA
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
-    Object.values(this.charts).forEach(chart => {
-      if (chart) {
-        chart.resize();
-      }
-    });
+    // Debounce para evitar muitas chamadas
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+
+    this.resizeTimeout = setTimeout(() => {
+      console.log('🔄 Dashboard - Redimensionando gráficos...');
+
+      // Para cada gráfico, força um update completo
+      Object.keys(this.charts).forEach(chartKey => {
+        const chart = this.charts[chartKey];
+        if (chart) {
+          try {
+            // Primeiro destrói o gráfico existente
+            chart.destroy();
+
+            // Aguarda um frame antes de recriar
+            requestAnimationFrame(() => {
+              // Encontra qual métrica corresponde a este canvas
+              const metric = this.metrics.find(m => m.canvasId === chartKey);
+              if (metric && this.apiData[metric.key]) {
+                this.renderChartWithApiData(metric.key);
+              }
+            });
+          } catch (error) {
+            console.error(`❌ Erro ao redimensionar gráfico ${chartKey}:`, error);
+          }
+        }
+      });
+    }, 250); // Debounce de 250ms
   }
 
   // Método para recriar todos os gráficos
@@ -837,6 +876,11 @@ export class AdminDashboardContent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Limpa timeout se existir
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+
     // Destroi todos os gráficos ao sair do componente
     Object.values(this.charts).forEach(chart => {
       if (chart) {
