@@ -3254,3 +3254,94 @@ input:checked + .toggle-slider:before {
   background: rgba(220, 53, 69, 0.1);
   color: #dc3545;
 }
+
+/* ===== BOTÃO INCLUIR PACOTE - LARANJA ===== */
+.btn-add-package {
+  background: linear-gradient(135deg, #ff8c00 0%, #ff6b35 50%, #f7931e 100%) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3) !important;
+  border-radius: 50px !important;
+}
+
+.btn-add-package::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+  border-radius: 50px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-add-package:hover::before {
+  opacity: 1;
+}
+
+.btn-add-package:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4) !important;
+  background: linear-gradient(135deg, #ff9500 0%, #ff7040 50%, #f8a01e 100%) !important;
+}
+
+.btn-add-package:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3) !important;
+}
+
+.btn-add-package i {
+  transition: transform 0.3s ease;
+}
+
+.btn-add-package:hover i:first-child {
+  transform: rotate(180deg);
+}
+
+.btn-add-package:hover i:last-child {
+  transform: translateX(3px);
+}
+
+/* Animação pulsante para chamar atenção */
+@keyframes pulse-orange {
+  0% {
+    box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(255, 140, 0, 0.5);
+  }
+  100% {
+    box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+  }
+}
+
+.btn-add-package:focus {
+  animation: pulse-orange 1.5s infinite;
+  outline: none !important;
+}
+
+/* Responsividade para o botão */
+@media (max-width: 768px) {
+  .btn-add-package {
+    font-size: 0.9rem !important;
+    padding: 0.5rem 1.5rem !important;
+  }
+  
+  .btn-add-package span {
+    display: none;
+  }
+  
+  .btn-add-package::after {
+    content: 'Incluir';
+    margin-left: 0.5rem;
+  }
+}
