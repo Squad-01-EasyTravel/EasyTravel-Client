@@ -26,19 +26,19 @@
               <div class="row g-3 text-center hero-stats">
                 <div class="col-3">
                   <div class="stats-card stats-total bg-primary bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
-                    <h3 class="stats-number h2 fw-bold mb-1">{{ packages.length }}</h3>
-                    <small class="stats-label fw-semibold">Total de Pacotes</small>
+                    <h3 class="stats-number h2 fw-bold mb-1">{{ filteredPackages.length }}</h3>
+                    <small class="stats-label fw-semibold">{{ searchTerm ? 'Pacotes Encontrados' : 'Total de Pacotes' }}</small>
                   </div>
                 </div>
                 <div class="col-3">
                   <div class="stats-card stats-available bg-success bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
-                    <h3 class="stats-number h2 fw-bold mb-1">18</h3>
+                    <h3 class="stats-number h2 fw-bold mb-1">{{ getAvailablePackagesCount() }}</h3>
                     <small class="stats-label fw-semibold">Disponíveis</small>
                   </div>
                 </div>
                 <div class="col-3">
                   <div class="stats-card stats-inactive bg-warning bg-opacity-90 text-dark rounded-4 p-3 backdrop-blur">
-                    <h3 class="stats-number h2 fw-bold mb-1">5</h3>
+                    <h3 class="stats-number h2 fw-bold mb-1">{{ getUnavailablePackagesCount() }}</h3>
                     <small class="stats-label fw-semibold">Inativos</small>
                   </div>
                 </div>
@@ -88,7 +88,10 @@
                    <button class="btn btn-search-action" (click)="openFilterModal()" title="Filtros avançados">
                       <i class="fas fa-sliders-h"></i>
                     </button>
-                    <button class="btn btn-search-action" title="Limpar filtros">
+                    <button class="btn btn-search-action" 
+                            title="Limpar filtros"
+                            (click)="clearAdvancedFilters()"
+                            [disabled]="!hasActiveFilters()">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
@@ -105,18 +108,48 @@
                   </div>
                   <input type="text"
                          class="search-input-field"
-                         placeholder="Digite o nome do pacote, destino ou categoria..."
+                         placeholder="Digite o nome do pacote..."
+                         [(ngModel)]="searchTerm"
+                         (ngModelChange)="onSearchChange($event)"
                          #searchInput>
                   <div class="search-input-actions">
-                    <button type="button" class="btn-clear-search" title="Limpar busca">
+                    <button type="button" 
+                            class="btn-clear-search" 
+                            title="Limpar busca"
+                            (click)="clearSearch()"
+                            [style.display]="searchTerm ? 'block' : 'none'">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
                 </div>
 
-                <!-- Tags de filtros ativos (visual) -->
-                <div class="active-filters-container">
-                  <!-- As tags de filtros aparecerão aqui quando filtros forem aplicados -->
+                <!-- Tags de filtros ativos -->
+                <div class="active-filters-container" *ngIf="searchTerm || hasActiveFilters()">
+                  <!-- Tag de busca -->
+                  <div class="active-filter-tag" *ngIf="searchTerm">
+                    <i class="fas fa-search me-1"></i>
+                    <span class="filter-text">Busca: "{{ searchTerm }}"</span>
+                    <button type="button" class="btn-remove-filter" (click)="clearSearch()" title="Remover filtro">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- Tags de filtros avançados -->
+                  <div class="active-filter-tag" *ngFor="let tag of getActiveFilterTags()">
+                    <i class="fas fa-filter me-1"></i>
+                    <span class="filter-text">{{ tag }}</span>
+                    <button type="button" class="btn-remove-filter" (click)="clearAdvancedFilters()" title="Remover filtro">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- Informações dos resultados -->
+                  <div class="filter-results-info">
+                    <small class="text-muted">
+                      <i class="fas fa-info-circle me-1"></i>
+                      {{ filteredPackages.length }} de {{ packages.length }} pacotes encontrados
+                    </small>
+                  </div>
                 </div>
               </div>
             </div>
@@ -134,8 +167,11 @@
           <div class="package-card card h-100 border-0 shadow-sm">
             <!-- Imagem do Card com overlay melhorado -->
             <div class="card-image-container position-relative overflow-hidden">
-              <img [src]="package.imageUrl" [alt]="package.bundleTitle"
-                class="card-img-top w-100 h-100 object-fit-cover">
+              <img [src]="package.imageUrl" 
+                   [alt]="package.bundleTitle"
+                   class="card-img-top w-100 h-100 object-fit-cover"
+                   (error)="onImageError($event, package)"
+                   loading="lazy">
 
               <!-- Gradient overlay -->
               <div class="image-overlay position-absolute top-0 start-0 w-100 h-100"></div>
@@ -286,7 +322,7 @@
         </div>
       </div>
     </div> <!-- Paginação Premium com Bootstrap -->
-    <div class="container mt-5" *ngIf="packages.length > 0">
+    <div class="container mt-5" *ngIf="filteredPackages.length > 0">
       <div class="pagination-section">
         <div class="card border-0 shadow-lg">
           <div class="card-body p-4">
@@ -297,7 +333,9 @@
                   <h6 class="mb-1 fw-bold text-primary">Resultados</h6>
                   <p class="text-muted mb-0">
                     Mostrando <strong class="text-primary">{{getDisplayStart()}}-{{getDisplayEnd()}}</strong>
-                    de <strong class="text-primary">{{packages.length}}</strong> pacotes
+                    de <strong class="text-primary">{{filteredPackages.length}}</strong> 
+                    {{ searchTerm ? 'pacotes encontrados' : 'pacotes' }}
+                    {{ searchTerm && filteredPackages.length !== packages.length ? '(de ' + packages.length + ' total)' : '' }}
                   </p>
                 </div>
               </div>
@@ -352,7 +390,7 @@
     </div>
 
     <!-- Empty State Premium -->
-    <div class="container empty-state-section" *ngIf="packages.length === 0">
+    <div class="container empty-state-section" *ngIf="filteredPackages.length === 0 && packages.length === 0">
       <div class="row justify-content-center">
         <div class="col-lg-8">
           <div class="empty-state-card text-center p-5">
@@ -417,6 +455,70 @@
                 <i class="fas fa-lightbulb me-1"></i>
                 Dica: Use as estatísticas acima para acompanhar o crescimento do seu negócio
               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Search Results -->
+    <div class="container empty-state-section" *ngIf="filteredPackages.length === 0 && packages.length > 0">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="empty-state-card text-center p-5">
+            <!-- Illustration -->
+            <div class="empty-illustration mb-4">
+              <div class="illustration-container">
+                <div class="main-illustration">
+                  <i class="fas fa-search"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="empty-content">
+              <h2 class="empty-title fw-bold mb-3">Nenhum pacote encontrado</h2>
+              <p class="empty-description text-muted mb-4 lead">
+                Não encontramos pacotes com o título "<strong>{{ searchTerm }}</strong>".
+                Tente ajustar o nome do pacote ou limpar a busca.
+              </p>
+
+              <!-- Search Tips -->
+              <div class="search-tips mb-4">
+                <h6 class="fw-bold mb-3">Dicas de busca por título:</h6>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <div class="tip-card p-3 rounded-3 bg-light">
+                      <i class="fas fa-tag text-primary mb-2"></i>
+                      <small class="d-block"><strong>Nome completo</strong><br>Ex: "Pacote Nordeste Completo"</small>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="tip-card p-3 rounded-3 bg-light">
+                      <i class="fas fa-search text-success mb-2"></i>
+                      <small class="d-block"><strong>Palavras-chave</strong><br>Ex: "Férias", "Aventura"</small>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="tip-card p-3 rounded-3 bg-light">
+                      <i class="fas fa-spell-check text-warning mb-2"></i>
+                      <small class="d-block"><strong>Parte do nome</strong><br>Ex: "Nordeste", "Sul"</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-flex gap-3 justify-content-center">
+                <button class="btn btn-outline-primary px-4 py-2" (click)="clearSearch()">
+                  <i class="fas fa-times me-2"></i>
+                  Limpar Busca
+                </button>
+                <button class="btn btn-primary px-4 py-2" (click)="openCreateModal()">
+                  <i class="fas fa-plus me-2"></i>
+                  Criar Novo Pacote
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -669,45 +771,26 @@
                   </small>
                 </div>
 
-                <!-- Destino e Origem -->
-                <div class="form-group">
-                  <label for="destination" class="form-label-modern">
-                    <i class="fas fa-map-marker-alt label-icon"></i>
-                    Destino
-                    <span class="required-indicator">*</span>
-                  </label>
-                  <input type="text" id="destination" class="form-control-modern"
-                         [(ngModel)]="newPackage.destination"
-                         name="destination"
-                         placeholder="Ex: Fortaleza, CE" required>
-                </div>
-
-                <div class="form-group">
-                  <label for="origin" class="form-label-modern">
-                    <i class="fas fa-plane-departure label-icon"></i>
-                    Origem
-                    <span class="required-indicator">*</span>
-                  </label>
-                  <input type="text" id="origin" class="form-control-modern"
-                         [(ngModel)]="newPackage.origin"
-                         name="origin"
-                         placeholder="Ex: São Paulo, SP" required>
-                </div>
-
                 <!-- Status do Pacote -->
                 <div class="form-group full-width">
                   <label class="form-label-modern">
                     <i class="fas fa-toggle-on label-icon"></i>
                     Status do Pacote
+                    <small class="text-muted ms-2">(Alteração imediata)</small>
                   </label>
                   <div class="toggle-container">
                     <label class="toggle-switch">
-                      <input type="checkbox" [(ngModel)]="newPackage.available" name="available">
+                      <input type="checkbox" [(ngModel)]="newPackage.available" name="available" (change)="onStatusToggleChange()">
                       <span class="toggle-slider"></span>
                     </label>
                     <span class="toggle-label">
+                      <i class="fas me-2" [class.fa-play-circle]="!newPackage.available" [class.fa-pause-circle]="newPackage.available" 
+                         [class.text-success]="newPackage.available" [class.text-danger]="!newPackage.available"></i>
                       {{ newPackage.available ? 'Ativo - Visível para clientes' : 'Inativo - Oculto para clientes' }}
                     </span>
+                    <small class="text-muted d-block mt-1">
+                      <strong>{{ newPackage.available ? 'Pausar' : 'Ativar' }}</strong> - {{ newPackage.available ? 'Tornar inativo' : 'Tornar ativo' }}
+                    </small>
                   </div>
                 </div>
               </div>
@@ -907,6 +990,49 @@
               </div>
             </div>
 
+            <!-- Seção: Localização da Viagem (Visualização) -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                  <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="section-title-content">
+                  <h5 class="section-title">Localização da Viagem</h5>
+                  <p class="section-subtitle">Origem e destino do pacote</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <!-- Origem -->
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-plane-departure label-icon"></i>
+                    Origem
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">
+                      <i class="fas fa-plane-departure text-success me-2"></i>
+                      {{ viewPackage?.origin }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Destino -->
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="fas fa-map-marker-alt label-icon"></i>
+                    Destino
+                  </label>
+                  <div class="view-field">
+                    <span class="view-content">
+                      <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                      {{ viewPackage?.destination }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Seção: Mídia e Configurações (Visualização) -->
             <div class="form-section">
               <div class="form-section-header">
@@ -927,34 +1053,11 @@
                     Imagem Principal
                   </label>
                   <div class="view-image-container">
-                    <img [src]="viewPackage!.imageUrl" [alt]="viewPackage!.bundleTitle" class="view-image">
-                  </div>
-                </div>
-
-                <!-- Destino e Origem -->
-                <div class="form-group">
-                  <label class="form-label-modern">
-                    <i class="fas fa-map-marker-alt label-icon"></i>
-                    Destino
-                  </label>
-                  <div class="view-field">
-                    <span class="view-content">
-                      <i class="fas fa-map-marker-alt text-primary me-1"></i>
-                      {{ viewPackage?.destination }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label-modern">
-                    <i class="fas fa-plane-departure label-icon"></i>
-                    Origem
-                  </label>
-                  <div class="view-field">
-                    <span class="view-content">
-                      <i class="fas fa-plane-departure text-success me-1"></i>
-                      {{ viewPackage?.origin }}
-                    </span>
+                    <img [src]="viewPackage!.imageUrl" 
+                         [alt]="viewPackage!.bundleTitle" 
+                         class="view-image"
+                         (error)="onImageError($event, viewPackage!)"
+                         loading="lazy">
                   </div>
                 </div>
 
@@ -1076,25 +1179,13 @@
                   <label class="filter-label">Categoria do Pacote</label>
                   <div class="filter-options">
                     <div class="filter-checkbox-group">
-                      <label class="filter-checkbox">
-                        <input type="checkbox" value="BRONZE">
+                      <label class="filter-checkbox" *ngFor="let category of categories">
+                        <input type="checkbox" 
+                               [value]="category.value"
+                               [checked]="advancedFilters.categoria.includes(category.value)"
+                               (change)="onCategoryChange(category.value, $event)">
                         <span class="checkbox-custom"></span>
-                        <span class="checkbox-label">🥉 Bronze</span>
-                      </label>
-                      <label class="filter-checkbox">
-                        <input type="checkbox" value="PRATA">
-                        <span class="checkbox-custom"></span>
-                        <span class="checkbox-label">🥈 Prata</span>
-                      </label>
-                      <label class="filter-checkbox">
-                        <input type="checkbox" value="OURO">
-                        <span class="checkbox-custom"></span>
-                        <span class="checkbox-label">🥇 Ouro</span>
-                      </label>
-                      <label class="filter-checkbox">
-                        <input type="checkbox" value="PLATINA">
-                        <span class="checkbox-custom"></span>
-                        <span class="checkbox-label">💎 Platina</span>
+                        <span class="checkbox-label">{{ category.label }}</span>
                       </label>
                     </div>
                   </div>
@@ -1107,17 +1198,21 @@
                     <div class="price-inputs">
                       <div class="price-input-group">
                         <span class="price-prefix">R$</span>
-                        <input type="number" class="price-input" placeholder="Min" min="0">
+                        <input type="number" 
+                               class="price-input" 
+                               placeholder="Min" 
+                               min="0"
+                               [(ngModel)]="advancedFilters.precoMinimo">
                       </div>
                       <span class="price-separator">até</span>
                       <div class="price-input-group">
                         <span class="price-prefix">R$</span>
-                        <input type="number" class="price-input" placeholder="Max" min="0">
+                        <input type="number" 
+                               class="price-input" 
+                               placeholder="Max" 
+                               min="0"
+                               [(ngModel)]="advancedFilters.precoMaximo">
                       </div>
-                    </div>
-                    <div class="price-range-slider">
-                      <input type="range" class="range-input" min="0" max="5000" value="0">
-                      <input type="range" class="range-input" min="0" max="5000" value="5000">
                     </div>
                   </div>
                 </div>
@@ -1138,13 +1233,11 @@
                 <div class="filter-group">
                   <label class="filter-label">Destino</label>
                   <div class="filter-select-container">
-                    <select class="filter-select">
+                    <select class="filter-select" [(ngModel)]="advancedFilters.destino">
                       <option value="">Todos os destinos</option>
-                      <option value="nordeste">Nordeste</option>
-                      <option value="sul">Sul</option>
-                      <option value="sudeste">Sudeste</option>
-                      <option value="centro-oeste">Centro-Oeste</option>
-                      <option value="norte">Norte</option>
+                      <option *ngFor="let location of locations" [value]="location.city">
+                        {{ location.city }} - {{ location.states }}
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -1153,13 +1246,11 @@
                 <div class="filter-group">
                   <label class="filter-label">Origem</label>
                   <div class="filter-select-container">
-                    <select class="filter-select">
+                    <select class="filter-select" [(ngModel)]="advancedFilters.origem">
                       <option value="">Todas as origens</option>
-                      <option value="sao-paulo">São Paulo</option>
-                      <option value="rio-de-janeiro">Rio de Janeiro</option>
-                      <option value="belo-horizonte">Belo Horizonte</option>
-                      <option value="brasilia">Brasília</option>
-                      <option value="salvador">Salvador</option>
+                      <option *ngFor="let location of locations" [value]="location.city">
+                        {{ location.city }} - {{ location.states }}
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -1181,12 +1272,16 @@
                   <label class="filter-label">Período da Viagem</label>
                   <div class="date-range-container">
                     <div class="date-input-group">
-                      <input type="date" class="date-input">
+                      <input type="date" 
+                             class="date-input"
+                             [(ngModel)]="advancedFilters.dataIda">
                       <span class="date-label">Data início</span>
                     </div>
                     <span class="date-separator">até</span>
                     <div class="date-input-group">
-                      <input type="date" class="date-input">
+                      <input type="date" 
+                             class="date-input"
+                             [(ngModel)]="advancedFilters.dataVolta">
                       <span class="date-label">Data fim</span>
                     </div>
                   </div>
@@ -1195,17 +1290,24 @@
                 <!-- Status -->
                 <div class="filter-group">
                   <label class="filter-label">Status</label>
-                  <div class="status-toggles">
-                    <label class="status-toggle">
-                      <input type="checkbox" checked>
-                      <span class="toggle-slider"></span>
-                      <span class="toggle-label">Disponível</span>
-                    </label>
-                    <label class="status-toggle">
-                      <input type="checkbox">
-                      <span class="toggle-slider"></span>
-                      <span class="toggle-label">Indisponível</span>
-                    </label>
+                  <div class="filter-select-container">
+                    <select class="filter-select" [(ngModel)]="advancedFilters.status">
+                      <option value="all">Todos os status</option>
+                      <option value="available">Disponível</option>
+                      <option value="unavailable">Indisponível</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Número de Viajantes -->
+                <div class="filter-group">
+                  <label class="filter-label">Número de Viajantes (mín.)</label>
+                  <div class="filter-input-container">
+                    <input type="number" 
+                           class="filter-input" 
+                           min="1" 
+                           max="20"
+                           [(ngModel)]="advancedFilters.viajantes">
                   </div>
                 </div>
               </div>
@@ -1220,7 +1322,7 @@
             <div class="filter-results-info">
               <small class="text-muted">
                 <i class="fas fa-info-circle me-1"></i>
-                <span class="results-count">24</span> pacotes encontrados
+                <span class="results-count">{{ filteredPackages.length }}</span> pacotes encontrados
               </small>
             </div>
 
@@ -1230,12 +1332,12 @@
                 Cancelar
               </button>
 
-              <button type="button" class="btn btn-outline-primary">
+              <button type="button" class="btn btn-outline-primary" (click)="clearAdvancedFilters()">
                 <i class="fas fa-undo me-2"></i>
                 Limpar Filtros
               </button>
 
-              <button type="button" class="btn btn-primary" (click)="closeFilterModal()">
+              <button type="button" class="btn btn-primary" (click)="applyAdvancedFilterModal()">
                 <i class="fas fa-search me-2"></i>
                 Aplicar Filtros
               </button>
