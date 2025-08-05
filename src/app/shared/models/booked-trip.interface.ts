@@ -12,6 +12,7 @@ export interface BookedTrip {
   paymentMethod?: string; // forma de pagamento
   rating?: number; // média de avaliação
   description?: string; // descrição da viagem
+  bundleId?: number; // ID do pacote para buscar imagem e localização
 }
 
 export type BookingStatus = 'Confirmado' | 'Pendente' | 'Cancelado';

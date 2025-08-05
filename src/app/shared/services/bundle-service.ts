@@ -44,4 +44,22 @@ export class BundleService {
     const url = `http://localhost:8080/api/locations`;
     return this.http.get<Location[]>(url);
   }
+
+  getAllBundles(): Observable<BundleClass[]> {
+    return this.http.get<BundleClass[]>(this.baseUrl);
+  }
+
+  // Atualizar bundle existente
+  updateBundle(id: number, bundle: Partial<BundleClass>): Observable<BundleClass> {
+    const url = `${this.baseUrl}/${id}`;
+    return this.http.put<BundleClass>(url, bundle);
+  }
+
+  // Excluir bundle por ID
+  deleteBundle(id: number): Observable<void> {
+    const url = `${this.baseUrl}/${id}`;
+    return this.http.delete<void>(url);
+  }
+
+  
 }

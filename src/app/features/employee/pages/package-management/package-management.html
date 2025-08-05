@@ -197,21 +197,32 @@
                     </div>
                   </div>
                   <div class="col-6">
-                    <div class="detail-pill bg-light rounded-pill p-2 text-center">
-                      <i class="fas fa-ticket-alt text-warning d-block mb-1"></i>
-                      <small class="fw-semibold d-block">{{ package.quantity }} vagas</small>
-                      <small class="text-muted" style="font-size: 0.7rem;">Disponível</small>
-                    </div>
-                  </div>
-                  <div class="col-6" *ngIf="package.videoUrl">
-                    <div class="detail-pill bg-light rounded-pill p-2 text-center">
-                      <i class="fas fa-video text-info d-block mb-1"></i>
-                      <small class="fw-semibold d-block">
-                        <a [href]="package.videoUrl" target="_blank" class="text-decoration-none">
-                          Ver vídeo
-                        </a>
-                      </small>
-                      <small class="text-muted" style="font-size: 0.7rem;">Mídia</small>
+                    <div class="detail-pill bg-light rounded-pill p-2 text-center position-relative">
+                      <i class="fas fa-ticket-alt text-warning d-block mb-2"></i>
+                      
+                      <!-- Container dos controles de quantidade -->
+                      <div class="quantity-controls d-flex align-items-center justify-content-center mb-1">
+                        <button class="btn-quantity btn-quantity-minus" 
+                                (click)="changeQuantity(package, -1)"
+                                [disabled]="package.quantity <= 0"
+                                [class.disabled]="package.quantity <= 0"
+                                title="Diminuir vagas">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                        
+                        <div class="quantity-display">
+                          <span class="quantity-number fw-bold">{{ package.quantity }}</span>
+                          <small class="quantity-label d-block">vagas</small>
+                        </div>
+                        
+                        <button class="btn-quantity btn-quantity-plus" 
+                                (click)="changeQuantity(package, 1)"
+                                title="Aumentar vagas">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                      </div>
+                      
+                      <small class="text-muted" style="font-size: 0.65rem;">Disponível</small>
                     </div>
                   </div>
                 </div>
@@ -658,33 +669,6 @@
                   </small>
                 </div>
 
-                <!-- URL do Vídeo -->
-                <div class="form-group">
-                  <label for="videoUrl" class="form-label-modern">
-                    <i class="fas fa-video label-icon"></i>
-                    URL do Vídeo (Opcional)
-                  </label>
-                  <input type="url" id="videoUrl" class="form-control-modern"
-                         [(ngModel)]="newPackage.videoUrl"
-                         name="videoUrl"
-                         placeholder="https://exemplo.com/video.mp4">
-                  <small class="form-text text-muted">
-                    <i class="fas fa-info-circle me-1"></i>
-                    YouTube, Vimeo ou link direto do vídeo
-                  </small>
-                </div>
-
-                <!-- Informações Adicionais -->
-                <div class="form-group full-width">
-                  <label for="additionalInfo" class="form-label-modern">
-                    <i class="fas fa-info-circle label-icon"></i>
-                    Informações Adicionais
-                  </label>
-                  <textarea id="additionalInfo" class="form-control-modern textarea-modern" rows="3"
-                    [(ngModel)]="newPackage.additionalInfo" name="additionalInfo"
-                    placeholder="Inclua informações extras como: o que está incluído, o que não está incluído, requisitos, etc."></textarea>
-                </div>
-
                 <!-- Destino e Origem -->
                 <div class="form-group">
                   <label for="destination" class="form-label-modern">
@@ -944,31 +928,6 @@
                   </label>
                   <div class="view-image-container">
                     <img [src]="viewPackage!.imageUrl" [alt]="viewPackage!.bundleTitle" class="view-image">
-                  </div>
-                </div>
-
-                <!-- URL do Vídeo -->
-                <div class="form-group" *ngIf="viewPackage?.videoUrl">
-                  <label class="form-label-modern">
-                    <i class="fas fa-video label-icon"></i>
-                    URL do Vídeo
-                  </label>
-                  <div class="view-field">
-                    <a [href]="viewPackage!.videoUrl" target="_blank" class="view-link">
-                      <i class="fas fa-external-link-alt me-1"></i>
-                      Ver Vídeo
-                    </a>
-                  </div>
-                </div>
-
-                <!-- Informações Adicionais -->
-                <div class="form-group full-width" *ngIf="viewPackage?.additionalInfo">
-                  <label class="form-label-modern">
-                    <i class="fas fa-info-circle label-icon"></i>
-                    Informações Adicionais
-                  </label>
-                  <div class="view-field view-field-large">
-                    <span class="view-content">{{ viewPackage!.additionalInfo }}</span>
                   </div>
                 </div>
 

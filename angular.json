@@ -65,7 +65,8 @@
               "buildTarget": "ET-Easy-Travel:build:production"
             },
             "development": {
-              "buildTarget": "ET-Easy-Travel:build:development"
+              "buildTarget": "ET-Easy-Travel:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

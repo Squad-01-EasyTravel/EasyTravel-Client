@@ -3021,3 +3021,143 @@ input:checked + .toggle-slider:before {
     justify-content: center;
   }
 }
+
+/* ===== QUANTITY CONTROLS - CONTROLES DE QUANTIDADE ===== */
+.quantity-controls {
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.btn-quantity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-quantity::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.btn-quantity:hover::before {
+  opacity: 1;
+}
+
+.btn-quantity:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.btn-quantity:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.btn-quantity-minus {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+}
+
+.btn-quantity-minus:hover {
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-quantity-plus {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+.btn-quantity-plus:hover {
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-quantity.disabled,
+.btn-quantity:disabled {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: 0 1px 2px rgba(108, 117, 125, 0.2);
+}
+
+.btn-quantity.disabled:hover,
+.btn-quantity:disabled:hover {
+  transform: none;
+  box-shadow: 0 1px 2px rgba(108, 117, 125, 0.2);
+}
+
+.quantity-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 45px;
+  padding: 0 0.25rem;
+}
+
+.quantity-number {
+  font-size: 0.9rem;
+  color: #495057;
+  line-height: 1;
+  margin-bottom: 1px;
+}
+
+.quantity-label {
+  font-size: 0.65rem;
+  color: #6c757d;
+  font-weight: 500;
+  line-height: 1;
+  text-transform: lowercase;
+}
+
+/* Animação suave para mudanças de quantidade */
+.quantity-number {
+  transition: all 0.2s ease;
+}
+
+.quantity-controls:hover .quantity-number {
+  color: #212529;
+  font-weight: 700;
+}
+
+/* Responsive adjustments para os controles de quantidade */
+@media (max-width: 768px) {
+  .btn-quantity {
+    width: 22px;
+    height: 22px;
+    font-size: 0.65rem;
+  }
+  
+  .quantity-display {
+    min-width: 40px;
+  }
+  
+  .quantity-number {
+    font-size: 0.85rem;
+  }
+  
+  .quantity-label {
+    font-size: 0.6rem;
+  }
+}

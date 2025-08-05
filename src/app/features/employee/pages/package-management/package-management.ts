@@ -1,21 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BundleService } from '@/app/shared/services/bundle-service';
+import { BundleClass } from '@/app/features/client/pages/bundle/class/bundle-class';
 
 interface TravelPackage {
   id: number;
   bundleTitle: string;
   bundleDescription: string;
   initialPrice: number;
-  bundleRank: 'BRONZE' | 'PRATA' | 'OURO' | 'PLATINA';
+  bundleRank: 'BRONZE' | 'PRATA' | 'OURO' | 'PLATINA' | 'GOLD' | 'SILVER';
   initialDate: string;
   finalDate: string;
   quantity: number;
-  imageUrl: string;
-  videoUrl?: string;
-  available: boolean;
-  createdAt: Date;
-  additionalInfo?: string;
+  travelersNumber: number;
+  bundleStatus: string;
+  imageUrl?: string;
+  available?: boolean;
+  createdAt?: Date;
   destination?: string;
   origin?: string;
 }
@@ -45,12 +47,9 @@ export class PackageManagementComponent implements OnInit {
     initialDate: '',
     finalDate: '',
     quantity: 0,
+    travelersNumber: 1,
     imageUrl: '',
-    videoUrl: '',
-    available: true,
-    additionalInfo: '',
-    destination: '',
-    origin: ''
+    available: true
   };
 
   // Propriedades para upload de imagem
@@ -65,48 +64,107 @@ export class PackageManagementComponent implements OnInit {
   // Propriedades para o modal de filtro
   isFilterModalOpen = false;
 
-  constructor() {}
+  constructor(private service: BundleService) {}
 
   ngOnInit(): void {
     this.loadPackages();
   }
 
   loadPackages(): void {
-    // Simulando dados de pacotes - substitua por chamada real à API
-    this.packages = [
-      {
-        id: 1,
-        bundleTitle: 'Pacote Férias Nordeste',
-        bundleDescription: 'Pacote para o nordeste com tudo incluso',
-        initialPrice: 1200,
-        bundleRank: 'BRONZE',
-        initialDate: '2025-07-29T18:12:22.171Z',
-        finalDate: '2025-07-29T18:12:22.171Z',
-        quantity: 10,
-        imageUrl: '/assets/imgs/fortaleza.jpg',
-        videoUrl: '',
-        available: true,
-        createdAt: new Date('2024-01-15'),
-        destination: 'Fortaleza, CE',
-        origin: 'São Paulo, SP'
+    console.log('🔄 Carregando pacotes da API...');
+    
+    this.service.getAllBundles().subscribe({
+      next: (bundles: BundleClass[]) => {
+        console.log('📦 Pacotes recebidos da API:', bundles.length, bundles);
+        
+        if (!bundles || !Array.isArray(bundles)) {
+          console.warn('⚠️ Nenhum pacote encontrado ou resposta inválida');
+          this.packages = [];
+          return;
+        }
+        
+        // Converter BundleClass para TravelPackage
+        this.packages = bundles.map(bundle => this.convertBundleToTravelPackage(bundle));
+        
+        console.log('✅ Pacotes convertidos para TravelPackage:', this.packages.length, this.packages);
+        
+        // Resetar para primeira página
+        this.currentPage = 1;
       },
-      {
-        id: 2,
-        bundleTitle: 'Pacote Sul',
-        bundleDescription: 'Experiência única na Serra Gaúcha',
-        initialPrice: 980,
-        bundleRank: 'OURO',
-        initialDate: '2025-08-01T10:00:00.000Z',
-        finalDate: '2025-08-10T10:00:00.000Z',
-        quantity: 5,
-        imageUrl: '/assets/imgs/gramado.jpg',
-        videoUrl: '',
-        available: true,
-        createdAt: new Date('2024-02-10'),
-        destination: 'Gramado, RS',
-        origin: 'Rio de Janeiro, RJ'
+      error: (error) => {
+        console.error('❌ Erro ao carregar pacotes:', error);
+        console.log('Status do erro:', error.status);
+        console.log('Mensagem do erro:', error.message);
+        
+        // Em caso de erro, manter array vazio
+        this.packages = [];
       }
-    ];
+    });
+  }
+
+  private convertBundleToTravelPackage(bundle: BundleClass): TravelPackage {
+    return {
+      id: bundle.id,
+      bundleTitle: bundle.bundleTitle,
+      bundleDescription: bundle.bundleDescription,
+      initialPrice: bundle.initialPrice,
+      bundleRank: this.mapBundleRank(bundle.bundleRank),
+      initialDate: bundle.initialDate,
+      finalDate: bundle.finalDate,
+      quantity: bundle.quantity,
+      travelersNumber: bundle.travelersNumber,
+      bundleStatus: bundle.bundleStatus,
+      imageUrl: bundle.imageUrl || '/assets/imgs/fortaleza.jpg', // Imagem padrão se não tiver
+      available: bundle.bundleStatus === 'AVAILABLE',
+      createdAt: new Date(),
+      destination: bundle.destinationCity && bundle.destinationState 
+        ? `${bundle.destinationCity}, ${bundle.destinationState}` 
+        : 'Destino não informado',
+      origin: bundle.departureCity && bundle.departureState 
+        ? `${bundle.departureCity}, ${bundle.departureState}` 
+        : 'Origem não informada'
+    };
+  }
+
+  private mapBundleRank(rank: string): 'BRONZE' | 'PRATA' | 'OURO' | 'PLATINA' | 'GOLD' | 'SILVER' {
+    // Mapear diferentes formatos de rank para nosso enum
+    const normalizedRank = rank.toUpperCase();
+    
+    switch (normalizedRank) {
+      case 'GOLD':
+        return 'OURO';
+      case 'SILVER':
+        return 'PRATA';
+      case 'BRONZE':
+        return 'BRONZE';
+      case 'PLATINUM':
+      case 'PLATINA':
+        return 'PLATINA';
+      default:
+        return 'BRONZE';
+    }
+  }
+
+  private convertRankToBackend(rank: string): string {
+    // Converter rank do frontend de volta para formato do backend
+    const normalizedRank = rank.toUpperCase();
+    
+    switch (normalizedRank) {
+      case 'OURO':
+        return 'GOLD';
+      case 'PRATA':
+        return 'SILVER';
+      case 'BRONZE':
+        return 'BRONZE';
+      case 'PLATINA':
+        return 'PLATINUM';
+      case 'GOLD':
+        return 'GOLD';
+      case 'SILVER':
+        return 'SILVER';
+      default:
+        return 'BRONZE';
+    }
   }
 
   getAvailablePackagesCount(): number {
@@ -188,11 +246,14 @@ export class PackageManagementComponent implements OnInit {
   getRankDisplay(rank?: string): string {
     const rankMap: { [key: string]: string } = {
       'BRONZE': '🥉 Bronze - Básico',
-      'PRATA': '🥈 Prata - Intermediário',
+      'PRATA': '🥈 Prata - Intermediário', 
+      'SILVER': '🥈 Prata - Intermediário',
       'OURO': '🥇 Ouro - Premium',
-      'PLATINA': '💎 Platina - Luxo'
+      'GOLD': '🥇 Ouro - Premium',
+      'PLATINA': '💎 Platina - Luxo',
+      'PLATINUM': '💎 Platina - Luxo'
     };
-    return rank ? rankMap[rank] || rank : '';
+    return rank ? rankMap[rank.toUpperCase()] || rank : 'Não definido';
   }
 
   resetForm(): void {
@@ -204,12 +265,9 @@ export class PackageManagementComponent implements OnInit {
       initialDate: '',
       finalDate: '',
       quantity: 0,
+      travelersNumber: 1,
       imageUrl: '',
-      videoUrl: '',
-      available: true,
-      additionalInfo: '',
-      destination: '',
-      origin: ''
+      available: true
     };
 
     // Resetar variáveis de upload
@@ -296,50 +354,253 @@ export class PackageManagementComponent implements OnInit {
   savePackage(): void {
     if (this.isEditMode && this.selectedPackage) {
       // Atualizar pacote existente
-      const index = this.packages.findIndex(p => p.id === this.selectedPackage!.id);
-      if (index !== -1) {
-        this.packages[index] = {
-          ...this.selectedPackage,
-          ...this.newPackage,
-          id: this.selectedPackage.id,
-          createdAt: this.selectedPackage.createdAt
-        } as TravelPackage;
-      }
+      console.log('✏️ Atualizando pacote existente:', this.selectedPackage.id);
+      
+      // Converter rank para formato do backend
+      const backendRank = this.convertRankToBackend(this.newPackage.bundleRank || 'BRONZE');
+      
+      // Preparar dados para update (todos os campos obrigatórios)
+      const updateData = {
+        bundleTitle: this.newPackage.bundleTitle || '',
+        bundleDescription: this.newPackage.bundleDescription || '',
+        initialPrice: this.newPackage.initialPrice || 0,
+        bundleRank: backendRank,
+        initialDate: this.newPackage.initialDate || '',
+        finalDate: this.newPackage.finalDate || '',
+        quantity: this.newPackage.quantity || 0,
+        travelersNumber: this.newPackage.travelersNumber || 1,
+        bundleStatus: this.newPackage.available ? 'AVAILABLE' : 'UNAVAILABLE'
+      };
+      
+      console.log('📤 Enviando dados de edição para API:', updateData);
+      
+      // Fazer chamada para API de update
+      this.service.updateBundle(this.selectedPackage.id, updateData).subscribe({
+        next: (updatedBundle) => {
+          console.log('✅ Bundle editado com sucesso:', updatedBundle);
+          
+          // Atualizar na lista local
+          const index = this.packages.findIndex(p => p.id === this.selectedPackage!.id);
+          if (index !== -1) {
+            this.packages[index] = {
+              ...this.selectedPackage!,
+              ...this.newPackage,
+              id: this.selectedPackage!.id,
+              createdAt: this.selectedPackage!.createdAt,
+              bundleRank: this.mapBundleRank(updatedBundle.bundleRank), // Converter de volta para frontend
+              available: updatedBundle.bundleStatus === 'AVAILABLE',
+              bundleStatus: updatedBundle.bundleStatus
+            } as TravelPackage;
+          }
+          
+          this.closeModal();
+          
+          // Recarregar dados da API após salvar
+          console.log('🔄 Recarregando dados da API após edição...');
+          this.loadPackages();
+          
+          // Mostrar mensagem de sucesso
+          alert('Pacote editado com sucesso!');
+        },
+        error: (error) => {
+          console.error('❌ Erro ao editar pacote:', error);
+          console.log('Status do erro:', error.status);
+          console.log('Mensagem do erro:', error.message);
+          
+          // Mostrar mensagem de erro
+          if (error.status === 404) {
+            alert('Pacote não encontrado. Pode ter sido excluído.');
+            this.loadPackages();
+            this.closeModal();
+          } else if (error.status === 403) {
+            alert('Você não tem permissão para editar este pacote.');
+          } else if (error.status === 400) {
+            alert('Dados inválidos. Verifique os campos e tente novamente.');
+          } else {
+            alert('Erro ao editar pacote. Tente novamente.');
+          }
+        }
+      });
     } else {
       // Criar novo pacote
+      console.log('➕ Criando novo pacote');
+      
+      // Aqui você implementaria a chamada para API de create
+      // this.service.createBundle(this.newPackage).subscribe({...})
+      
       const newId = Math.max(...this.packages.map(p => p.id), 0) + 1;
       const packageToAdd: TravelPackage = {
         ...this.newPackage,
         id: newId,
-        createdAt: new Date()
+        createdAt: new Date(),
+        available: true,
+        bundleStatus: 'AVAILABLE',
+        travelersNumber: 1
       } as TravelPackage;
 
       this.packages.push(packageToAdd);
-    }
+      
+      // Resetar para primeira página se necessário
+      const totalPages = this.getTotalPages();
+      if (this.currentPage > totalPages) {
+        this.currentPage = Math.max(1, totalPages);
+      }
 
-    // Resetar para primeira página se necessário
-    const totalPages = this.getTotalPages();
-    if (this.currentPage > totalPages) {
-      this.currentPage = Math.max(1, totalPages);
+      this.closeModal();
+      
+      // Recarregar dados da API após salvar
+      console.log('🔄 Recarregando dados da API após operação...');
+      this.loadPackages();
     }
-
-    this.closeModal();
   }
 
   deletePackage(id: number): void {
-    if (confirm('Tem certeza que deseja excluir este pacote?')) {
-      this.packages = this.packages.filter(p => p.id !== id);
+    if (confirm('Tem certeza que deseja excluir este pacote? Esta ação não pode ser desfeita.')) {
+      console.log('🗑️ Excluindo pacote ID:', id);
+      
+      // Fazer chamada para API de delete
+      this.service.deleteBundle(id).subscribe({
+        next: () => {
+          console.log('✅ Pacote excluído com sucesso da API');
+          
+          // Remover da lista local
+          this.packages = this.packages.filter(p => p.id !== id);
 
-      // Ajustar página se necessário
-      const totalPages = this.getTotalPages();
-      if (this.currentPage > totalPages && totalPages > 0) {
-        this.currentPage = totalPages;
-      }
+          // Ajustar página se necessário
+          const totalPages = this.getTotalPages();
+          if (this.currentPage > totalPages && totalPages > 0) {
+            this.currentPage = totalPages;
+          }
+          
+          // Recarregar dados da API para garantir sincronização
+          console.log('🔄 Recarregando dados da API após exclusão...');
+          this.loadPackages();
+          
+          // Mostrar mensagem de sucesso
+          alert('Pacote excluído com sucesso!');
+        },
+        error: (error) => {
+          console.error('❌ Erro ao excluir pacote:', error);
+          console.log('Status do erro:', error.status);
+          console.log('Mensagem do erro:', error.message);
+          
+          // Mostrar mensagem de erro
+          if (error.status === 404) {
+            alert('Pacote não encontrado. Pode já ter sido excluído.');
+            // Recarregar dados para sincronizar
+            this.loadPackages();
+          } else if (error.status === 403) {
+            alert('Você não tem permissão para excluir este pacote.');
+          } else {
+            alert('Erro ao excluir pacote. Tente novamente.');
+          }
+        }
+      });
     }
   }
 
   toggleAvailability(packageItem: TravelPackage): void {
-    packageItem.available = !packageItem.available;
+    console.log('🔄 Alterando disponibilidade do pacote ID:', packageItem.id);
+    
+    // Determinar o novo status
+    const newStatus = packageItem.available ? 'UNAVAILABLE' : 'AVAILABLE';
+    console.log(`📋 Alterando status de ${packageItem.bundleStatus} para ${newStatus}`);
+    
+    // Converter rank de volta para formato do backend
+    const backendRank = this.convertRankToBackend(packageItem.bundleRank);
+    
+    // Preparar dados para update (todos os campos obrigatórios)
+    const updateData = {
+      bundleTitle: packageItem.bundleTitle,
+      bundleDescription: packageItem.bundleDescription,
+      initialPrice: packageItem.initialPrice,
+      bundleRank: backendRank, // Usar o rank convertido para o backend
+      initialDate: packageItem.initialDate,
+      finalDate: packageItem.finalDate,
+      quantity: packageItem.quantity,
+      travelersNumber: packageItem.travelersNumber,
+      bundleStatus: newStatus
+    };
+    
+    console.log('📤 Enviando dados para API:', updateData);
+    
+    // Fazer chamada para API
+    this.service.updateBundle(packageItem.id, updateData).subscribe({
+      next: (updatedBundle) => {
+        console.log('✅ Bundle atualizado com sucesso:', updatedBundle);
+        
+        // Atualizar localmente
+        packageItem.available = newStatus === 'AVAILABLE';
+        packageItem.bundleStatus = newStatus;
+        
+        // Recarregar dados da API para garantir sincronização
+        console.log('🔄 Recarregando dados da API após alterar status...');
+        this.loadPackages();
+      },
+      error: (error) => {
+        console.error('❌ Erro ao alterar status do bundle:', error);
+        console.log('Status do erro:', error.status);
+        console.log('Mensagem do erro:', error.message);
+        
+        // Em caso de erro, reverter as alterações locais
+        alert('Erro ao alterar disponibilidade do pacote. Tente novamente.');
+      }
+    });
+  }
+
+  changeQuantity(packageItem: TravelPackage, change: number): void {
+    console.log('🔢 Alterando quantidade do pacote ID:', packageItem.id, 'Mudança:', change);
+    
+    // Calcular nova quantidade
+    const newQuantity = packageItem.quantity + change;
+    
+    // Validar se a nova quantidade é válida (não pode ser negativa)
+    if (newQuantity < 0) {
+      console.log('⚠️ Quantidade não pode ser negativa');
+      return;
+    }
+    
+    console.log(`📋 Alterando quantidade de ${packageItem.quantity} para ${newQuantity}`);
+    
+    // Converter rank de volta para formato do backend
+    const backendRank = this.convertRankToBackend(packageItem.bundleRank);
+    
+    // Preparar dados para update (todos os campos obrigatórios)
+    const updateData = {
+      bundleTitle: packageItem.bundleTitle,
+      bundleDescription: packageItem.bundleDescription,
+      initialPrice: packageItem.initialPrice,
+      bundleRank: backendRank,
+      initialDate: packageItem.initialDate,
+      finalDate: packageItem.finalDate,
+      quantity: newQuantity, // Nova quantidade
+      travelersNumber: packageItem.travelersNumber,
+      bundleStatus: packageItem.bundleStatus
+    };
+    
+    console.log('📤 Enviando dados para API (alteração de quantidade):', updateData);
+    
+    // Fazer chamada para API
+    this.service.updateBundle(packageItem.id, updateData).subscribe({
+      next: (updatedBundle) => {
+        console.log('✅ Quantidade atualizada com sucesso:', updatedBundle);
+        
+        // Atualizar localmente
+        packageItem.quantity = newQuantity;
+        
+        // Recarregar dados da API para garantir sincronização
+        console.log('🔄 Recarregando dados da API após alterar quantidade...');
+        this.loadPackages();
+      },
+      error: (error) => {
+        console.error('❌ Erro ao alterar quantidade do bundle:', error);
+        console.log('Status do erro:', error.status);
+        console.log('Mensagem do erro:', error.message);
+        
+        // Em caso de erro, mostrar mensagem
+        alert('Erro ao alterar quantidade de vagas. Tente novamente.');
+      }
+    });
   }
 
   // ===== MÉTODOS PARA UPLOAD DE IMAGEM =====
@@ -436,9 +697,8 @@ export class PackageManagementComponent implements OnInit {
       this.newPackage.bundleRank &&
       this.newPackage.initialDate &&
       this.newPackage.finalDate &&
-      this.newPackage.quantity !== undefined && this.newPackage.quantity >= 0 &&
-      this.newPackage.destination &&
-      this.newPackage.origin &&
+      this.newPackage.quantity !== undefined && 
+      this.newPackage.quantity >= 0 &&
       hasImage
     );
   }
