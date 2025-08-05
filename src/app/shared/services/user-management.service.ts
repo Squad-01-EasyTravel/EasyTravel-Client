@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { map, switchMap, catchError, tap } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
+// Interfaces para tipagem dos dados da API de usuários
 export interface UserManagement {
   id: number;
   name: string;
@@ -47,23 +49,57 @@ export interface UpdateUserDto {
   userStatus?: 'ACTIVATED' | 'DEACTIVATED';
 }
 
+export interface UserStats {
+  totalUsers: number;
+  activeUsers: number;
+  inactiveUsers: number;
+  clientUsers: number;
+  employeeUsers: number;
+  adminUsers: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserManagementService {
-  private baseUrl = 'http://localhost:8080/api/users'; // Ajuste para a URL da sua API
+  private baseUrl = 'http://localhost:8080/api/users';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
+
+  // Método privado para obter headers de autenticação
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    console.log('🔑 UserManagementService - Token disponível:', !!token);
+    console.log('🔑 UserManagementService - Usuário autenticado:', this.authService.isAuthenticated());
+    console.log('🔑 UserManagementService - Role do usuário:', this.authService.getCurrentUserRole());
+
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+      console.log('🔑 UserManagementService - Header Authorization adicionado');
+    } else {
+      console.log('❌ UserManagementService - Sem token disponível!');
+    }
+
+    return headers;
+  }
 
   // Método para tratar erros de autenticação
   private handleError(error: any): Observable<never> {
+    console.error('❌ UserManagementService - Erro na API:', error);
+    
     if (error.status === 403) {
-      console.error('Erro de autorização: Token inválido ou expirado');
-      // Você pode adicionar aqui um redirecionamento para login se necessário
-      // this.router.navigate(['/login']);
+      console.error('❌ Erro de autorização: Token inválido ou expirado');
     } else if (error.status === 401) {
-      console.error('Erro de autenticação: Usuário não autenticado');
+      console.error('❌ Erro de autenticação: Usuário não autenticado');
     }
+    
     return throwError(() => error);
   }
 
@@ -76,10 +112,16 @@ export class UserManagementService {
     };
   }
 
-  // Buscar usuários com paginação
+  // GET /api/users - Buscar todos os usuários
   getUsers(page: number = 1, pageSize: number = 10, search?: string, role?: string): Observable<UserManagementResponse> {
-    // Fazer chamada para API real
-    return this.http.get<UserManagement[]>(`${this.baseUrl}`).pipe(
+    const url = `${this.baseUrl}`;
+    console.log('🔌 UserManagementService - Chamando API:', url);
+    console.log('📊 UserManagementService - Parâmetros:', { page, pageSize, search, role });
+
+    return this.http.get<UserManagement[]>(url, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(data => console.log('✅ UserManagementService - Usuários recebidos:', data.length, 'usuários')),
       map(response => {
         // Transformar os dados do backend
         let users = response.map(user => this.transformUser(user));
@@ -115,66 +157,93 @@ export class UserManagementService {
     );
   }
 
-  // Buscar usuário por ID
+  // GET /api/users/{id} - Buscar usuário por ID
   getUserById(id: number | string): Observable<UserManagement> {
     const numericId = typeof id === 'string' ? parseInt(id) : id;
-    return this.http.get<UserManagement>(`${this.baseUrl}/${numericId}`).pipe(
+    const url = `${this.baseUrl}/${numericId}`;
+    console.log('🔌 UserManagementService - Chamando API:', url);
+
+    return this.http.get<UserManagement>(url, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(data => console.log('✅ UserManagementService - Usuário por ID recebido:', data)),
       map(user => this.transformUser(user)),
       catchError(error => this.handleError(error))
     );
   }
 
-  // Criar novo usuário
+  // POST /api/users - Criar novo usuário
   createUser(userData: CreateUserDto): Observable<UserManagement> {
-    return this.http.post<UserManagement>(`${this.baseUrl}`, userData).pipe(
+    const url = `${this.baseUrl}`;
+    console.log('🔌 UserManagementService - Criando usuário:', url, userData);
+
+    return this.http.post<UserManagement>(url, userData, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(data => console.log('✅ UserManagementService - Usuário criado:', data)),
       map(user => this.transformUser(user)),
       catchError(error => this.handleError(error))
     );
   }
 
-  // Atualizar usuário
+  // PUT /api/users/{id} - Atualizar usuário
   updateUser(id: number | string, userData: UpdateUserDto): Observable<UserManagement> {
     const numericId = typeof id === 'string' ? parseInt(id) : id;
-    return this.http.put<UserManagement>(`${this.baseUrl}/${numericId}`, userData).pipe(
+    const url = `${this.baseUrl}/${numericId}`;
+    console.log('🔌 UserManagementService - Atualizando usuário:', url, userData);
+
+    return this.http.put<UserManagement>(url, userData, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(data => console.log('✅ UserManagementService - Usuário atualizado:', data)),
       map(user => this.transformUser(user)),
       catchError(error => this.handleError(error))
     );
   }
 
-  // Desativar/ativar usuário
-  toggleUserStatus(id: number | string): Observable<boolean> {
+  // DELETE /api/users/{id} - Excluir usuário
+  deleteUser(id: number | string): Observable<boolean> {
     const numericId = typeof id === 'string' ? parseInt(id) : id;
+    const url = `${this.baseUrl}/${numericId}`;
+    console.log('🔌 UserManagementService - Excluindo usuário:', url);
+
+    return this.http.delete<boolean>(url, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(() => console.log('✅ UserManagementService - Usuário excluído')),
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  // Método auxiliar para alternar status do usuário
+  toggleUserStatus(id: number | string): Observable<boolean> {
+    console.log('🔄 UserManagementService - Alterando status do usuário:', id);
+    
     return this.getUserById(id).pipe(
       switchMap((user: UserManagement) => {
         const newStatus: 'ACTIVATED' | 'DEACTIVATED' = user.userStatus === 'ACTIVATED' ? 'DEACTIVATED' : 'ACTIVATED';
+        console.log('🔄 UserManagementService - Novo status:', newStatus);
         return this.updateUser(id, { userStatus: newStatus });
       }),
-      map(() => true),
+      map(() => {
+        console.log('✅ UserManagementService - Status alterado com sucesso');
+        return true;
+      }),
       catchError(error => this.handleError(error))
     );
   }
 
-  // Excluir usuário
-  deleteUser(id: number | string): Observable<boolean> {
-    const numericId = typeof id === 'string' ? parseInt(id) : id;
-    return this.http.delete<boolean>(`${this.baseUrl}/${numericId}`).pipe(
-      catchError(error => this.handleError(error))
-    );
-  }
-
-  // Buscar estatísticas de usuários
-  getUserStats(): Observable<{
-    totalUsers: number;
-    activeUsers: number;
-    inactiveUsers: number;
-    clientUsers: number;
-    employeeUsers: number;
-    adminUsers: number;
-  }> {
-    return this.http.get<UserManagement[]>(`${this.baseUrl}`).pipe(
+  // Método para buscar estatísticas de usuários
+  getUserStats(): Observable<UserStats> {
+    console.log('📊 UserManagementService - Buscando estatísticas de usuários');
+    
+    return this.http.get<UserManagement[]>(`${this.baseUrl}`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(data => console.log('✅ UserManagementService - Dados para estatísticas:', data.length, 'usuários')),
       map(response => {
         const users = response.map(user => this.transformUser(user));
-        return {
+        const stats = {
           totalUsers: users.length,
           activeUsers: users.filter(u => u.isActive).length,
           inactiveUsers: users.filter(u => !u.isActive).length,
@@ -182,6 +251,8 @@ export class UserManagementService {
           employeeUsers: users.filter(u => u.role === 'EMPLOYEE').length,
           adminUsers: users.filter(u => u.role === 'ADMIN').length,
         };
+        console.log('📊 UserManagementService - Estatísticas calculadas:', stats);
+        return stats;
       }),
       catchError(error => this.handleError(error))
     );
