@@ -123,6 +123,18 @@
                   </div>
                 </div>
 
+                <!-- Botão de Incluir Pacote -->
+                <div class="mt-3 d-flex justify-content-center">
+                  <button type="button" 
+                          class="btn-add-package btn btn-warning btn-lg px-4 py-2 rounded-pill fw-bold shadow"
+                          (click)="openCreateModal()"
+                          title="Criar novo pacote de viagem">
+                    <i class="fas fa-plus me-2"></i>
+                    <span>Incluir Novo Pacote</span>
+                    <i class="fas fa-suitcase-rolling ms-2"></i>
+                  </button>
+                </div>
+
                 <!-- Tags de filtros ativos -->
                 <div class="active-filters-container" *ngIf="searchTerm || hasActiveFilters()">
                   <!-- Tag de busca -->

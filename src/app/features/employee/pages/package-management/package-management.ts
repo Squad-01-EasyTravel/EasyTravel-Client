@@ -875,32 +875,78 @@ export class PackageManagementComponent implements OnInit {
       // Criar novo pacote
       console.log('➕ Criando novo pacote');
       
-      // Aqui você implementaria a chamada para API de create
-      // this.service.createBundle(this.newPackage).subscribe({...})
+      // Converter rank para formato do backend
+      const backendRank = this.convertRankToBackend(this.newPackage.bundleRank || 'BRONZE');
       
-      const newId = Math.max(...this.packages.map(p => p.id), 0) + 1;
-      const packageToAdd: TravelPackage = {
-        ...this.newPackage,
-        id: newId,
-        createdAt: new Date(),
-        available: true,
-        bundleStatus: 'AVAILABLE',
-        travelersNumber: 1
-      } as TravelPackage;
+      // Preparar dados para criação (todos os campos obrigatórios)
+      const createData = {
+        bundleTitle: this.newPackage.bundleTitle || '',
+        bundleDescription: this.newPackage.bundleDescription || '',
+        initialPrice: this.newPackage.initialPrice || 0,
+        bundleRank: backendRank,
+        initialDate: this.newPackage.initialDate || '',
+        finalDate: this.newPackage.finalDate || '',
+        quantity: this.newPackage.quantity || 0,
+        travelersNumber: this.newPackage.travelersNumber || 1,
+        bundleStatus: this.newPackage.available ? 'AVAILABLE' : 'UNAVAILABLE'
+      };
+      
+      console.log('📤 Enviando dados de criação para API:', createData);
+      
+      // Fazer chamada para API de create
+      this.service.createBundle(createData).subscribe({
+        next: (createdBundle) => {
+          console.log('✅ Bundle criado com sucesso:', createdBundle);
+          
+          // Converter e adicionar na lista local
+          const newPackage: TravelPackage = {
+            id: createdBundle.id,
+            bundleTitle: createdBundle.bundleTitle,
+            bundleDescription: createdBundle.bundleDescription,
+            initialPrice: createdBundle.initialPrice,
+            bundleRank: this.mapBundleRank(createdBundle.bundleRank), // Converter de volta para frontend
+            initialDate: createdBundle.initialDate,
+            finalDate: createdBundle.finalDate,
+            quantity: createdBundle.quantity,
+            travelersNumber: createdBundle.travelersNumber,
+            bundleStatus: createdBundle.bundleStatus,
+            available: createdBundle.bundleStatus === 'AVAILABLE',
+            createdAt: new Date(),
+            imageUrl: this.newPackage.imageUrl || '/assets/imgs/fortaleza.jpg'
+          };
+          
+          this.packages.push(newPackage);
+          
+          // Resetar para primeira página se necessário
+          const totalPages = this.getTotalPages();
+          if (this.currentPage > totalPages) {
+            this.currentPage = Math.max(1, totalPages);
+          }
 
-      this.packages.push(packageToAdd);
-      
-      // Resetar para primeira página se necessário
-      const totalPages = this.getTotalPages();
-      if (this.currentPage > totalPages) {
-        this.currentPage = Math.max(1, totalPages);
-      }
-
-      this.closeModal();
-      
-      // Recarregar dados da API após salvar
-      console.log('🔄 Recarregando dados da API após operação...');
-      this.loadPackages();
+          this.closeModal();
+          
+          // Recarregar dados da API após criar
+          console.log('🔄 Recarregando dados da API após criação...');
+          this.loadPackages();
+          
+          // Mostrar mensagem de sucesso
+          alert('Pacote criado com sucesso!');
+        },
+        error: (error) => {
+          console.error('❌ Erro ao criar pacote:', error);
+          console.log('Status do erro:', error.status);
+          console.log('Mensagem do erro:', error.message);
+          
+          // Mostrar mensagem de erro
+          if (error.status === 400) {
+            alert('Dados inválidos. Verifique os campos e tente novamente.');
+          } else if (error.status === 403) {
+            alert('Você não tem permissão para criar pacotes.');
+          } else {
+            alert('Erro ao criar pacote. Tente novamente.');
+          }
+        }
+      });
     }
   }
 

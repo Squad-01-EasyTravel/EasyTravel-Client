@@ -49,6 +49,11 @@ export class BundleService {
     return this.http.get<BundleClass[]>(this.baseUrl);
   }
 
+  // Criar novo bundle
+  createBundle(bundle: Partial<BundleClass>): Observable<BundleClass> {
+    return this.http.post<BundleClass>(this.baseUrl, bundle);
+  }
+
   // Atualizar bundle existente
   updateBundle(id: number, bundle: Partial<BundleClass>): Observable<BundleClass> {
     const url = `${this.baseUrl}/${id}`;
