@@ -1,13 +1,21 @@
 /* ===== REVIEW MANAGEMENT - DESIGN SYSTEM PADRONIZADO ===== */
 
-/* ===== HERO SECTION ===== */
+/* ===== HERO SECTION - PADRONIZADO COM DASHBOARD ===== */
 .hero-section {
   position: relative;
   overflow: hidden;
   min-height: 60vh;
   display: flex;
   align-items: center;
-  margin-bottom: 2rem;
+  z-index: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  /* REMOVE QUALQUER ESPAÇAMENTO */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 1.5rem !important;
 }
 
 .hero-bg {
@@ -18,6 +26,8 @@
   bottom: 0;
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
   z-index: 1;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .hero-overlay {
@@ -28,6 +38,8 @@
   bottom: 0;
   background: rgba(255, 107, 53, 0.15);
   z-index: 2;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .hero-bg::before {
@@ -44,6 +56,22 @@
 .hero-content {
   position: relative;
   z-index: 4;
+}
+
+/* Garantir que conteúdo fique abaixo da sidebar */
+.hero-section .container-fluid {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10; /* Abaixo da sidebar mas acima do background */
 }
 
 /* Hero Badge */
@@ -725,11 +753,13 @@
   }
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
+/* ===== RESPONSIVE DESIGN - PADRONIZADO COM DASHBOARD ===== */
 @media (max-width: 768px) {
   .hero-section {
-    min-height: 50vh;
-    padding: 2rem 0;
+    min-height: 45vh;
+    text-align: center;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .hero-title {

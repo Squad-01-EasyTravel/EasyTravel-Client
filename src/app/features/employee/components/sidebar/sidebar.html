@@ -1,38 +1,36 @@
-<div class="sidebar">
+<div class="sidebar" [class.open]="isOpen">
+    <!-- Botão de fechar para mobile - SEM CLASSES BOOTSTRAP -->
+    <button class="sidebar-close" (click)="toggleSidebar()" type="button">
+      <i class="bi bi-x-lg"></i>
+    </button>
 
     <h1>EasyTravel</h1>
 
     <div class="sidebar-highlight d-flex align-items-center">
-
       <div class="highlight-bar me-2"></div>
       <h3 class="mb-0">Funcionário</h3>
     </div>
 
     <div class="sidebar-links">
-      <a routerLink="/admin/dashboard">
+      <a routerLink="/admin/dashboard" (click)="closeSidebarOnMobile()">
         <i class="bi bi-table"></i>
-        <span class="sidebar-icon placeholder-icon"></span>
-        Dashboard
+        <span class="link-text">Dashboard</span>
       </a>
-      <a routerLink="/employee/package-management">
+      <a routerLink="/employee/package-management" (click)="closeSidebarOnMobile()">
         <i class="bi bi-airplane-fill"></i>
-        <span class="sidebar-icon placeholder-icon"></span>
-        Pacotes
+        <span class="link-text">Pacotes</span>
       </a>
-      <a href="">
+      <a href="" (click)="closeSidebarOnMobile()">
         <i class="bi bi-person"></i>
-        <span class="sidebar-icon placeholder-icon"></span>
-        Clientes/Usuários
+        <span class="link-text">Usuários</span>
       </a>
-      <a routerLink="/employee/review-management">
+      <a routerLink="/employee/review-management" (click)="closeSidebarOnMobile()">
         <i class="bi bi-star-fill"></i>
-        <span class="sidebar-icon placeholder-icon"></span>
-        Avaliações
+        <span class="link-text">Avaliações</span>
       </a>
-      <a routerLink="/home">
+      <a routerLink="/home" (click)="closeSidebarOnMobile()">
         <i class="bi bi-house"></i>
-        <span class="sidebar-icon placeholder-icon"></span>
-        Voltar para pagina inicial
+        <span class="link-text">Home</span>
       </a>
     </div>
 </div>

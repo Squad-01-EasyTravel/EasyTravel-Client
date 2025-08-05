@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Sidebar } from './components/sidebar/sidebar';
@@ -7,6 +7,13 @@ import { Sidebar } from './components/sidebar/sidebar';
   selector: 'app-employee-layout',
   standalone: true,
   imports: [CommonModule, RouterModule, Sidebar],
-  templateUrl: './employee-layout.html'
+  templateUrl: './employee-layout.html',
+  styleUrl: './employee-layout.css'
 })
-export class EmployeeLayoutComponent {}
+export class EmployeeLayoutComponent {
+  @ViewChild('sidebar') sidebar!: Sidebar;
+
+  toggleSidebar() {
+    this.sidebar.toggleSidebar();
+  }
+}

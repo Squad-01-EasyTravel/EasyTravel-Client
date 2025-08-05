@@ -306,13 +306,24 @@
   }
 }
 
-/* Hero Section Styles */
+/* =================================
+   HERO SECTION STYLES - PADRONIZADO COM DASHBOARD
+================================= */
 .hero-section {
   position: relative;
   overflow: hidden;
   min-height: 60vh;
   display: flex;
   align-items: center;
+  z-index: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  /* REMOVE QUALQUER ESPAÇAMENTO */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 1.5rem !important;
 }
 
 .hero-bg {
@@ -323,6 +334,8 @@
   bottom: 0;
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
   z-index: 1;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .hero-overlay {
@@ -333,6 +346,24 @@
   bottom: 0;
   background: rgba(255, 107, 53, 0.15);
   z-index: 2;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Garantir que conteúdo fique abaixo da sidebar */
+.hero-section .container-fluid {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10; /* Abaixo da sidebar mas acima do background */
 }
 
 .hero-bg::before {
@@ -344,11 +375,6 @@
   bottom: 0;
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="hero-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23hero-pattern)"/></svg>');
   z-index: 3;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 4;
 }
 
 /* Hero Badge Animation */
@@ -390,12 +416,28 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.stats-card:hover::before {
+  left: 100%;
 }
 
 .stats-card:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.25) !important;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .stats-number {
@@ -465,23 +507,20 @@
   font-size: 1.5rem;
 }
 
-.element-1 {
-  top: -30px;
-  left: -30px;
-  animation: float 6s ease-in-out infinite;
+/* Hero Image Container Simplificado */
+.hero-image-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.element-2 {
-  top: -50px;
-  right: -40px;
-  animation: float 6s ease-in-out infinite 2s;
-}
-
-.element-3 {
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: float 6s ease-in-out infinite 4s;
+.hero-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Search Section */
@@ -859,18 +898,26 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* Responsive Design */
+/* Responsive Design - Padronizado com Dashboard */
 @media (max-width: 768px) {
   .hero-section {
-    min-height: 50vh;
+    min-height: 45vh;
     text-align: center;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .hero-title {
     font-size: 2.5rem;
   }
 
+  .hero-stats {
+    margin-top: 2rem;
+  }
+
   .hero-stats .col-4 {
+    flex: 0 0 50%;
+    max-width: 50%;
     margin-bottom: 1rem;
   }
 
@@ -1061,43 +1108,6 @@
   animation: float 3s ease-in-out infinite;
 }
 
-.floating-icons {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.floating-icons i {
-  position: absolute;
-  font-size: 1.5rem;
-  color: var(--secondary-color);
-  opacity: 0.7;
-}
-
-.icon-1 {
-  top: 10%;
-  left: 10%;
-  animation: float 2s ease-in-out infinite 0.5s;
-}
-
-.icon-2 {
-  top: 20%;
-  right: 15%;
-  animation: float 2.5s ease-in-out infinite 1s;
-}
-
-.icon-3 {
-  bottom: 25%;
-  left: 5%;
-  animation: float 2.8s ease-in-out infinite 1.5s;
-}
-
-.icon-4 {
-  bottom: 15%;
-  right: 10%;
-  animation: float 3.2s ease-in-out infinite 2s;
-}
-
 .empty-title {
   font-size: 2.5rem;
   background: linear-gradient(135deg, var(--text-color), var(--primary-color));
@@ -1189,10 +1199,6 @@
 
   .main-illustration {
     font-size: 3rem;
-  }
-
-  .floating-icons i {
-    font-size: 1.2rem;
   }
 
   .illustration-container {

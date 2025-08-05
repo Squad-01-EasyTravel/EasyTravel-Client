@@ -1,5 +1,5 @@
 import { Sidebar } from '@/app/features/employee/components/sidebar/sidebar';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -9,5 +9,9 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './admin-dashboard.css'
 })
 export class AdminDashboard {
+  @ViewChild('sidebar') sidebar!: Sidebar;
 
+  toggleSidebar() {
+    this.sidebar.toggleSidebar();
+  }
 }
