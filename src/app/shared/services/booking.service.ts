@@ -142,22 +142,28 @@ export class BookingService {
 
   // Mapear dados da API para o formato usado na interface
   private mapReservationsToBookedTrips(reservations: Reservation[]): BookedTrip[] {
-    return reservations.map(reservation => ({
-      id: reservation.id.toString(),
-      imageUrl: '', // Será preenchida via API de imagens
-      origin: '', // Será preenchida via API de localizações do pacote
-      destination: '', // Será preenchida via API de localizações do pacote
-      departureDate: this.formatDateToString(reservation.bundle.initialDate),
-      returnDate: this.formatDateToString(reservation.bundle.finalDate),
-      status: this.mapReservationStatus(reservation.reservStatus),
-      orderId: `#${reservation.id}`,
-      price: reservation.bundle.initialPrice,
-      duration: this.calculateDuration(reservation.bundle.initialDate, reservation.bundle.finalDate),
-      paymentMethod: '', // Será implementado conforme necessário
-      rating: 0, // Será implementado conforme necessário
-      description: reservation.bundle.bundleDescription,
-      bundleId: reservation.bundleId // Adicionar para buscar imagem e localização
-    }));
+    return reservations.map(reservation => {
+      const mappedTrip = {
+        id: reservation.id.toString(),
+        imageUrl: '', // Será preenchida via API de imagens
+        origin: '', // Será preenchida via API de localizações do pacote
+        destination: '', // Será preenchida via API de localizações do pacote
+        departureDate: this.formatDateToString(reservation.bundle.initialDate),
+        returnDate: this.formatDateToString(reservation.bundle.finalDate),
+        status: this.mapReservationStatus(reservation.reservStatus),
+        orderId: `#${reservation.id}`,
+        price: reservation.bundle.initialPrice,
+        duration: this.calculateDuration(reservation.bundle.initialDate, reservation.bundle.finalDate),
+        paymentMethod: '', // Será implementado conforme necessário
+        rating: 0, // Será implementado conforme necessário
+        description: reservation.bundle.bundleDescription,
+        bundleId: reservation.bundleId, // Adicionar para buscar imagem e localização
+        maxTravelers: reservation.bundle.travelersNumber // Número máximo de viajantes permitidos
+      };
+      
+      console.log(`🧑‍🤝‍🧑 Reserva ${reservation.id}: Máx. ${reservation.bundle.travelersNumber} viajantes`);
+      return mappedTrip;
+    });
   }
 
   private mapReservationStatus(status: string): 'Confirmado' | 'Pendente' | 'Cancelado' {
@@ -279,5 +285,79 @@ export class BookingService {
     
     // Se for um caminho sem barra inicial, adicionar barra e base URL
     return `${this.BACKEND_BASE_URL}/${cleanUrl}`;
+  }
+
+  // Método para verificar se o usuário já possui o pacote
+  checkIfUserHasPackage(bundleId: number): Observable<boolean> {
+    return this.getMyReservations().pipe(
+      map((reservations: any[]) => {
+        const hasPackage = reservations.some(reservation => 
+          reservation.bundleId === bundleId
+        );
+        console.log(`🔍 Verificando se usuário já possui bundle ${bundleId}:`, hasPackage);
+        return hasPackage;
+      }),
+      catchError((error) => {
+        console.error('❌ Erro ao verificar pacotes do usuário:', error);
+        return of(false); // Em caso de erro, assume que não possui
+      })
+    );
+  }
+
+  // Método para criar uma nova reserva
+  createReservation(bundleId: number): Observable<any> {
+    console.log('🔄 Criando reserva para bundle:', bundleId);
+    
+    if (!this.authService.isAuthenticated()) {
+      console.error('❌ Usuário não autenticado para criar reserva');
+      throw new Error('Usuário não autenticado');
+    }
+
+    const user = this.authService.getCurrentUser();
+    const token = this.authService.getToken();
+    
+    if (!user || !token) {
+      console.error('❌ Dados de usuário ou token não encontrados');
+      throw new Error('Dados de autenticação inválidos');
+    }
+
+    const url = `${this.baseUrl}/reservations`;
+    
+    const reservationData = {
+      reservDate: new Date().toISOString(),
+      userId: user.id,
+      bundleId: bundleId
+    };
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    
+    console.log('📤 Enviando reserva:', {
+      url,
+      data: reservationData,
+      headers: { Authorization: `Bearer ${token ? token.substring(0, 20) + '...' : 'null'}` }
+    });
+    
+    return this.http.post(url, reservationData, { headers }).pipe(
+      map((response: any) => {
+        console.log('✅ Reserva criada com sucesso:', response);
+        return response;
+      }),
+      catchError((error) => {
+        console.error('❌ Erro ao criar reserva:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.message,
+          error: error.error,
+          url: url,
+          data: reservationData,
+          user: user,
+          token: token ? `${token.substring(0, 20)}...` : 'null'
+        });
+        throw error;
+      })
+    );
   }
 }

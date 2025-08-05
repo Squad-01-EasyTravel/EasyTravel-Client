@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { BookingService } from '@/app/shared/services/booking.service';
+import { NotificationService } from '@/app/shared/services/notification.service';
 
 @Component({
   selector: 'app-card',
@@ -9,7 +11,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
   styleUrl: './card.css'
 })
 export class Card implements OnInit {
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute, 
+    private router: Router,
+    private bookingService: BookingService,
+    private notificationService: NotificationService
+  ) {}
 
   @Input() pacote!: any; // Aceita o objeto processado com dados da API
 
@@ -37,6 +44,125 @@ export class Card implements OnInit {
     this.router.navigate(['/bundles/details-bundle', this.pacote.id]).then(() => {
       // Garantir que a página comece do topo
       window.scrollTo(0, 0);
+    });
+  }
+
+  // NOVO MÉTODO: Adicionar ao carrinho e criar reserva na API
+  addToCart(): void {
+    console.log('🛒 CARD: Adicionando pacote ao carrinho:', this.pacote);
+    console.log('🛒 CARD: Bundle ID:', this.pacote.id);
+    
+    // 1. PRIMEIRO: Verificar se o usuário já possui este pacote
+    this.bookingService.checkIfUserHasPackage(this.pacote.id).subscribe({
+      next: (hasPackage: boolean) => {
+        if (hasPackage) {
+          // Usuário já possui o pacote
+          this.notificationService.showWarning(
+            'Pacote já adicionado!',
+            'Você já possui esse pacote no seu carrinho'
+          );
+          console.log('⚠️ CARD: Usuário já possui este pacote');
+          return;
+        }
+        
+        // 2. USUÁRIO NÃO POSSUI: Criar reserva na API
+        this.createNewReservation();
+      },
+      error: (error: any) => {
+        console.error('❌ CARD: Erro ao verificar pacotes:', error);
+        // Em caso de erro na verificação, tenta criar mesmo assim
+        this.createNewReservation();
+      }
+    });
+  }
+
+  private createNewReservation(): void {
+    this.bookingService.createReservation(this.pacote.id).subscribe({
+      next: (reservationResponse: any) => {
+        console.log('✅ CARD: Reserva criada com sucesso:', reservationResponse);
+        
+        // Mostrar notificação de sucesso
+        this.notificationService.showSuccess(
+          'Pacote adicionado!',
+          'Pacote adicionado às suas reservas com sucesso'
+        );
+        
+        // Redirecionar para booking com dados do pacote
+        this.redirectToBooking();
+      },
+      error: (error: any) => {
+        console.error('❌ CARD: Erro ao criar reserva:', error);
+        
+        // Verificar se é erro de autenticação
+        if (error.status === 403) {
+          this.notificationService.showError(
+            'Acesso negado',
+            'Você não tem permissão para criar reservas. Verifique sua autenticação.'
+          );
+          return;
+        }
+        
+        if (error.status === 401) {
+          this.notificationService.showError(
+            'Não autorizado',
+            'Sua sessão expirou. Faça login novamente.'
+          );
+          return;
+        }
+        
+        // Outros erros
+        this.notificationService.showError(
+          'Erro ao criar reserva',
+          `Erro ${error.status}: ${error.error?.message || error.message}. Tente novamente.`
+        );
+        
+        // Em caso de erro, ainda redireciona para não travar o fluxo
+        this.redirectToBooking();
+      }
+    });
+  }
+
+  // Método para redirecionar para booking com dados do pacote
+  private redirectToBooking(): void {
+    // Buscar o título correto de diferentes possibilidades
+    const packageTitle = this.pacote.bundleTitle || 
+                        this.pacote.title || 
+                        this.pacote.locationName || 
+                        this.pacote.bundleName || 
+                        this.pacote.destination ||
+                        'Pacote Selecionado';
+
+    const reservationData = {
+      id: this.pacote.id,
+      bundleId: this.pacote.id, // ID do bundle para buscar dados reais da API
+      title: packageTitle,
+      imageUrl: this.pacote.image,
+      startDate: this.formatDateForBooking(new Date()), // Data atual como padrão
+      endDate: this.formatDateForBooking(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)), // +7 dias
+      travelers: 1, // Padrão 1 viajante
+      duration: this.pacote.duration || 7,
+      description: this.pacote.description || this.pacote.bundleDescription || 'Pacote de viagem incrível',
+      price: this.pacote.initialPrice || this.pacote.bundlePrice || 2000
+    };
+
+    console.log('🛒 CARD: Dados de reserva criados:', reservationData);
+    console.log('🛒 CARD: Título definido como:', packageTitle);
+    console.log('🚀 CARD: Redirecionando para /booking...');
+
+    // Navegar para booking com os dados (igual ao my-booking)
+    this.router.navigate(['/booking'], {
+      state: {
+        reservationData: reservationData
+      }
+    });
+  }
+
+  // Método auxiliar para formatar data para booking
+  private formatDateForBooking(date: Date): string {
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     });
   }
 

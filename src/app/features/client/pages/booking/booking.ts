@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Navbar } from "../../../../shared/navbar/navbar";
 import { Footer } from "../../../../shared/footer/footer";
 import { CurrentUser } from './classe/current-user';
@@ -9,6 +10,7 @@ import { BookingService } from '@/app/shared/services/booking.service';
 import { BundleService } from '@/app/shared/services/bundle-service';
 import { BundleClass } from '../bundle/class/bundle-class';
 import { AuthService } from '@/app/shared/services/auth.service';
+import { NotificationService } from '@/app/shared/services/notification.service';
 
 interface ReservationData {
   id: string;
@@ -61,12 +63,17 @@ interface TravelerInfo {
   email: string;
   phone: string;
   editing: boolean;
+  
+  // Novos campos para a API /api/travelers
+  documentNumber: string;
+  documentType: 'CPF' | 'PASSPORT';
+  age: number;
 }
 
 @Component({
   selector: 'app-booking',
   standalone: true,
-  imports: [CommonModule, FormsModule, Navbar, Footer],
+  imports: [CommonModule, FormsModule, HttpClientModule, Navbar, Footer],
   templateUrl: './booking.html',
   styleUrl: './booking.css'
 })
@@ -122,6 +129,15 @@ export class Booking implements OnInit {
   bundleLocationName: string = '';
   realBundleData: any = null;
 
+  // Lista de viajantes já cadastrados na reserva
+  registeredTravelers: any[] = [];
+
+  // Controle de edição dos viajantes cadastrados
+  editingRegisteredTravelers: { [travelerId: string]: boolean } = {};
+
+  // Controle de confirmação de exclusão dos viajantes cadastrados
+  deletingRegisteredTravelers: { [travelerId: string]: boolean } = {};
+
   // Informações dos viajantes extras para o pacote único
   travelersInfoByPackage: { [packageId: string]: TravelerInfo[] } = {};
   totalPrice: string = '0,00';
@@ -141,9 +157,15 @@ export class Booking implements OnInit {
     const finalCategory = this.getFinalCategoryFromBundle();
     const finalRating = this.getFinalRatingFromBundle();
     
+    // Buscar o melhor título possível
+    const packageTitle = packageData.title || 
+                        this.currentBundle?.bundleTitle || 
+                        this.bundleLocationName ||
+                        'Pacote Selecionado';
+    
     this.selectedPackageData = {
       id: packageData.id?.toString() || this.currentBundle?.id?.toString() || '1',
-      title: packageData.title || this.currentBundle?.bundleTitle || '',
+      title: packageTitle,
       category: finalCategory,
       imageUrl: packageData.imageUrl || this.currentBundle?.imageUrl || '/assets/imgs/fortaleza.jpg',
       rating: finalRating,
@@ -166,13 +188,17 @@ export class Booking implements OnInit {
     };
     
     console.log('✅ Dados do pacote selecionado definidos com rank da API:', this.selectedPackageData);
+    console.log('📝 Título definido como:', packageTitle);
     console.log('📊 Rank do bundle:', finalCategory, 'Rating calculado:', finalRating);
   }
 
   constructor(
     private router: Router,
     private service: BookingService,
-    private bundleService: BundleService, private authService: AuthService
+    private bundleService: BundleService, 
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private http: HttpClient
   ) {}
 
   currentUser: CurrentUser = new CurrentUser();
@@ -181,11 +207,17 @@ export class Booking implements OnInit {
   ngOnInit(): void {
     console.log('🚀 Iniciando ngOnInit...');
     
+    // Carregar dados do perfil do usuário
+    this.loadUserProfile();
+    
     // Verificar se há dados de reserva vindos da navegação
     const navigationState = this.router.getCurrentNavigation()?.extras?.state || history.state;
     if (navigationState && navigationState['reservationData']) {
       this.reservationData = navigationState['reservationData'];
       console.log('📦 Dados da reserva recebidos:', this.reservationData);
+      
+      // AGORA que temos os dados da reserva, carregar viajantes já cadastrados
+      this.loadRegisteredTravelers();
       
       // Se temos bundleId, buscar dados REAIS da API (igual à página home)
       if (this.reservationData && this.reservationData.bundleId) {
@@ -197,6 +229,9 @@ export class Booking implements OnInit {
         this.initializeTravelersForCurrentPackage();
         this.calculateTotalPrice();
         this.loadBookingData();
+        
+        // IMPORTANTE: Carregar viajantes já cadastrados na reserva
+        this.loadRegisteredTravelers();
       }
       return; // Sair aqui para evitar outras requisições desnecessárias
     }
@@ -364,7 +399,11 @@ export class Booking implements OnInit {
         rg: '',
         email: '',
         phone: '',
-        editing: false
+        editing: false,
+        // Novos campos para a API
+        documentNumber: '',
+        documentType: 'CPF',
+        age: 0
       });
     }
   }
@@ -374,13 +413,390 @@ export class Booking implements OnInit {
   }
 
   saveTraveler(index: number): void {
-    this.travelersInfoByPackage[this.currentPackage.id][index].editing = false;
-    console.log('Traveler saved:', this.travelersInfoByPackage[this.currentPackage.id][index]);
+    const traveler = this.travelersInfoByPackage[this.currentPackage.id][index];
+    
+    // Validar se todos os campos obrigatórios estão preenchidos
+    if (!traveler.fullName || !traveler.documentNumber || !traveler.documentType || !traveler.age) {
+      this.notificationService.showWarning('Campos obrigatórios', 'Por favor, preencha todos os campos obrigatórios');
+      return;
+    }
+
+    // Obter o ID da reserva
+    const reservationId = this.reservationData?.id;
+    if (!reservationId) {
+      this.notificationService.showError('Erro', 'ID da reserva não encontrado');
+      return;
+    }
+
+    // Preparar dados para envio à API
+    const travelerData = {
+      fullName: traveler.fullName,
+      documentNumber: traveler.documentNumber,
+      documentType: traveler.documentType,
+      age: traveler.age,
+      reservationId: parseInt(reservationId) // Converter para número se necessário
+    };
+
+    console.log('📝 Enviando viajante para API:', travelerData);
+
+    // Fazer requisição POST para /api/travelers
+    this.http.post<any>('http://localhost:8080/api/travelers', travelerData).subscribe({
+      next: (response) => {
+        console.log('✅ Viajante adicionado com sucesso:', response);
+        
+        // Atualizar o estado local
+        traveler.editing = false;
+        
+        // Recarregar a lista de viajantes cadastrados
+        this.loadRegisteredTravelers();
+        
+        // Mostrar notificação de sucesso
+        this.notificationService.showSuccess(
+          'Viajante adicionado!', 
+          `${traveler.fullName} foi adicionado à reserva com sucesso`
+        );
+      },
+      error: (error) => {
+        console.error('❌ Erro ao adicionar viajante:', error);
+        this.notificationService.showError(
+          'Erro ao adicionar viajante', 
+          'Não foi possível adicionar o viajante à reserva. Tente novamente.'
+        );
+      }
+    });
   }
 
   cancelEdit(index: number): void {
     this.travelersInfoByPackage[this.currentPackage.id][index].editing = false;
     // Restaurar dados originais se necessário
+  }
+
+  /**
+   * Inicia a edição de um viajante já cadastrado na reserva
+   */
+  editRegisteredTraveler(traveler: any): void {
+    this.editingRegisteredTravelers[traveler.id] = true;
+    console.log('✏️ Iniciando edição do viajante cadastrado:', traveler);
+  }
+
+  /**
+   * Atualiza um viajante já cadastrado na reserva usando PUT /api/travelers/{id}
+   */
+  updateRegisteredTraveler(traveler: any): void {
+    // Validar se todos os campos obrigatórios estão preenchidos
+    if (!traveler.fullName || !traveler.documentNumber || !traveler.documentType || !traveler.age) {
+      this.notificationService.showWarning('Campos obrigatórios', 'Por favor, preencha todos os campos obrigatórios');
+      return;
+    }
+
+    // Preparar dados para envio à API (sem alterar o reservationId)
+    const travelerData = {
+      fullName: traveler.fullName,
+      documentNumber: traveler.documentNumber,
+      documentType: traveler.documentType,
+      age: traveler.age,
+      reservationId: traveler.reservationId // Manter o reservationId original
+    };
+
+    console.log('📝 Atualizando viajante cadastrado ID:', traveler.id);
+    console.log('📋 Dados para atualização:', travelerData);
+
+    // Fazer requisição PUT para /api/travelers/{id}
+    this.http.put<any>(`http://localhost:8080/api/travelers/${traveler.id}`, travelerData).subscribe({
+      next: (response) => {
+        console.log('✅ Viajante atualizado com sucesso:', response);
+        
+        // Parar o modo de edição
+        this.editingRegisteredTravelers[traveler.id] = false;
+        
+        // Recarregar a lista de viajantes cadastrados para refletir as mudanças
+        this.loadRegisteredTravelers();
+        
+        // Mostrar notificação de sucesso
+        this.notificationService.showSuccess(
+          'Usuário editado com sucesso', 
+          `Os dados de ${traveler.fullName} foram atualizados com sucesso`
+        );
+      },
+      error: (error) => {
+        console.error('❌ Erro ao atualizar viajante:', error);
+        this.notificationService.showError(
+          'Erro ao atualizar viajante', 
+          'Não foi possível atualizar os dados do viajante. Tente novamente.'
+        );
+      }
+    });
+  }
+
+  /**
+   * Cancela a edição de um viajante já cadastrado
+   */
+  cancelEditRegisteredTraveler(traveler: any): void {
+    this.editingRegisteredTravelers[traveler.id] = false;
+    
+    // Recarregar os dados originais para desfazer as alterações
+    this.loadRegisteredTravelers();
+    
+    console.log('❌ Edição cancelada para o viajante:', traveler.fullName);
+  }
+
+  /**
+   * Ativa o modo de confirmação de exclusão no card do viajante
+   */
+  deleteRegisteredTraveler(traveler: any): void {
+    console.log('🗑️ Ativando modo de confirmação de exclusão para:', traveler.fullName);
+    
+    // Ativar modo de confirmação de exclusão para este viajante
+    this.deletingRegisteredTravelers[traveler.id] = true;
+    
+    // Desativar modo de edição se estiver ativo
+    this.editingRegisteredTravelers[traveler.id] = false;
+  }
+
+  /**
+   * Cancela o modo de confirmação de exclusão
+   */
+  cancelDeleteRegisteredTraveler(traveler: any): void {
+    console.log('❌ Cancelando exclusão do viajante:', traveler.fullName);
+    this.deletingRegisteredTravelers[traveler.id] = false;
+  }
+
+  /**
+   * Confirma e executa a exclusão do viajante
+   */
+  confirmDeleteRegisteredTraveler(traveler: any): void {
+    console.log('🗑️ Confirmando exclusão do viajante:', traveler.fullName);
+    
+    // Desativar modo de confirmação
+    this.deletingRegisteredTravelers[traveler.id] = false;
+    
+    // Executar a exclusão
+    this.executeDeleteTraveler(traveler);
+  }
+
+  /**
+   * Executa a exclusão do viajante na API
+   */
+  private executeDeleteTraveler(traveler: any): void {
+    console.log('🗑️ Deletando viajante cadastrado ID:', traveler.id);
+    console.log('👤 Viajante a ser deletado:', traveler);
+
+    // Fazer requisição DELETE para /api/travelers/{id}
+    this.http.delete<any>(`http://localhost:8080/api/travelers/${traveler.id}`).subscribe({
+      next: (response) => {
+        console.log('✅ Viajante deletado com sucesso:', response);
+        
+        // Recarregar a lista de viajantes cadastrados para refletir a exclusão
+        this.loadRegisteredTravelers();
+        
+        // Mostrar notificação de sucesso personalizada
+        this.showDeleteSuccessNotification(traveler.fullName);
+      },
+      error: (error) => {
+        console.error('❌ Erro ao deletar viajante:', error);
+        this.notificationService.showError(
+          'Erro ao remover viajante', 
+          'Não foi possível remover o viajante da reserva. Tente novamente.'
+        );
+      }
+    });
+  }
+
+  /**
+   * Exibe confirmação personalizada para exclusão de viajante
+   */
+  private showDeleteConfirmation(traveler: any): void {
+    // Remover qualquer modal anterior que possa existir
+    const existingModal = document.querySelector('.delete-confirmation-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Evitar scroll do body enquanto modal está aberto
+    document.body.classList.add('modal-open');
+
+    // Criar elemento do modal de confirmação com melhor estrutura
+    const modal = document.createElement('div');
+    modal.className = 'delete-confirmation-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0'; 
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.zIndex = '999999';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    
+    modal.innerHTML = `
+      <div class="delete-confirmation-overlay"></div>
+      <div class="delete-confirmation-content">
+        <div class="delete-confirmation-header">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Confirmar Exclusão</h3>
+        </div>
+        <div class="delete-confirmation-body">
+          <p>Tem certeza que deseja remover <strong>${traveler.fullName}</strong> da reserva?</p>
+          <p class="warning-text">Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="delete-confirmation-actions">
+          <button class="btn-confirm-delete" data-action="confirm">
+            <i class="fas fa-trash"></i>
+            Sim, Remover
+          </button>
+          <button class="btn-cancel-delete" data-action="cancel">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Adicionar modal ao body no final da árvore DOM
+    document.body.appendChild(modal);
+    console.log('🎭 Modal de confirmação criado e adicionado ao DOM:', modal);
+    console.log('📍 Posição do modal no DOM:', modal.getBoundingClientRect());
+
+    // Garantir que o modal seja renderizado usando requestAnimationFrame
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // Forçar reflow para garantir que o elemento seja renderizado
+        modal.offsetHeight;
+        console.log('🔄 Forçando reflow do modal');
+        
+        // Verificar se o modal está sendo exibido corretamente
+        const computedStyle = window.getComputedStyle(modal);
+        console.log('🎨 Estilos computados do modal:', {
+          position: computedStyle.position,
+          zIndex: computedStyle.zIndex,
+          display: computedStyle.display,
+          visibility: computedStyle.visibility,
+          opacity: computedStyle.opacity
+        });
+      });
+    });
+
+    // Adicionar event listeners
+    const confirmBtn = modal.querySelector('.btn-confirm-delete') as HTMLElement;
+    const cancelBtn = modal.querySelector('.btn-cancel-delete') as HTMLElement;
+    const overlay = modal.querySelector('.delete-confirmation-overlay') as HTMLElement;
+
+    console.log('🔍 Elementos do modal encontrados:', { confirmBtn, cancelBtn, overlay });
+
+    const handleConfirm = () => {
+      this.confirmDeleteTraveler(traveler);
+      this.closeDeleteModal(modal);
+    };
+
+    const handleCancel = () => {
+      console.log('❌ Exclusão cancelada pelo usuário');
+      this.closeDeleteModal(modal);
+    };
+
+    confirmBtn.addEventListener('click', handleConfirm);
+    cancelBtn.addEventListener('click', handleCancel);
+    overlay.addEventListener('click', handleCancel);
+
+    // Adicionar classe para animação com delay maior
+    setTimeout(() => {
+      modal.classList.add('show');
+      console.log('✨ Modal de confirmação exibido com classe "show"');
+      console.log('🔧 Posição após mostrar:', modal.getBoundingClientRect());
+    }, 50);
+  }
+
+  /**
+   * Confirma e executa a exclusão do viajante
+   */
+  private confirmDeleteTraveler(traveler: any): void {
+    console.log('🗑️ Deletando viajante cadastrado ID:', traveler.id);
+    console.log('👤 Viajante a ser deletado:', traveler);
+
+    // Fazer requisição DELETE para /api/travelers/{id}
+    this.http.delete<any>(`http://localhost:8080/api/travelers/${traveler.id}`).subscribe({
+      next: (response) => {
+        console.log('✅ Viajante deletado com sucesso:', response);
+        
+        // Recarregar a lista de viajantes cadastrados para refletir a exclusão
+        this.loadRegisteredTravelers();
+        
+        // Mostrar notificação de sucesso personalizada
+        this.showDeleteSuccessNotification(traveler.fullName);
+      },
+      error: (error) => {
+        console.error('❌ Erro ao deletar viajante:', error);
+        this.notificationService.showError(
+          'Erro ao remover viajante', 
+          'Não foi possível remover o viajante da reserva. Tente novamente.'
+        );
+      }
+    });
+  }
+
+  /**
+   * Fecha o modal de confirmação de exclusão
+   */
+  private closeDeleteModal(modal: HTMLElement): void {
+    // Restaurar scroll do body
+    document.body.classList.remove('modal-open');
+    
+    modal.classList.remove('show');
+    setTimeout(() => {
+      if (modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+      }
+    }, 300);
+  }
+
+  /**
+   * Exibe notificação de sucesso personalizada após exclusão
+   */
+  private showDeleteSuccessNotification(travelerName: string): void {
+    // Criar elemento da notificação de sucesso com overlay
+    const notification = document.createElement('div');
+    notification.className = 'delete-success-notification';
+    notification.innerHTML = `
+      <div class="delete-success-overlay"></div>
+      <div class="delete-success-content">
+        <div class="delete-success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="delete-success-text">
+          <h4>Viajante Removido!</h4>
+          <p><strong>${travelerName}</strong> foi removido da reserva com sucesso</p>
+        </div>
+      </div>
+    `;
+
+    // Adicionar notificação ao body
+    document.body.appendChild(notification);
+
+    // Mostrar com animação
+    setTimeout(() => notification.classList.add('show'), 10);
+
+    // Remover após 5 segundos com clique no overlay
+    const overlay = notification.querySelector('.delete-success-overlay') as HTMLElement;
+    const autoHide = setTimeout(() => {
+      this.hideDeleteSuccessNotification(notification);
+    }, 5000);
+
+    // Permitir fechar clicando no overlay
+    overlay.addEventListener('click', () => {
+      clearTimeout(autoHide);
+      this.hideDeleteSuccessNotification(notification);
+    });
+  }
+
+  /**
+   * Oculta a notificação de sucesso com animação
+   */
+  private hideDeleteSuccessNotification(notification: HTMLElement): void {
+    notification.classList.remove('show');
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 400);
   }
 
   allTravelersCompleted(): boolean {
@@ -393,21 +809,92 @@ export class Booking implements OnInit {
     const travelers = this.travelersInfoByPackage[this.currentPackage.id] || [];
     return travelers.every(traveler => {
       return traveler.fullName &&
-             traveler.birthDate &&
-             traveler.cpf &&
-             traveler.rg &&
-             traveler.email &&
-             traveler.phone;
+             traveler.documentNumber &&
+             traveler.documentType &&
+             traveler.age > 0;
     });
   }
 
   updateTravelerCount(newCount: number): void {
-    if (newCount < 1) newCount = 1;
-    if (newCount > 10) newCount = 10; // Limite máximo
+    // Obter informações necessárias para o cálculo
+    const maxTravelers = this.getMaxTravelers();
+    const registeredCount = this.registeredTravelers.length;
+    const titularCount = 1; // Sempre há 1 titular (usuário logado)
+    const totalOccupied = titularCount + registeredCount;
+    const availableSlots = Math.max(0, maxTravelers - totalOccupied);
+    
+    console.log(`🧳 === ATUALIZAÇÃO DE VIAJANTES (COM CONTROLE INTELIGENTE) ===`);
+    console.log(`📊 Contagem solicitada: ${newCount}`);
+    console.log(`👑 Titular: ${titularCount}`);
+    console.log(`✅ Já cadastrados: ${registeredCount}`);
+    console.log(`📈 Máximo permitido: ${maxTravelers}`);
+    console.log(`� Total ocupado: ${totalOccupied}`);
+    console.log(`🆓 Slots disponíveis: ${availableSlots}`);
+    
+    // O newCount representa o total de viajantes desejado (incluindo titular)
+    // Mas precisamos considerar que já temos viajantes cadastrados
+    
+    if (newCount < 1) {
+      console.log('⚠️ Não é possível ter menos de 1 viajante');
+      this.notificationService.showWarning('Limite mínimo', 'Número mínimo de viajantes é 1');
+      newCount = 1;
+    }
+    
+    // Verificar se o total solicitado excede o máximo permitido
+    if (newCount > maxTravelers) {
+      console.log(`🚫 LIMITE ULTRAPASSADO! Solicitado: ${newCount}, Máximo: ${maxTravelers}`);
+      this.notificationService.showWarning('Limite máximo', `Este pacote permite no máximo ${maxTravelers} viajantes`);
+      newCount = maxTravelers;
+    }
+    
+    // Verificar se já atingimos o limite com os viajantes cadastrados
+    if (totalOccupied >= maxTravelers) {
+      console.log(`⚠️ Limite já atingido! Cadastrados: ${totalOccupied}, Máximo: ${maxTravelers}`);
+      this.notificationService.showWarning(
+        'Limite atingido', 
+        `Você já possui ${totalOccupied} viajante(s) cadastrado(s). O máximo para este pacote é ${maxTravelers}.`
+      );
+      newCount = totalOccupied;
+    }
 
+    // Atualizar o currentPackage e reinicializar viajantes
     this.currentPackage.travelers = newCount;
-    this.initializeTravelersForCurrentPackage();
+    console.log(`✅ Contagem de viajantes definida para: ${newCount}`);
+    
+    // Reinicializar formulários de viajantes baseado nos slots disponíveis reais
+    const newAvailableSlots = Math.max(0, newCount - totalOccupied);
+    this.initializeTravelersBasedOnAvailableSlots(newAvailableSlots);
     this.calculateTotalPrice();
+  }
+
+  getMaxTravelers(): number {
+    // Tentar obter o limite do currentBundle primeiro
+    let maxTravelers = this.currentBundle?.travelersNumber;
+    
+    // Se não encontrar no currentBundle, tentar no realBundleData
+    if (!maxTravelers && this.realBundleData) {
+      maxTravelers = this.realBundleData.travelersNumber || 
+                    this.realBundleData.maxTravelers || 
+                    this.realBundleData.travelers ||
+                    this.realBundleData.maxViajantes ||
+                    this.realBundleData.numeroViajantes;
+    }
+    
+    // Se ainda não encontrar, usar fallback de 10
+    if (!maxTravelers || maxTravelers <= 0) {
+      maxTravelers = 10;
+      console.log('⚠️ Usando fallback de 10 viajantes - campo não encontrado na API');
+    }
+    
+    console.log('🔍 getMaxTravelers() análise:', {
+      currentBundle: this.currentBundle,
+      realBundleData: this.realBundleData,
+      currentBundleTravelersNumber: this.currentBundle?.travelersNumber,
+      realBundleTravelersNumber: this.realBundleData?.travelersNumber,
+      finalMaxTravelers: maxTravelers
+    });
+    
+    return maxTravelers;
   }
 
   // Função removida já que não trabalhamos mais com seleção múltipla
@@ -425,7 +912,12 @@ export class Booking implements OnInit {
 
   getFormattedBasePrice(pkg: SelectedPackage): string {
     const basePricePerPerson = parseFloat(pkg.basePrice.replace(/[.,]/g, '')) / 100;
-    const totalBasePrice = basePricePerPerson * pkg.travelers;
+    // Usar o número real de viajantes (titular + cadastrados)
+    const totalTravelers = this.getTotalOccupiedSlots();
+    const totalBasePrice = basePricePerPerson * totalTravelers;
+    console.log('getFormattedBasePrice - Base price per person:', basePricePerPerson);
+    console.log('getFormattedBasePrice - Total travelers:', totalTravelers);
+    console.log('getFormattedBasePrice - Total base price:', totalBasePrice);
     return totalBasePrice.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
@@ -583,18 +1075,34 @@ export class Booking implements OnInit {
   calculateTotalPrice(): void {
     const pkg = this.currentPackage;
     const basePricePerPerson = parseFloat(pkg.basePrice.replace(/[.,]/g, '')) / 100;
-    let total = basePricePerPerson * pkg.travelers;
+    
+    // IMPORTANTE: Calcular preço baseado no número REAL de viajantes
+    // Titular (1) + Viajantes já cadastrados na reserva
+    const realTravelerCount = this.getTotalOccupiedSlots();
+    
+    console.log(`💰 === CÁLCULO DE PREÇO DINÂMICO ===`);
+    console.log(`👑 Titular: 1`);
+    console.log(`✅ Viajantes cadastrados: ${this.registeredTravelers.length}`);
+    console.log(`📊 Total real de viajantes: ${realTravelerCount}`);
+    console.log(`💵 Preço por pessoa: R$ ${basePricePerPerson.toFixed(2)}`);
+    
+    // Calcular total baseado no número real de viajantes
+    let total = basePricePerPerson * realTravelerCount;
     
     let extraPrice = pkg.extraServices ?
       parseFloat(pkg.extraPrice?.replace(/[.,]/g, '') || '0') / 100 : 0;
     let discount = parseFloat(pkg.discount?.replace(/[.,]/g, '') || '0') / 100;
 
     total += extraPrice - discount;
+    
+    console.log(`💰 Cálculo: ${realTravelerCount} × R$ ${basePricePerPerson.toFixed(2)} = R$ ${total.toFixed(2)}`);
 
     this.totalPrice = total.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
+    
+    console.log(`✅ Preço final: R$ ${this.totalPrice}`);
   }  
 
   loadBookingData(): void {
@@ -719,9 +1227,18 @@ export class Booking implements OnInit {
     const mockRating = this.getRatingFromRankConsistent(bundle.bundleRank, bundle.id);
     console.log('⭐ Rating mockado calculado:', mockRating, 'baseado no rank:', bundle.bundleRank);
     
+    // Buscar o melhor título possível
+    const packageTitle = bundle.bundleTitle || 
+                        bundle.bundleName || 
+                        this.bundleLocationName || 
+                        (this.reservationData ? this.reservationData.title : null) || 
+                        'Pacote Incrível';
+    
+    console.log('📝 Título do pacote definido como:', packageTitle);
+    
     this.packageList = [{
       id: bundle.id.toString(),
-      title: this.bundleLocationName || bundle.bundleName || (this.reservationData ? this.reservationData.title : 'Pacote Incrível'),
+      title: packageTitle,
       category: bundle.bundleRank, // Rank REAL da API
       imageUrl: this.bundleImageUrl || '/assets/imgs/fortaleza.jpg',
       rating: mockRating, // Rating MOCKADO baseado no rank
@@ -729,14 +1246,14 @@ export class Booking implements OnInit {
       endDate: this.reservationData ? this.reservationData.endDate : '22/08/2024',
       travelers: this.reservationData ? this.reservationData.travelers : 1,
       duration: bundle.duration || (this.reservationData ? this.reservationData.duration : 7),
-      description: bundle.description || (this.reservationData ? this.reservationData.description : 'Pacote de viagem incrível com tudo incluso'),
+      description: bundle.bundleDescription || bundle.description || (this.reservationData ? this.reservationData.description : 'Pacote de viagem incrível com tudo incluso'),
       includes: [
         'Hospedagem em hotel 4 estrelas',
         'Café da manhã incluído', 
         'Transfer aeroporto-hotel',
         'Seguro viagem'
       ],
-      basePrice: this.formatPrice(bundle.bundlePrice || (this.reservationData ? this.reservationData.price : 2000)),
+      basePrice: this.formatPrice(bundle.bundlePrice || bundle.initialPrice || (this.reservationData ? this.reservationData.price : 2000)),
       extraPrice: '0,00',
       discount: '0,00',
       extraServices: false,
@@ -745,6 +1262,37 @@ export class Booking implements OnInit {
 
     this.selectedPackageData = this.packageList[0];
     
+    // ✅ IMPORTANTE: Atualizar currentBundle com os dados REAIS da API
+    this.currentBundle = {
+      id: bundle.id,
+      bundleTitle: packageTitle,
+      bundleDescription: bundle.bundleDescription || bundle.description || '',
+      initialPrice: bundle.bundlePrice || bundle.initialPrice || 0,
+      bundleRank: bundle.bundleRank || '',
+      initialDate: this.reservationData ? this.reservationData.startDate : '',
+      finalDate: this.reservationData ? this.reservationData.endDate : '',
+      quantity: bundle.quantity || 1,
+      // ✅ Tentar diferentes nomes do campo de viajantes máximos
+      travelersNumber: bundle.travelersNumber || bundle.maxTravelers || bundle.travelers || bundle.maxViajantes || bundle.numeroViajantes || 10,
+      bundleStatus: bundle.bundleStatus || 'active',
+      imageUrl: this.bundleImageUrl || '/assets/imgs/fortaleza.jpg',
+      departureCity: bundle.departureCity || '',
+      departureState: bundle.departureState || '',
+      destinationCity: bundle.destinationCity || '',
+      destinationState: bundle.destinationState || ''
+    };
+    
+    console.log('🔄 currentBundle atualizado com dados REAIS:', this.currentBundle);
+    console.log('👥 Número máximo de viajantes permitido:', this.currentBundle.travelersNumber);
+    console.log('🔍 Campos possíveis do bundle da API:', {
+      travelersNumber: bundle.travelersNumber,
+      maxTravelers: bundle.maxTravelers,
+      travelers: bundle.travelers,
+      maxViajantes: bundle.maxViajantes,
+      numeroViajantes: bundle.numeroViajantes,
+      bundle: bundle // Todo o objeto para análise
+    });
+    
     console.log('✅ Pacote populado com dados REAIS da API:');
     console.log('📄 Título REAL:', this.bundleLocationName);
     console.log('🏷️ Rank REAL:', bundle.bundleRank);
@@ -752,9 +1300,242 @@ export class Booking implements OnInit {
     console.log('🖼️ Imagem REAL:', this.bundleImageUrl);
     console.log('📍 Localização REAL:', this.bundleLocationName);
     console.log('💰 Preço REAL:', bundle.bundlePrice);
+    console.log('👥 Viajantes máximo REAL:', this.currentBundle.travelersNumber);
     
     this.initializeTravelersForCurrentPackage();
     this.calculateTotalPrice();
     this.loadBookingData();
+    
+    // IMPORTANTE: Carregar viajantes já cadastrados na reserva após carregar dados reais
+    this.loadRegisteredTravelers();
+  }
+
+  /**
+   * Carrega os dados do perfil do usuário autenticado da API
+   */
+  private loadUserProfile(): void {
+    // Obter o usuário do localStorage
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      console.log('⚠️ Usuário não encontrado no localStorage');
+      return;
+    }
+
+    const user = JSON.parse(storedUser);
+    const userId = user.id;
+    
+    if (!userId) {
+      console.log('⚠️ ID do usuário não encontrado');
+      return;
+    }
+
+    console.log('👤 Carregando perfil do usuário ID:', userId);
+
+    // Fazer requisição GET para /api/users/{id}
+    this.http.get<any>(`http://localhost:8080/api/users/${userId}`).subscribe({
+      next: (userData) => {
+        console.log('✅ Dados do usuário carregados da API:', userData);
+        
+        // Mapear os dados da API para o userProfile
+        this.userProfile = {
+          fullName: userData.name || '',
+          birthDate: '', // Não está disponível na API
+          cpf: userData.cpf || '',
+          rg: '', // Não está disponível na API
+          email: userData.email || '',
+          phone: userData.telephone || ''
+        };
+        
+        console.log('📋 Perfil do usuário atualizado:', this.userProfile);
+        console.log('📞 Telefone original:', userData.telephone);
+        console.log('📞 Telefone formatado:', this.formatPhoneNumber(userData.telephone || ''));
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar dados do usuário:', error);
+        this.notificationService.showError('Erro', 'Não foi possível carregar os dados do seu perfil');
+      }
+    });
+  }
+
+  /**
+   * Carrega os viajantes já cadastrados na reserva
+   */
+  private loadRegisteredTravelers(): void {
+    const reservationId = this.reservationData?.id;
+    if (!reservationId) {
+      console.log('⚠️ ID da reserva não encontrado para carregar viajantes');
+      return;
+    }
+
+    console.log('🧳 Carregando viajantes já cadastrados na reserva ID:', reservationId);
+
+    // Fazer requisição GET para /api/travelers/reservation/{reservationId}
+    this.http.get<any[]>(`http://localhost:8080/api/travelers/reservation/${reservationId}`).subscribe({
+      next: (travelers) => {
+        console.log('✅ Viajantes cadastrados carregados da API:', travelers);
+        this.registeredTravelers = travelers || [];
+        console.log(`📊 Total de viajantes já cadastrados: ${this.registeredTravelers.length}`);
+        
+        // IMPORTANTE: Recalcular o número de viajantes disponíveis após carregar os cadastrados
+        this.updateAvailableTravelerSlots();
+        
+        // IMPORTANTE: Recalcular o preço total após carregar os viajantes cadastrados
+        this.calculateTotalPrice();
+      },
+      error: (error) => {
+        console.error('❌ Erro ao carregar viajantes cadastrados:', error);
+        this.registeredTravelers = [];
+        // Não mostrar erro para o usuário, pois pode ser que não tenha viajantes cadastrados ainda
+        
+        // Mesmo com erro, recalcular slots disponíveis
+        this.updateAvailableTravelerSlots();
+        
+        // IMPORTANTE: Recalcular o preço total mesmo sem viajantes cadastrados
+        this.calculateTotalPrice();
+      }
+    });
+  }
+
+  /**
+   * Atualiza o número de slots de viajantes disponíveis considerando os já cadastrados
+   */
+  private updateAvailableTravelerSlots(): void {
+    const maxTravelers = this.getMaxTravelers();
+    const registeredCount = this.registeredTravelers.length;
+    const titularCount = 1; // Sempre há 1 titular (usuário logado)
+    
+    // Total já ocupado = titular + viajantes já cadastrados
+    const totalOccupied = titularCount + registeredCount;
+    
+    // Slots ainda disponíveis = máximo - já ocupados
+    const availableSlots = Math.max(0, maxTravelers - totalOccupied);
+    
+    console.log(`🧮 === CÁLCULO DE SLOTS DISPONÍVEIS ===`);
+    console.log(`👑 Titular da conta: ${titularCount}`);  
+    console.log(`✅ Viajantes já cadastrados: ${registeredCount}`);
+    console.log(`📊 Total ocupado: ${totalOccupied}`);
+    console.log(`🎯 Máximo permitido: ${maxTravelers}`);
+    console.log(`🆓 Slots disponíveis: ${availableSlots}`);
+    
+    // Atualizar o currentPackage.travelers para refletir apenas os slots disponíveis
+    if (this.selectedPackageData) {
+      // Definir como o número atual de viajantes extras que podem ser adicionados
+      this.selectedPackageData.travelers = Math.max(1, totalOccupied + Math.min(availableSlots, 1));
+      console.log(`🔄 Travelers atualizado para: ${this.selectedPackageData.travelers}`);
+    }
+    
+    // Atualizar packageList também
+    if (this.packageList && this.packageList[0]) {
+      this.packageList[0].travelers = Math.max(1, totalOccupied + Math.min(availableSlots, 1));
+      console.log(`🔄 PackageList travelers atualizado para: ${this.packageList[0].travelers}`);
+    }
+    
+    // Reinicializar viajantes extras baseado nos slots disponíveis
+    this.initializeTravelersBasedOnAvailableSlots(availableSlots);
+  }
+
+  /**
+   * Inicializa viajantes extras baseado nos slots disponíveis
+   */
+  private initializeTravelersBasedOnAvailableSlots(availableSlots: number): void {
+    const packageId = this.currentPackage.id;
+    
+    console.log(`🎰 Inicializando ${availableSlots} slot(s) disponível(is) para viajantes extras`);
+    
+    // Limpar viajantes extras existentes
+    this.travelersInfoByPackage[packageId] = [];
+    
+    // Se há slots disponíveis, criar formulários vazios para eles
+    for (let i = 0; i < availableSlots; i++) {
+      this.travelersInfoByPackage[packageId].push({
+        fullName: '',
+        birthDate: '',
+        cpf: '',
+        rg: '',
+        email: '',
+        phone: '',
+        editing: false,
+        // Novos campos para a API
+        documentNumber: '',
+        documentType: 'CPF',
+        age: 0
+      });
+    }
+    
+    console.log(`✅ ${availableSlots} formulário(s) de viajante extra criado(s)`);
+  }
+
+  /**
+   * Retorna o número de slots disponíveis para novos viajantes
+   */
+  getAvailableSlots(): number {
+    const maxTravelers = this.getMaxTravelers();
+    const registeredCount = this.registeredTravelers.length;
+    const titularCount = 1;
+    const totalOccupied = titularCount + registeredCount;
+    return Math.max(0, maxTravelers - totalOccupied);
+  }
+
+  /**
+   * Retorna o total de viajantes já ocupados (titular + cadastrados)
+   */
+  getTotalOccupiedSlots(): number {
+    return 1 + this.registeredTravelers.length; // 1 titular + viajantes cadastrados
+  }
+
+  /**
+   * Formata o número de telefone para exibição visual
+   * @param phone - Número de telefone sem formatação
+   * @returns Telefone formatado (ex: (11) 99999-9999 ou (11) 9999-9999)
+   */
+  formatPhoneNumber(phone: string): string {
+    if (!phone) return '';
+    
+    // Remove todos os caracteres não numéricos
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    // Se não tem número, retorna vazio
+    if (cleanPhone.length === 0) return '';
+    
+    // Formata conforme o padrão brasileiro
+    if (cleanPhone.length === 11) {
+      // Celular: (XX) 9XXXX-XXXX
+      return `(${cleanPhone.substring(0, 2)}) ${cleanPhone.substring(2, 7)}-${cleanPhone.substring(7)}`;
+    } else if (cleanPhone.length === 10) {
+      // Fixo: (XX) XXXX-XXXX
+      return `(${cleanPhone.substring(0, 2)}) ${cleanPhone.substring(2, 6)}-${cleanPhone.substring(6)}`;
+    } else if (cleanPhone.length === 9) {
+      // Celular sem DDD: 9XXXX-XXXX
+      return `${cleanPhone.substring(0, 5)}-${cleanPhone.substring(5)}`;
+    } else if (cleanPhone.length === 8) {
+      // Fixo sem DDD: XXXX-XXXX
+      return `${cleanPhone.substring(0, 4)}-${cleanPhone.substring(4)}`;
+    } else {
+      // Outros casos, retorna como está
+      return phone;
+    }
+  }
+
+  /**
+   * Formata o número do documento para exibição visual
+   * @param documentNumber - Número do documento sem formatação
+   * @param documentType - Tipo do documento (CPF ou PASSPORT)
+   * @returns Documento formatado
+   */
+  formatDocumentNumber(documentNumber: string, documentType: string): string {
+    if (!documentNumber) return '';
+    
+    if (documentType === 'CPF') {
+      // Remove todos os caracteres não numéricos
+      const cleanCpf = documentNumber.replace(/\D/g, '');
+      
+      // Se tem 11 dígitos, formata como CPF: 000.000.000-00
+      if (cleanCpf.length === 11) {
+        return `${cleanCpf.substring(0, 3)}.${cleanCpf.substring(3, 6)}.${cleanCpf.substring(6, 9)}-${cleanCpf.substring(9)}`;
+      }
+    }
+    
+    // Para passaporte ou CPF inválido, retorna como está
+    return documentNumber;
   }
 }

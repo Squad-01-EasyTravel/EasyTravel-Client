@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Navbar } from '../../../../../shared/navbar/navbar';
 import { Footer } from '../../../../../shared/footer/footer';
 import { BundleService } from '@/app/shared/services/bundle-service';
+import { BookingService } from '@/app/shared/services/booking.service';
+import { NotificationService } from '@/app/shared/services/notification.service';
 import { BundleClass } from '../class/bundle-class';
 import { MediaResponse } from '../../../../../shared/models/media-response.interface';
 import { BundleLocationResponse } from '../../../../../shared/models/bundle-location-response.interface';
@@ -52,7 +54,9 @@ export class DetailsBundle implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private service: BundleService
+    private service: BundleService,
+    private bookingService: BookingService,
+    private notificationService: NotificationService
   ) {}
 
   // Dados do pacote (virão do back-end)
@@ -410,22 +414,122 @@ export class DetailsBundle implements OnInit {
     return total.toLocaleString('pt-BR');
   }
 
-  // Método para realizar reserva
+  // Método para realizar reserva - Criar reserva na API e redirecionar para booking
   realizarReserva() {
-    if (!this.pacote) return;
+    if (!this.bundleClass) {
+      console.error('❌ Não há dados do bundle para reservar');
+      return;
+    }
 
-    const dadosReserva = {
-      pacoteId: this.pacote.id,
-      numeroPassageiros: this.numeroPassageiros,
-      valorTotal: this.pacote.preco * this.numeroPassageiros,
-      dataReserva: new Date()
+    console.log('🛒 DETAILS: Realizando reserva do bundle:', this.bundleClass);
+    
+    // 1. PRIMEIRO: Verificar se o usuário já possui este pacote
+    this.bookingService.checkIfUserHasPackage(this.bundleClass.id).subscribe({
+      next: (hasPackage: boolean) => {
+        if (hasPackage) {
+          // Usuário já possui o pacote
+          this.notificationService.showWarning(
+            'Pacote já adicionado!',
+            'Você já possui esse pacote no seu carrinho'
+          );
+          console.log('⚠️ DETAILS: Usuário já possui este pacote');
+          return;
+        }
+        
+        // 2. USUÁRIO NÃO POSSUI: Criar reserva na API
+        this.createNewReservation();
+      },
+      error: (error: any) => {
+        console.error('❌ DETAILS: Erro ao verificar pacotes:', error);
+        // Em caso de erro na verificação, tenta criar mesmo assim
+        this.createNewReservation();
+      }
+    });
+  }
+
+  private createNewReservation(): void {
+    this.bookingService.createReservation(this.bundleClass.id).subscribe({
+      next: (reservationResponse: any) => {
+        console.log('✅ DETAILS: Reserva criada com sucesso:', reservationResponse);
+        
+        // Mostrar notificação de sucesso
+        this.notificationService.showSuccess(
+          'Pacote adicionado!',
+          'Pacote adicionado às suas reservas com sucesso'
+        );
+        
+        // Redirecionar para booking com dados do pacote
+        this.redirectToBooking();
+      },
+      error: (error: any) => {
+        console.error('❌ DETAILS: Erro ao criar reserva:', error);
+        
+        // Verificar se é erro de autenticação
+        if (error.status === 403) {
+          this.notificationService.showError(
+            'Acesso negado',
+            'Você não tem permissão para criar reservas. Verifique sua autenticação.'
+          );
+          return;
+        }
+        
+        if (error.status === 401) {
+          this.notificationService.showError(
+            'Não autorizado',
+            'Sua sessão expirou. Faça login novamente.'
+          );
+          return;
+        }
+        
+        // Outros erros
+        this.notificationService.showError(
+          'Erro ao criar reserva',
+          `Erro ${error.status}: ${error.error?.message || error.message}. Tente novamente.`
+        );
+        
+        // Em caso de erro, ainda redireciona para não travar o fluxo
+        this.redirectToBooking();
+      }
+    });
+  }
+
+  // Método para redirecionar para booking com dados do pacote
+  private redirectToBooking(): void {
+    // Buscar o título correto de diferentes possibilidades
+    const packageTitle = this.bundleClass.bundleTitle || 
+                        this.destinationLocation || 
+                        'Pacote Selecionado';
+
+    const reservationData = {
+      id: this.bundleClass.id,
+      bundleId: this.bundleClass.id, // ID do bundle para buscar dados reais da API
+      title: packageTitle,
+      imageUrl: this.bundleImageUrl,
+      startDate: this.formatDateForBooking(new Date()), // Data atual como padrão
+      endDate: this.formatDateForBooking(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)), // +7 dias
+      travelers: 1, // Padrão 1 viajante
+      duration: 7, // Duração padrão
+      description: this.bundleClass.bundleDescription || 'Pacote de viagem incrível com experiências únicas',
+      price: this.bundleClass.initialPrice || 2000
     };
 
-    console.log('Dados da reserva para enviar ao back-end:', dadosReserva);
+    console.log('🛒 DETAILS: Dados de reserva criados:', reservationData);
+    console.log('🛒 DETAILS: Título definido como:', packageTitle);
 
-    // Aqui você faria a chamada HTTP para o back-end
-    // this.reservaService.criarReserva(dadosReserva).subscribe(...)
+    // Navegar para booking com os dados (igual ao my-booking e card)
+    this.router.navigate(['/booking'], {
+      state: {
+        reservationData: reservationData
+      }
+    });
+  }
 
-    alert('Reserva realizada com sucesso! (Implementar integração com back-end)');
+  // Método auxiliar para formatar data para booking
+  private formatDateForBooking(date: Date): string {
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 }
