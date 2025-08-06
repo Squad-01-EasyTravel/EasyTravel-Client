@@ -1,0 +1,668 @@
+<div class="d-flex">
+  <div class="container-fluid">
+    <!-- Hero Header Section -->
+    <div class="hero-section position-relative mb-4">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="container position-relative">
+        <div class="row align-items-center py-5">
+          <div class="col-lg-8">
+            <div class="hero-content text-white">
+              <!-- Badge animado -->
+              <span class="hero-badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill mb-3 d-inline-flex align-items-center">
+                <i class="fas fa-users me-2 text-warning"></i>
+                <span class="fw-semibold">Gerenciamento de Usuários</span>
+              </span>
+
+              <!-- Título com gradiente -->
+              <h1 class="hero-title display-3 fw-bold mb-3">
+                Controle de <span class="text-gradient">Usuários</span>
+              </h1>
+
+              <!-- Subtítulo -->
+              <p class="hero-description lead mb-4 opacity-75">
+                Gerencie todos os usuários da plataforma, visualize detalhes, crie novos perfis e controle permissões
+              </p>
+
+              <!-- Estatísticas melhoradas com cores -->
+              <div class="row g-3 text-center hero-stats">
+                <div class="col-3">
+                  <div class="stats-card stats-total bg-primary bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{userStats.totalUsers}}</h3>
+                    <small class="stats-label fw-semibold">Total Usuários</small>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="stats-card stats-active bg-success bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{userStats.activeUsers}}</h3>
+                    <small class="stats-label fw-semibold">Ativos</small>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="stats-card stats-clients bg-info bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{userStats.clientUsers}}</h3>
+                    <small class="stats-label fw-semibold">Clientes</small>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="stats-card stats-admins bg-warning bg-opacity-90 text-dark rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{userStats.adminUsers + userStats.employeeUsers}}</h3>
+                    <small class="stats-label fw-semibold">Staff</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 text-center">
+            <div class="hero-action">
+              <button class="btn-create-main btn btn-light btn-lg px-5 py-3 shadow-lg rounded-4 fw-bold" (click)="openCreateModal()">
+                <i class="fas fa-plus me-2"></i>
+                Criar Usuário
+              </button>
+              <div class="hero-decorations mt-4">
+                <div class="floating-element element-1">
+                  <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="floating-element element-2">
+                  <i class="fas fa-users-cog"></i>
+                </div>
+                <div class="floating-element element-3">
+                  <i class="fas fa-shield-alt"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section - Reformulado no padrão Bundle/Home -->
+    <div class="container mb-4">
+      <div class="search-section-redesigned">
+        <div class="search-header-card">
+          <div class="search-header-content">
+            <div class="header-info">
+              <h2 class="search-title">
+                <i class="fas fa-users me-2"></i>
+                Buscar Usuários
+              </h2>
+              <p class="search-subtitle">
+                Encontre e gerencie usuários da plataforma
+              </p>
+            </div>
+            <div class="search-stats">
+              <span class="results-count">
+                <i class="fas fa-list me-1"></i>
+                {{totalUsers}} usuários encontrados
+              </span>
+            </div>
+          </div>
+          
+          <!-- Formulário de busca estilo Home -->
+          <div class="search-form-container">
+            <div class="search-tabs">
+              <button class="search-tab active">
+                <i class="fas fa-search"></i>
+                <span>Filtros de Busca</span>
+              </button>
+            </div>
+            
+            <div class="search-form-content">
+              <div class="search-fields-row">
+                <div class="search-field">
+                  <label class="search-label">Buscar</label>
+                  <div class="search-input-container">
+                    <input
+                      type="text"
+                      class="search-input-field"
+                      placeholder="Nome, email ou CPF..."
+                      [(ngModel)]="searchTerm"
+                      (keyup.enter)="onSearch()"
+                    >
+                    <i class="fas fa-search search-icon"></i>
+                  </div>
+                </div>
+                
+                <div class="search-field">
+                  <label class="search-label">Tipo de Usuário</label>
+                  <select class="search-select-field" [(ngModel)]="selectedRole" (change)="onRoleFilter()">
+                    <option value="">Todos os tipos</option>
+                    <option value="CLIENT">Clientes</option>
+                    <option value="EMPLOYEE">Funcionários</option>
+                    <option value="ADMIN">Administradores</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="search-actions">
+                <button class="search-btn primary" (click)="onSearch()">
+                  <i class="fas fa-search me-2"></i>
+                  Buscar Usuários
+                </button>
+                <button class="search-btn secondary" (click)="searchTerm=''; selectedRole=''; onSearch()">
+                  <i class="fas fa-times me-2"></i>
+                  Limpar Filtros
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Grid Section - Reformulado no padrão Bundle -->
+    <div class="container">
+      <div class="users-grid-section">
+        <!-- Header dos resultados estilo Bundle -->
+        <div class="results-header">
+          <div class="header-info">
+            <h2 class="page-title">
+              <i class="fas fa-users me-2"></i>
+              Lista de Usuários
+            </h2>
+            <p class="results-count">
+              <i class="fas fa-user-friends"></i>
+              {{users.length}} usuários na página atual
+            </p>
+          </div>
+          
+          <div class="view-options">
+            <span class="sorting-info">
+              <i class="fas fa-filter"></i>
+              {{selectedRole ? 'Filtrado por: ' + getRoleDisplayName(selectedRole) : 'Todos os tipos'}}
+            </span>
+            <span class="showing-text">
+              Página {{currentPage}} de {{totalPages}}
+            </span>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-state text-center py-5">
+          <div class="loading-card">
+            <div class="spinner-border text-primary mb-3" role="status">
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="text-muted">Carregando usuários...</p>
+          </div>
+        </div>
+
+        <!-- Users Grid - Padrão do Site -->
+        <div *ngIf="!loading" class="cards-grid">
+          <div *ngFor="let user of users" class="user-card-container">
+            <!-- Avatar e Badge de Status -->
+            <div class="user-card-image-wrapper">
+              <div class="user-avatar-wrapper">
+                <img *ngIf="user.avatar" 
+                     [src]="user.avatar" 
+                     [alt]="user.name" 
+                     class="user-avatar-img"
+                     (error)="onImageError($event)">
+                <div class="user-avatar-placeholder" *ngIf="!user.avatar">
+                  <span class="avatar-initials">{{getUserInitials(user.name)}}</span>
+                </div>
+              </div>
+              
+              <!-- Badge de Papel/Role -->
+              <div class="user-card-badge">
+                <span class="badge-role" [class]="getRoleClass(user.userRole)">
+                  <i [class]="getRoleIcon(user.userRole)"></i>
+                  {{getRoleDisplayName(user.userRole)}}
+                </span>
+              </div>
+              
+              <!-- Status Overlay -->
+              <div class="user-status-overlay">
+                <div class="status-indicator" [class.active]="isUserActive(user)" [class.inactive]="!isUserActive(user)">
+                  <i [class]="isUserActive(user) ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                  <span>{{isUserActive(user) ? 'Ativo' : 'Inativo'}}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Corpo do Card - Design Minimalista -->
+            <div class="user-card-body">
+              <!-- Header com Nome e Role apenas -->
+              <div class="user-card-header">
+                <h3 class="user-name">{{user.name}}</h3>
+                <div class="user-role-display">
+                  <span class="role-text">{{getRoleDisplayName(user.userRole)}}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer com Ações -->
+            <div class="user-card-footer">
+              <button class="btn-card-action btn-details" 
+                      (click)="openDetailsModal(user)"
+                      title="Ver Detalhes">
+                <i class="fas fa-eye"></i>
+                Ver Detalhes
+              </button>
+              
+              <button class="btn-card-action" 
+                      [class.btn-deactivate]="isUserActive(user)"
+                      [class.btn-activate]="!isUserActive(user)"
+                      (click)="toggleUserStatus(user)"
+                      [title]="isUserActive(user) ? 'Desativar' : 'Ativar'">
+                <i [class]="isUserActive(user) ? 'fas fa-user-slash' : 'fas fa-user-check'"></i>
+                {{isUserActive(user) ? 'Desativar' : 'Ativar'}}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && users.length === 0" class="empty-state">
+          <div class="empty-content">
+            <div class="empty-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3>Nenhum usuário encontrado</h3>
+            <p *ngIf="searchTerm || selectedRole">
+              Não encontramos usuários que correspondam aos filtros selecionados:<br>
+              <span *ngIf="searchTerm"><strong>Busca:</strong> "{{searchTerm}}"<br></span>
+              <span *ngIf="selectedRole"><strong>Tipo:</strong> {{getRoleDisplayName(selectedRole)}}<br></span>
+              Tente ajustar os filtros ou limpar todas as seleções.
+            </p>
+            <p *ngIf="!searchTerm && !selectedRole">
+              Não há usuários cadastrados no sistema. Crie o primeiro usuário para começar.
+            </p>
+            <button class="btn-clear-filters" (click)="searchTerm=''; selectedRole=''; onSearch()">
+              <i class="fas fa-refresh"></i>
+              Limpar Filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Pagination estilo Bundle -->
+        <div *ngIf="!loading && users.length > 0" class="pagination-section">
+          <div class="pagination-wrapper">
+            <div class="pagination-main-controls">
+              <!-- Navegação de páginas -->
+              <div class="pagination-nav" *ngIf="totalPages > 1">
+                <button
+                  class="pagination-btn prev-btn"
+                  [disabled]="currentPage === 1"
+                  (click)="onPageChange(currentPage - 1)">
+                  <i class="fas fa-chevron-left"></i>
+                  <span>Anterior</span>
+                </button>
+
+                <div class="pagination-numbers">
+                  <button
+                    *ngFor="let page of paginationArray"
+                    class="page-number"
+                    [class.active]="page === currentPage"
+                    (click)="onPageChange(page)">
+                    {{page}}
+                  </button>
+                </div>
+
+                <button
+                  class="pagination-btn next-btn"
+                  [disabled]="currentPage === totalPages"
+                  (click)="onPageChange(currentPage + 1)">
+                  <span>Próximo</span>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+
+              <!-- Seletor de itens por página -->
+              <div class="page-size-selector">
+                <label>Mostrar:</label>
+                <select [(ngModel)]="pageSize" (ngModelChange)="currentPage=1; loadUsers()">
+                  <option value="6">6 usuários</option>
+                  <option value="10">10 usuários</option>
+                  <option value="20">20 usuários</option>
+                  <option value="50">50 usuários</option>
+                </select>
+                <span>por página</span>
+              </div>
+            </div>
+
+            <!-- Informações da página -->
+            <div class="pagination-info">
+              <span class="page-info">
+                Página {{currentPage}} de {{totalPages}}
+              </span>
+              <span class="items-info">
+                ({{(currentPage - 1) * pageSize + 1}}-{{Math.min(currentPage * pageSize, totalUsers)}} de {{totalUsers}} usuários)
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Criação/Edição de Usuário - Padrão do Site -->
+<div class="modal-overlay" *ngIf="isUserModalOpen" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header do Modal -->
+    <div class="modal-header-section">
+      <div class="modal-header-content">
+        <div class="modal-icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <div class="modal-title-group">
+          <h2 class="modal-title">{{isEditMode ? 'Editar Usuário' : 'Criar Novo Usuário'}}</h2>
+          <p class="modal-subtitle">
+            {{isEditMode ? 'Atualize as informações do usuário' : 'Preencha os dados para criar um novo usuário'}}
+          </p>
+        </div>
+      </div>
+      <button class="modal-close-btn" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Corpo do Modal -->
+    <div class="modal-body-section">
+      <form (ngSubmit)="saveUser()" #userFormRef="ngForm" class="user-form">
+        <!-- Seção de Informações Pessoais -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="section-title-group">
+              <h3 class="section-title">Informações Pessoais</h3>
+              <p class="section-subtitle">Dados básicos do usuário</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-user form-label-icon"></i>
+                Nome Completo *
+              </label>
+              <input 
+                type="text" 
+                class="form-input" 
+                [(ngModel)]="userForm.name" 
+                name="name" 
+                required
+                placeholder="Digite o nome completo do usuário">
+              <div class="form-input-border"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-envelope form-label-icon"></i>
+                Email *
+              </label>
+              <input 
+                type="email" 
+                class="form-input" 
+                [(ngModel)]="userForm.email" 
+                name="email" 
+                required
+                placeholder="usuario@exemplo.com">
+              <div class="form-input-border"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-id-card form-label-icon"></i>
+                CPF *
+              </label>
+              <input 
+                type="text" 
+                class="form-input" 
+                [(ngModel)]="userForm.cpf" 
+                name="cpf" 
+                required
+                placeholder="000.000.000-00">
+              <div class="form-input-border"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-phone form-label-icon"></i>
+                Telefone *
+              </label>
+              <input 
+                type="text" 
+                class="form-input" 
+                [(ngModel)]="userForm.telephone" 
+                name="telephone" 
+                required
+                placeholder="(11) 99999-9999">
+              <div class="form-input-border"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-passport form-label-icon"></i>
+                Passaporte
+              </label>
+              <input 
+                type="text" 
+                class="form-input" 
+                [(ngModel)]="userForm.passport" 
+                name="passport" 
+                placeholder="BR123456789">
+              <div class="form-input-border"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Acesso -->
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <i class="fas fa-key"></i>
+            </div>
+            <div class="section-title-group">
+              <h3 class="section-title">Informações de Acesso</h3>
+              <p class="section-subtitle">Configurações de login e permissões</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group" *ngIf="!isEditMode">
+              <label class="form-label">
+                <i class="fas fa-lock form-label-icon"></i>
+                Senha *
+              </label>
+              <input 
+                type="password" 
+                class="form-input" 
+                [(ngModel)]="userForm.password" 
+                name="password" 
+                [required]="!isEditMode"
+                placeholder="Digite uma senha segura">
+              <div class="form-input-border"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-user-tag form-label-icon"></i>
+                Tipo de Usuário *
+              </label>
+              <div class="select-wrapper">
+                <select 
+                  class="form-select" 
+                  [(ngModel)]="userForm.userRole" 
+                  name="role" 
+                  required>
+                  <option value="">Selecione o tipo</option>
+                  <option value="CLIENT">Cliente</option>
+                  <option value="EMPLOYEE">Funcionário</option>
+                  <option value="ADMIN">Administrador</option>
+                </select>
+                <i class="fas fa-chevron-down select-arrow"></i>
+              </div>
+              <div class="form-input-border"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer do Modal -->
+    <div class="modal-footer-section">
+      <div class="modal-actions">
+        <button type="button" class="btn-modal btn-cancel" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+          <span>Cancelar</span>
+        </button>
+        <button type="button" class="btn-modal btn-primary" (click)="saveUser()" [disabled]="!isFormValid()">
+          <i class="fas fa-save"></i>
+          <span>{{isEditMode ? 'Atualizar' : 'Criar'}} Usuário</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalhes do Usuário - Padrão do Site -->
+<div class="modal-overlay" *ngIf="isDetailsModalOpen && selectedUser" (click)="closeModal()">
+  <div class="modal-container modal-large" (click)="$event.stopPropagation()">
+    <!-- Header do Modal -->
+    <div class="modal-header-section">
+      <div class="modal-header-content">
+        <div class="modal-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="modal-title-group">
+          <h2 class="modal-title">Detalhes do Usuário</h2>
+          <p class="modal-subtitle">Informações completas e estatísticas</p>
+        </div>
+      </div>
+      <button class="modal-close-btn" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Corpo do Modal -->
+    <div class="modal-body-section">
+      <!-- Seção do Perfil -->
+      <div class="user-profile-section">
+        <div class="profile-card">
+          <div class="profile-avatar">
+            <div class="avatar-container">
+              <img *ngIf="selectedUser.avatar" 
+                   [src]="selectedUser.avatar" 
+                   [alt]="selectedUser.name" 
+                   class="profile-avatar-img"
+                   (error)="onImageError($event)">
+              <div class="profile-avatar-placeholder" *ngIf="!selectedUser.avatar">
+                <span class="profile-initials">{{getUserInitials(selectedUser.name)}}</span>
+              </div>
+            </div>
+            <div class="profile-status" [class.active]="isUserActive(selectedUser)" [class.inactive]="!isUserActive(selectedUser)">
+              <i [class]="isUserActive(selectedUser) ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+              <span>{{isUserActive(selectedUser) ? 'Ativo' : 'Inativo'}}</span>
+            </div>
+          </div>
+          
+          <div class="profile-info">
+            <h3 class="profile-name">{{selectedUser.name}}</h3>
+            <div class="profile-role">
+              <span class="role-badge" [class]="getRoleClass(selectedUser.userRole)">
+                <i class="fas fa-user-tag"></i>
+                {{getRoleDisplayName(selectedUser.userRole)}}
+              </span>
+            </div>
+            <div class="profile-id">
+              <span class="id-label">ID do Usuário:</span>
+              <span class="id-value">#{{selectedUser.id}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid de Informações -->
+      <div class="info-grid">
+        <!-- Informações Pessoais -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-card-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <h4 class="info-card-title">Informações Pessoais</h4>
+          </div>
+          <div class="info-card-content">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-envelope"></i>
+                <span>Email</span>
+              </div>
+              <div class="info-value">{{selectedUser.email}}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-id-card"></i>
+                <span>CPF</span>
+              </div>
+              <div class="info-value">{{selectedUser.cpf}}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-phone"></i>
+                <span>Telefone</span>
+              </div>
+              <div class="info-value">{{selectedUser.telephone}}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-passport"></i>
+                <span>Passaporte</span>
+              </div>
+              <div class="info-value">{{selectedUser.passport || 'Não informado'}}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações do Sistema -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-card-icon">
+              <i class="fas fa-cog"></i>
+            </div>
+            <h4 class="info-card-title">Informações do Sistema</h4>
+          </div>
+          <div class="info-card-content">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-toggle-on"></i>
+                <span>Status da Conta</span>
+              </div>
+              <div class="info-value">
+                <span [class]="isUserActive(selectedUser) ? 'status-active' : 'status-inactive'">
+                  {{isUserActive(selectedUser) ? 'Conta Ativa' : 'Conta Inativa'}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer do Modal -->
+    <div class="modal-footer-section">
+      <div class="modal-actions">
+        <button type="button" class="btn-modal btn-cancel" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+          <span>Fechar</span>
+        </button>
+        <button type="button" class="btn-modal btn-secondary" (click)="closeModal(); openEditModal(selectedUser)"
+                *ngIf="selectedUser.userRole !== 'CLIENT'">
+          <i class="fas fa-edit"></i>
+          <span>Editar Usuário</span>
+        </button>
+        <button type="button" class="btn-modal" 
+                [class.btn-danger]="isUserActive(selectedUser)"
+                [class.btn-success]="!isUserActive(selectedUser)"
+                (click)="toggleUserStatus(selectedUser); closeModal()">
+          <i [class]="isUserActive(selectedUser) ? 'fas fa-user-slash' : 'fas fa-user-check'"></i>
+          <span>{{isUserActive(selectedUser) ? 'Desativar' : 'Ativar'}} Usuário</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
