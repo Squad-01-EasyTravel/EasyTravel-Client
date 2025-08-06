@@ -175,6 +175,24 @@ export class AuthService {
     }
   }
 
+  updateCurrentUser(userData: any): void {
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      // Atualizar dados do usuário mantendo a estrutura existente
+      const updatedUser = {
+        ...currentUser,
+        name: userData.name || currentUser.name,
+        email: userData.email || currentUser.email,
+        cpf: userData.cpf || currentUser.cpf,
+        telephone: userData.telephone || currentUser.telephone
+      };
+      
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      this.currentUserSubject.next(updatedUser);
+      console.log('👤 Dados do usuário atualizados no AuthService:', updatedUser);
+    }
+  }
+
   isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token) return false;

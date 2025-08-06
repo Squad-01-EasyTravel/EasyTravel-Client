@@ -824,14 +824,6 @@ export class Booking implements OnInit {
     const totalOccupied = titularCount + registeredCount;
     const availableSlots = Math.max(0, maxTravelers - totalOccupied);
     
-    console.log(`🧳 === ATUALIZAÇÃO DE VIAJANTES (COM CONTROLE INTELIGENTE) ===`);
-    console.log(`📊 Contagem solicitada: ${newCount}`);
-    console.log(`👑 Titular: ${titularCount}`);
-    console.log(`✅ Já cadastrados: ${registeredCount}`);
-    console.log(`📈 Máximo permitido: ${maxTravelers}`);
-    console.log(`� Total ocupado: ${totalOccupied}`);
-    console.log(`🆓 Slots disponíveis: ${availableSlots}`);
-    
     // O newCount representa o total de viajantes desejado (incluindo titular)
     // Mas precisamos considerar que já temos viajantes cadastrados
     
@@ -887,14 +879,6 @@ export class Booking implements OnInit {
       console.log('⚠️ Usando fallback de 10 viajantes - campo não encontrado na API');
     }
     
-    console.log('🔍 getMaxTravelers() análise:', {
-      currentBundle: this.currentBundle,
-      realBundleData: this.realBundleData,
-      currentBundleTravelersNumber: this.currentBundle?.travelersNumber,
-      realBundleTravelersNumber: this.realBundleData?.travelersNumber,
-      finalMaxTravelers: maxTravelers
-    });
-    
     return maxTravelers;
   }
 
@@ -916,9 +900,7 @@ export class Booking implements OnInit {
     // Usar o número real de viajantes (titular + cadastrados)
     const totalTravelers = this.getTotalOccupiedSlots();
     const totalBasePrice = basePricePerPerson * totalTravelers;
-    console.log('getFormattedBasePrice - Base price per person:', basePricePerPerson);
-    console.log('getFormattedBasePrice - Total travelers:', totalTravelers);
-    console.log('getFormattedBasePrice - Total base price:', totalBasePrice);
+    
     return totalBasePrice.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
@@ -1053,7 +1035,6 @@ export class Booking implements OnInit {
     // Se temos rating, calcular rank baseado nele (PADRÃO DAS OUTRAS PÁGINAS)
     if (finalRating > 0) {
       const calculatedRank = this.getRankFromRating(finalRating);
-      console.log(`📊 Rating: ${finalRating} → Rank calculado: ${calculatedRank}`);
       return calculatedRank;
     }
     
@@ -1081,12 +1062,6 @@ export class Booking implements OnInit {
     // Titular (1) + Viajantes já cadastrados na reserva
     const realTravelerCount = this.getTotalOccupiedSlots();
     
-    console.log(`💰 === CÁLCULO DE PREÇO DINÂMICO ===`);
-    console.log(`👑 Titular: 1`);
-    console.log(`✅ Viajantes cadastrados: ${this.registeredTravelers.length}`);
-    console.log(`📊 Total real de viajantes: ${realTravelerCount}`);
-    console.log(`💵 Preço por pessoa: R$ ${basePricePerPerson.toFixed(2)}`);
-    
     // Calcular total baseado no número real de viajantes
     let total = basePricePerPerson * realTravelerCount;
     
@@ -1095,8 +1070,6 @@ export class Booking implements OnInit {
     let discount = parseFloat(pkg.discount?.replace(/[.,]/g, '') || '0') / 100;
 
     total += extraPrice - discount;
-    
-    console.log(`💰 Cálculo: ${realTravelerCount} × R$ ${basePricePerPerson.toFixed(2)} = R$ ${total.toFixed(2)}`);
 
     // Armazenar o valor total numérico para envio ao backend (em reais)
     this.totalPriceNumeric = Math.round(total * 100) / 100; // Arredondar para 2 casas decimais
@@ -1106,9 +1079,6 @@ export class Booking implements OnInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
-    
-    console.log(`✅ Preço final formatado: R$ ${this.totalPrice}`);
-    console.log(`🔢 Preço final numérico (reais): ${this.totalPriceNumeric}`);
   }  
 
   loadBookingData(): void {
@@ -1148,8 +1118,6 @@ export class Booking implements OnInit {
 
     console.log('💳 Navegando para pagamento com dados completos:', bookingData);
     console.log('🔢 ID da reserva:', reservationId);
-    console.log('💰 Valor total (formatado):', this.totalPrice);
-    console.log('🔢 Valor total (numérico - reais):', this.totalPriceNumeric);
 
     // Navegar para a página de pagamento
     this.router.navigate(['/payment'], {
@@ -1393,7 +1361,6 @@ export class Booking implements OnInit {
       next: (travelers) => {
         console.log('✅ Viajantes cadastrados carregados da API:', travelers);
         this.registeredTravelers = travelers || [];
-        console.log(`📊 Total de viajantes já cadastrados: ${this.registeredTravelers.length}`);
         
         // IMPORTANTE: Recalcular o número de viajantes disponíveis após carregar os cadastrados
         this.updateAvailableTravelerSlots();
@@ -1428,13 +1395,6 @@ export class Booking implements OnInit {
     
     // Slots ainda disponíveis = máximo - já ocupados
     const availableSlots = Math.max(0, maxTravelers - totalOccupied);
-    
-    console.log(`🧮 === CÁLCULO DE SLOTS DISPONÍVEIS ===`);
-    console.log(`👑 Titular da conta: ${titularCount}`);  
-    console.log(`✅ Viajantes já cadastrados: ${registeredCount}`);
-    console.log(`📊 Total ocupado: ${totalOccupied}`);
-    console.log(`🎯 Máximo permitido: ${maxTravelers}`);
-    console.log(`🆓 Slots disponíveis: ${availableSlots}`);
     
     // Atualizar o currentPackage.travelers para refletir apenas os slots disponíveis
     if (this.selectedPackageData) {

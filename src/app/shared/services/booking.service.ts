@@ -360,4 +360,167 @@ export class BookingService {
       })
     );
   }
+
+  // Buscar detalhes do pagamento por ID da reserva
+  getPaymentDetails(reservationId: number): Observable<any> {
+    const url = `${this.baseUrl}/payments/reservation/${reservationId}`;
+    const token = this.authService.getToken();
+    
+    console.log('🔄 Fazendo requisição para:', url);
+    console.log('🔑 Token:', token ? 'Presente' : 'Ausente');
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.get<any>(url, { headers }).pipe(
+      map(response => {
+        console.log('✅ Resposta da API de pagamento:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('❌ Erro ao buscar detalhes do pagamento:', error);
+        console.error('🔗 URL da requisição:', url);
+        console.error('📄 Status:', error.status);
+        console.error('📝 Mensagem:', error.message);
+        throw error;
+      })
+    );
+  }
+
+  // Buscar viajantes por ID da reserva
+  getTravelersByReservation(reservationId: number): Observable<any[]> {
+    const url = `${this.baseUrl}/travelers/reservation/${reservationId}`;
+    const token = this.authService.getToken();
+    
+    console.log('🔄 Fazendo requisição para viajantes:', url);
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.get<any[]>(url, { headers }).pipe(
+      map(response => {
+        console.log('✅ Resposta da API de viajantes:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('❌ Erro ao buscar viajantes da reserva:', error);
+        console.error('🔗 URL da requisição:', url);
+        console.error('📄 Status:', error.status);
+        return of([]); // Retorna array vazio em caso de erro
+      })
+    );
+  }
+
+  // Buscar histórico de viagem pelo ID do pagamento
+  getTravelHistoryByPayment(paymentId: number): Observable<any[]> {
+    const url = `${this.baseUrl}/travel-histories/payment/${paymentId}`;
+    const token = this.authService.getToken();
+    
+    console.log('🔄 Fazendo requisição para travel history:', url);
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.get<any[]>(url, { headers }).pipe(
+      map(response => {
+        console.log('✅ Resposta da API de travel history:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('❌ Erro ao buscar travel history:', error);
+        console.error('🔗 URL da requisição:', url);
+        console.error('📄 Status:', error.status);
+        throw error;
+      })
+    );
+  }
+
+  // Criar avaliação
+  createReview(reviewData: any): Observable<any> {
+    const url = `${this.baseUrl}/reviews`;
+    const token = this.authService.getToken();
+    
+    console.log('🔄 Criando avaliação:', url);
+    console.log('📋 Dados da avaliação:', reviewData);
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.post<any>(url, reviewData, { headers }).pipe(
+      map(response => {
+        console.log('✅ Avaliação criada com sucesso:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('❌ Erro ao criar avaliação:', error);
+        console.error('🔗 URL da requisição:', url);
+        console.error('📄 Status:', error.status);
+        console.error('📝 Dados enviados:', reviewData);
+        throw error;
+      })
+    );
+  }
+
+  // Buscar avaliações do usuário autenticado
+  getMyReviews(): Observable<any[]> {
+    const url = `${this.baseUrl}/reviews/my`;
+    const token = this.authService.getToken();
+    
+    console.log('🔄 Fazendo requisição para avaliações do usuário:', url);
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.get<any[]>(url, { headers }).pipe(
+      map(response => {
+        console.log('✅ Avaliações do usuário recebidas:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('❌ Erro ao buscar avaliações do usuário:', error);
+        console.error('🔗 URL da requisição:', url);
+        console.error('📄 Status:', error.status);
+        return of([]); // Retorna array vazio em caso de erro
+      })
+    );
+  }
+
+  // Atualizar avaliação existente
+  updateReview(reviewId: number, reviewData: any): Observable<any> {
+    const url = `${this.baseUrl}/reviews/my/${reviewId}`;
+    const token = this.authService.getToken();
+    
+    console.log('🔄 Atualizando avaliação:', url);
+    console.log('📋 ID da avaliação:', reviewId);
+    console.log('📋 Novos dados da avaliação:', reviewData);
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.put<any>(url, reviewData, { headers }).pipe(
+      map(response => {
+        console.log('✅ Avaliação atualizada com sucesso:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('❌ Erro ao atualizar avaliação:', error);
+        console.error('🔗 URL da requisição:', url);
+        console.error('📄 Status:', error.status);
+        console.error('📝 Dados enviados:', reviewData);
+        throw error;
+      })
+    );
+  }
 }
