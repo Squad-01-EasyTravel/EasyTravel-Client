@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ValidationIndicatorComponent } from '../../../../../shared/components/validation-indicator/validation-indicator.component';
 import { AuthService, LoginDto } from '../../../../../shared/services/auth.service';
 import { ValidationService } from '../../../../../shared/services/validation.service';
@@ -9,7 +9,7 @@ import { ValidationService } from '../../../../../shared/services/validation.ser
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ValidationIndicatorComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ValidationIndicatorComponent],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
