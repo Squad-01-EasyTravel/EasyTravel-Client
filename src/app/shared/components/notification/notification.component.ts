@@ -51,22 +51,29 @@ import { Subscription } from 'rxjs';
       display: flex;
       align-items: flex-start;
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
       margin-bottom: 12px;
-      padding: 16px;
+      padding: 20px;
       transform: translateX(100%);
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       pointer-events: auto;
       cursor: pointer;
-      border-left: 4px solid;
-      backdrop-filter: blur(10px);
+      border-left: 5px solid;
+      backdrop-filter: blur(15px);
       position: relative;
       overflow: hidden;
+      min-width: 350px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     .notification.show {
       transform: translateX(0);
+    }
+
+    .notification:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
     }
 
     .notification::before {
@@ -80,56 +87,72 @@ import { Subscription } from 'rxjs';
       pointer-events: none;
     }
 
+    .notification::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+      pointer-events: none;
+    }
+
     .notification-success {
-      border-left-color: #10B981;
-      background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+      border-left-color: #22C55E;
+      background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+      box-shadow: 0 8px 32px rgba(34, 197, 94, 0.1);
     }
 
     .notification-error {
-      border-left-color: #EF4444;
-      background: linear-gradient(135deg, #FEF2F2 0%, #FEF2F2 100%);
+      border-left-color: #DC2626;
+      background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+      box-shadow: 0 8px 32px rgba(220, 38, 38, 0.1);
     }
 
     .notification-warning {
-      border-left-color: #F59E0B;
-      background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+      border-left-color: #D97706;
+      background: linear-gradient(135deg, #FFFBEB 0%, #FED7AA 100%);
+      box-shadow: 0 8px 32px rgba(217, 119, 6, 0.1);
     }
 
     .notification-info {
-      border-left-color: #3B82F6;
+      border-left-color: #2563EB;
       background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      box-shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
     }
 
     .notification-icon {
       flex-shrink: 0;
-      margin-right: 12px;
-      font-size: 20px;
+      margin-right: 16px;
+      font-size: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      margin-top: 2px;
     }
 
     .notification-success .notification-icon {
-      color: #10B981;
-      background: rgba(16, 185, 129, 0.1);
+      color: #22C55E;
+      background: rgba(34, 197, 94, 0.1);
     }
 
     .notification-error .notification-icon {
-      color: #EF4444;
-      background: rgba(239, 68, 68, 0.1);
+      color: #DC2626;
+      background: rgba(220, 38, 38, 0.1);
     }
 
     .notification-warning .notification-icon {
-      color: #F59E0B;
-      background: rgba(245, 158, 11, 0.1);
+      color: #D97706;
+      background: rgba(217, 119, 6, 0.1);
     }
 
     .notification-info .notification-icon {
-      color: #3B82F6;
-      background: rgba(59, 130, 246, 0.1);
+      color: #2563EB;
+      background: rgba(37, 99, 235, 0.1);
     }
 
     .notification-content {
@@ -138,16 +161,18 @@ import { Subscription } from 'rxjs';
     }
 
     .notification-title {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 4px;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 6px;
       color: #1F2937;
+      letter-spacing: -0.01em;
     }
 
     .notification-message {
-      font-size: 13px;
-      color: #6B7280;
-      line-height: 1.4;
+      font-size: 14px;
+      color: #4B5563;
+      line-height: 1.5;
+      font-weight: 400;
     }
 
     .notification-close {

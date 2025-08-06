@@ -89,12 +89,6 @@
                 </button>
 
                 <button *ngIf="trip.status === 'Confirmado'"
-                        class="btn btn-secondary-custom" (click)="downloadVoucher(trip)">
-                  <i class="fas fa-download"></i>
-                  Voucher
-                </button>
-
-                <button *ngIf="trip.status === 'Confirmado'"
                         class="btn btn-info-custom" (click)="rateTrip(trip)">
                   <i class="fas fa-star"></i>
                   Avaliar
@@ -106,7 +100,7 @@
                   Confirmar
                 </button>
 
-                <button *ngIf="trip.status === 'Confirmado' || trip.status === 'Pendente'"
+                <button *ngIf="trip.status === 'Pendente'"
                         class="btn btn-danger-custom" (click)="cancelTrip(trip)">
                   <i class="fas fa-times"></i>
                   Cancelar
@@ -311,11 +305,19 @@
               <i class="fas fa-credit-card detail-icon"></i>
               <div>
                 <span class="detail-label">Forma de Pagamento</span>
-                <span class="detail-value">{{selectedTrip.paymentMethod}}</span>
+                <span class="detail-value" *ngIf="selectedTripPaymentDetails">
+                  {{getPaymentMethodText(selectedTripPaymentDetails.paymentMethod)}}
+                </span>
+                <span class="detail-value" *ngIf="!selectedTripPaymentDetails && !isLoadingDetails">{{selectedTrip.paymentMethod}}</span>
+                <span class="detail-value" *ngIf="isLoadingDetails">Carregando...</span>
               </div>
             </div>
-            <div class="detail-item">
-              <!-- Célula vazia para layout -->
+            <div class="detail-item" *ngIf="selectedTripPaymentDetails?.installments">
+              <i class="fas fa-credit-card detail-icon"></i>
+              <div>
+                <span class="detail-label">Parcelas</span>
+                <span class="detail-value">{{selectedTripPaymentDetails.installments}}x</span>
+              </div>
             </div>
           </div>
 
@@ -324,22 +326,49 @@
               <i class="fas fa-dollar-sign detail-icon"></i>
               <div>
                 <span class="detail-label">Valor Total</span>
-                <span class="detail-value price">R$ {{selectedTrip.price.toLocaleString('pt-BR')}}</span>
+                <span class="detail-value price" *ngIf="selectedTripPaymentDetails">
+                  {{formatPaymentValue(selectedTripPaymentDetails.totPrice)}}
+                </span>
+                <span class="detail-value price" *ngIf="!selectedTripPaymentDetails && !isLoadingDetails">
+                  R$ {{selectedTrip.price.toLocaleString('pt-BR')}}
+                </span>
+                <span class="detail-value" *ngIf="isLoadingDetails">Carregando...</span>
               </div>
             </div>
-            <div class="detail-item" *ngIf="selectedTrip.rating">
-              <i class="fas fa-star detail-icon"></i>
+            <div class="detail-item" *ngIf="selectedTripPaymentDetails?.paymentDate">
+              <i class="fas fa-calendar-check detail-icon"></i>
               <div>
-                <span class="detail-label">Avaliação Média</span>
-                <div class="rating-display">
-                  <span class="rating-value">{{selectedTrip.rating}}</span>
-                  <div class="stars">
-                    <i *ngFor="let star of getStarArray(selectedTrip.rating!)" 
-                       class="fas fa-star" 
-                       [class.filled]="star"></i>
+                <span class="detail-label">Data do Pagamento</span>
+                <span class="detail-value">{{formatDate(selectedTripPaymentDetails.paymentDate)}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Viajantes -->
+          <div class="travelers-section" *ngIf="selectedTripTravelers.length > 0">
+            <h5><i class="fas fa-users"></i> Viajantes ({{selectedTripTravelers.length}})</h5>
+            <div class="travelers-list">
+              <div class="traveler-card" *ngFor="let traveler of selectedTripTravelers">
+                <div class="traveler-info">
+                  <div class="traveler-name">
+                    <i class="fas fa-user"></i>
+                    <span>{{traveler.fullName}}</span>
+                  </div>
+                  <div class="traveler-details">
+                    <span class="traveler-doc">{{traveler.documentType}}: {{traveler.documentNumber}}</span>
+                    <span class="traveler-age">{{traveler.age}} anos</span>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Loading de viajantes -->
+          <div class="travelers-section" *ngIf="isLoadingDetails">
+            <h5><i class="fas fa-users"></i> Viajantes</h5>
+            <div class="loading-travelers">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>Carregando viajantes...</span>
             </div>
           </div>
 
@@ -353,10 +382,6 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-secondary-custom" (click)="downloadVoucher(selectedTrip)">
-        <i class="fas fa-download"></i>
-        Baixar Voucher
-      </button>
       <button class="btn btn-info-custom" (click)="rateTrip(selectedTrip)">
         <i class="fas fa-star"></i>
         Avaliar Viagem
@@ -364,6 +389,152 @@
       <button class="btn btn-outline-custom" (click)="closeModal()">
         <i class="fas fa-times"></i>
         Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Avaliação -->
+<div class="modal-overlay" *ngIf="isRatingModalOpen" (click)="closeRatingModal()">
+  <div class="rating-modal-content" (click)="$event.stopPropagation()" *ngIf="selectedTripForRating">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-star"></i>
+        Avaliar Viagem
+      </h3>
+      <button class="modal-close-btn" (click)="closeRatingModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading -->
+      <div *ngIf="isLoadingReview" class="loading-section">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Carregando dados da avaliação...</span>
+      </div>
+
+      <!-- Formulário de Avaliação -->
+      <div *ngIf="!isLoadingReview" class="rating-form">
+        <!-- Informações da Viagem -->
+        <div class="trip-info-header">
+          <img [src]="selectedTripForRating.imageUrl" [alt]="selectedTripForRating.origin + ' - ' + selectedTripForRating.destination" class="trip-thumb">
+          <div class="trip-info">
+            <h4>{{selectedTripForRating.origin}} - {{selectedTripForRating.destination}}</h4>
+            <p class="trip-dates">
+              {{formatDate(selectedTripForRating.departureDate)}} a {{formatDate(selectedTripForRating.returnDate)}}
+            </p>
+          </div>
+        </div>
+
+        <!-- Mostrar avaliação existente -->
+        <div *ngIf="existingReview" class="existing-review-section">
+          <div class="existing-review-header">
+            <h5><i class="fas fa-star"></i> Sua Avaliação</h5>
+            <span class="review-date">{{formatDate(existingReview.avaliationDate)}}</span>
+          </div>
+          
+          <div class="existing-rating">
+            <div class="stars-display">
+              <i class="fas fa-star" 
+                 *ngFor="let star of [1,2,3,4,5]" 
+                 [class.active]="star <= convertRatingEnumToNumber(existingReview.rating)"></i>
+            </div>
+            <span class="rating-label">
+              <span [ngSwitch]="convertRatingEnumToNumber(existingReview.rating)">
+                <span *ngSwitchCase="1">Muito Ruim</span>
+                <span *ngSwitchCase="2">Ruim</span>
+                <span *ngSwitchCase="3">Regular</span>
+                <span *ngSwitchCase="4">Bom</span>
+                <span *ngSwitchCase="5">Excelente</span>
+              </span>
+            </span>
+          </div>
+          
+          <div class="existing-comment" *ngIf="existingReview.comment">
+            <h6>Comentário:</h6>
+            <p>{{existingReview.comment}}</p>
+          </div>
+          
+          <div class="edit-review-notice">
+            <i class="fas fa-info-circle"></i>
+            <span>Você já avaliou esta viagem. Modifique os campos abaixo se desejar atualizar sua avaliação.</span>
+          </div>
+        </div>
+
+        <!-- Formulário para nova avaliação ou edição -->
+        <div class="rating-form-section">
+          <!-- Sistema de Estrelas -->
+          <div class="rating-section">
+            <label class="rating-label">
+              <span *ngIf="existingReview">Atualizar sua avaliação:</span>
+              <span *ngIf="!existingReview">Sua avaliação:</span>
+            </label>
+            <div class="star-rating">
+              <button 
+                type="button"
+                class="star-btn"
+                *ngFor="let star of [1,2,3,4,5]; let i = index"
+                [class.active]="currentRating >= star"
+                (click)="setRating(star)"
+                [disabled]="isSavingReview">
+                <i class="fas fa-star"></i>
+              </button>
+            </div>
+            <div class="rating-text" *ngIf="currentRating > 0">
+              <span [ngSwitch]="currentRating">
+                <span *ngSwitchCase="1">Muito Ruim</span>
+                <span *ngSwitchCase="2">Ruim</span>
+                <span *ngSwitchCase="3">Regular</span>
+                <span *ngSwitchCase="4">Bom</span>
+                <span *ngSwitchCase="5">Excelente</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Campo de Comentário -->
+          <div class="comment-section">
+            <label class="comment-label">
+              <span *ngIf="existingReview">Atualizar comentário:</span>
+              <span *ngIf="!existingReview">Comentário (opcional):</span>
+            </label>
+            <textarea 
+              class="comment-textarea"
+              [(ngModel)]="ratingComment"
+              placeholder="Conte-nos como foi sua experiência..."
+              maxlength="100"
+              rows="4"
+              [disabled]="isSavingReview"></textarea>
+            <div class="char-counter">
+              <small>{{ratingComment.length}}/100 caracteres</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações de Debug (remover em produção) -->
+        <div class="debug-info" *ngIf="travelHistoryId">
+          <small>Travel History ID: {{travelHistoryId}} | Bundle ID: {{selectedTripForRating.bundleId}}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button 
+        class="btn btn-success-custom" 
+        (click)="saveReview()"
+        [disabled]="currentRating === 0 || isSavingReview || isLoadingReview">
+        <i class="fas fa-spinner fa-spin" *ngIf="isSavingReview"></i>
+        <i class="fas fa-check" *ngIf="!isSavingReview"></i>
+        <span *ngIf="!isSavingReview && existingReview">Atualizar Avaliação</span>
+        <span *ngIf="!isSavingReview && !existingReview">Salvar Avaliação</span>
+        <span *ngIf="isSavingReview">Salvando...</span>
+      </button>
+      <button 
+        class="btn btn-outline-custom" 
+        (click)="closeRatingModal()"
+        [disabled]="isSavingReview">
+        <i class="fas fa-times"></i>
+        Cancelar
       </button>
     </div>
   </div>

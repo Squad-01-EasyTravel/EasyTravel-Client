@@ -132,6 +132,13 @@
 .dropdown-menu {
     z-index: 9999;
     position: absolute;
+    right: 0 !important; /* Força alinhamento à direita */
+    left: auto !important; /* Remove alinhamento à esquerda */
+    top: 100% !important; /* Posiciona abaixo do botão */
+    transform: none !important; /* Remove qualquer transformação */
+    margin-top: 0.5rem;
+    max-width: 280px; /* Largura máxima para evitar quebra */
+    width: max-content; /* Ajusta largura ao conteúdo */
 }
 
 /* Avatar do usuário */
@@ -148,6 +155,17 @@
 .user-avatar-btn:focus {
     box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.3);
     border-radius: 50%;
+}
+
+/* Container do dropdown do usuário - garante posicionamento correto */
+.dropdown {
+    position: relative;
+    z-index: 1031;
+}
+
+/* Previne que o dropdown interfira com outros elementos */
+.dropdown.show {
+    z-index: 9999;
 }
 
 .user-avatar {
@@ -182,21 +200,27 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     margin-top: 0.5rem;
     min-width: 220px;
+    max-width: 280px; /* Previne que fique muito largo */
     z-index: 9999;
     position: absolute;
+    right: 0 !important; /* Alinha à direita do container pai */
+    left: auto !important; /* Remove alinhamento à esquerda */
+    top: 100% !important; /* Posiciona logo abaixo do avatar */
     isolation: isolate;
     will-change: transform;
+    /* Previne que o dropdown saia da tela */
+    transform-origin: top right;
     /* Estados de visibilidade */
     display: none;
     opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .user-dropdown.show {
     display: block;
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
 
 .user-dropdown .dropdown-header {
@@ -238,6 +262,36 @@
 .user-dropdown .dropdown-divider {
     border-color: rgba(255, 255, 255, 0.2);
     margin: 0.5rem 0;
+}
+
+/* Responsividade para o dropdown */
+@media (max-width: 768px) {
+    .user-dropdown {
+        min-width: 200px;
+        max-width: calc(100vw - 2rem); /* Previne overflow em telas pequenas */
+        right: 1rem !important; /* Adiciona margem nas bordas */
+        left: auto !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-dropdown {
+        min-width: 180px;
+        max-width: calc(100vw - 1rem);
+        right: 0.5rem !important;
+        font-size: 0.9rem; /* Texto menor em telas muito pequenas */
+    }
+    
+    .user-dropdown .dropdown-item {
+        padding: 0.6rem 0.8rem;
+    }
+}
+
+/* Garantir que o dropdown não quebre a tela em telas muito largas */
+@media (min-width: 1400px) {
+    .user-dropdown {
+        max-width: 320px;
+    }
 }
 
 /* Navbar toggler para mobile */

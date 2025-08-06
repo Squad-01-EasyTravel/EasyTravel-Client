@@ -1405,3 +1405,407 @@
     font-size: 1.3rem;
   }
 }
+
+/* ===== SEÇÃO DE VIAJANTES NO MODAL ===== */
+.travelers-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.travelers-section h5 {
+  margin-bottom: 1rem;
+  color: #374151;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.travelers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.traveler-card {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.traveler-card:hover {
+  background: #f1f5f9;
+  border-color: #ff6b35;
+}
+
+.traveler-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.traveler-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 1rem;
+}
+
+.traveler-name i {
+  color: #ff6b35;
+  font-size: 0.875rem;
+}
+
+.traveler-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.traveler-doc {
+  font-family: 'Courier New', monospace;
+  background: #ffffff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  display: inline-block;
+  width: fit-content;
+}
+
+.traveler-age {
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.loading-travelers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-style: italic;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.loading-travelers i {
+  color: #ff6b35;
+}
+
+/* Responsivo para seção de viajantes */
+@media (max-width: 768px) {
+  .travelers-section {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+  }
+
+  .traveler-card {
+    padding: 0.75rem;
+  }
+
+  .traveler-name {
+    font-size: 0.9rem;
+  }
+
+  .traveler-details {
+    font-size: 0.8rem;
+  }
+}
+
+/* ===== MODAL DE AVALIAÇÃO ===== */
+.rating-modal-content {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.rating-form {
+  padding: 0;
+}
+
+/* Cabeçalho da viagem no modal */
+.trip-info-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.trip-thumb {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trip-info h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.trip-dates {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Seção de avaliação existente */
+.existing-review-section {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.existing-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.existing-review-header h5 {
+  margin: 0;
+  color: #28a745;
+  font-weight: 600;
+}
+
+.review-date {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.existing-rating {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stars-display {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.stars-display i {
+  font-size: 1.2rem;
+  color: #e9ecef;
+}
+
+.stars-display i.active {
+  color: #ffc107;
+}
+
+.existing-comment {
+  margin-bottom: 1rem;
+}
+
+.existing-comment h6 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.existing-comment p {
+  margin: 0;
+  color: #2c3e50;
+  font-style: italic;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid #28a745;
+}
+
+.edit-review-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+  background: rgba(255, 193, 7, 0.1);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid #ffc107;
+}
+
+.rating-form-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+}
+
+/* Seção de avaliação com estrelas */
+.rating-section {
+  padding: 2rem 1.5rem 1rem;
+  text-align: center;
+}
+
+.rating-label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #e9ecef;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.star-btn:hover {
+  color: #ffc107;
+  transform: scale(1.1);
+}
+
+.star-btn.active {
+  color: #ffc107;
+}
+
+.star-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.rating-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ff6b35;
+  margin-top: 0.5rem;
+}
+
+/* Seção de comentário */
+.comment-section {
+  padding: 1rem 1.5rem 2rem;
+}
+
+.comment-label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+}
+
+.comment-textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.comment-textarea:focus {
+  outline: none;
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.15);
+}
+
+.comment-textarea:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.char-counter {
+  text-align: right;
+  margin-top: 0.5rem;
+}
+
+.char-counter small {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+/* Loading section */
+.loading-section {
+  padding: 3rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.loading-section i {
+  font-size: 2rem;
+  color: #ff6b35;
+  margin-bottom: 1rem;
+}
+
+/* Debug info (remover em produção) */
+.debug-info {
+  padding: 0.5rem 1.5rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  font-family: monospace;
+  color: #6c757d;
+  text-align: center;
+}
+
+/* Responsivo para modal de avaliação */
+@media (max-width: 768px) {
+  .rating-modal-content {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .trip-info-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .trip-thumb {
+    width: 100px;
+    height: 75px;
+  }
+
+  .star-rating {
+    gap: 0.25rem;
+  }
+
+  .star-btn {
+    font-size: 1.5rem;
+  }
+
+  .rating-section, .comment-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

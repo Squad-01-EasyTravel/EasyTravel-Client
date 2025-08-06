@@ -1,14 +1,35 @@
   <div class="cards-container">
     <button type="button" class="card card-button-style selecionado" data-card="credito" (click)="selectCard('credito')">
-      <img src="assets/imgs/cartCred.png" alt="Cartão de crédito" class="card-image">
+      <img src="assets/imgs/cartCred.png" alt="Cartão de crédito ou débito" class="card-image">
+      <div class="payment-info">
+        <h4 class="payment-title">Cartão de Crédito ou Débito</h4>
+        <div class="discount-badges">
+          <span class="discount-badge discount-good">8% OFF débito</span>
+          <span class="discount-badge discount-medium">5% OFF crédito até 3x</span>
+          <span class="discount-badge discount-small">2% OFF crédito 4x-6x</span>
+        </div>
+      </div>
     </button>
 
     <button type="button" class="card card-button-style" data-card="pix" (click)="selectCard('pix')">
       <img src="assets/imgs/pix.png" alt="PIX" class="card-image">
+      <div class="payment-info">
+        <h4 class="payment-title">PIX</h4>
+        <div class="discount-badges">
+          <span class="discount-badge discount-high">10% OFF</span>
+          <span class="instant-tag">Pagamento Instantâneo</span>
+        </div>
+      </div>
     </button>
 
     <button type="button" class="card card-button-style" data-card="boleto" (click)="selectCard('boleto')">
       <img src="assets/imgs/boleto.png" alt="Boleto" class="card-image">
+      <div class="payment-info">
+        <h4 class="payment-title">Boleto Bancário</h4>
+        <div class="discount-badges">
+          <span class="processing-time">Até 3 dias úteis</span>
+        </div>
+      </div>
     </button>
   </div>
 

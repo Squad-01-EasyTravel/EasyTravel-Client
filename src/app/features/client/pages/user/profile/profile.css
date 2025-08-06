@@ -1074,3 +1074,89 @@ select.input-custom:focus {
         padding: 1.5rem;
     }
 }
+
+/* ===== LOADING E ESTADOS ===== */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+}
+
+.loading-container .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+}
+
+.loading-container p {
+    color: var(--color-text-light, #666);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* ===== VALIDAÇÃO APRIMORADA ===== */
+.input-custom.is-valid {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.input-custom.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.validation-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    z-index: 5;
+}
+
+.validation-icon.check {
+    color: #28a745;
+    display: none;
+}
+
+.validation-icon.times {
+    color: #dc3545;
+    display: none;
+}
+
+.input-group .input-custom.is-valid ~ .validation-icon.check {
+    display: block;
+}
+
+.input-group .input-custom.is-invalid ~ .validation-icon.times {
+    display: block;
+}
+
+/* ===== BOTÕES COM ESTADOS ===== */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn .fas.fa-spinner {
+    margin-right: 0.5rem;
+}
+
+/* ===== RESPONSIVIDADE PARA LOADING ===== */
+@media (max-width: 768px) {
+    .loading-container {
+        padding: 2rem 1rem;
+    }
+    
+    .loading-container .spinner-border {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .loading-container p {
+        font-size: 1rem;
+    }
+}

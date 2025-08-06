@@ -30,10 +30,6 @@
                     <a class="nav-link nav-link-custom" [class.active]="isRouteActive('/bundles')" href="#"
                         routerLink="/bundles" (click)="onNavLinkClick()">Pacotes</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-link-custom" [class.active]="isRouteActive('/booking')" href="#"
-                        routerLink="/booking" (click)="onNavLinkClick()">Reservas</a>
-                </li>
             </ul>
 
             <!-- Botão de Login ou Avatar do Usuário -->
@@ -42,7 +38,7 @@
                 <a class="btn btn-login" routerLink="/auth/login" *ngIf="!isLoggedIn" (click)="onNavLinkClick()">Fazer Login</a>
 
                 <!-- Avatar do Usuário (quando logado) -->
-                <div class="dropdown" *ngIf="isLoggedIn">
+                <div class="dropdown position-relative" *ngIf="isLoggedIn">
                     <button class="btn p-0 user-avatar-btn" type="button"
                         (click)="toggleUserDropdown()"
                         [attr.aria-expanded]="isUserDropdownOpen">

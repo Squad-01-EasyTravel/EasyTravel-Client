@@ -30,13 +30,28 @@
 
 /* Garantir que dropdowns tenham z-index alto globalmente */
 .dropdown-menu {
-  z-index: 9999;
+  z-index: 9999 !important;
+  /* Previne overflow horizontal em telas pequenas */
+  max-width: calc(100vw - 2rem);
+  /* Garante que o dropdown seja visível */
+  overflow: visible;
 }
 
 /* Garantir que navbar tenha stacking context adequado */
 .navbar {
   z-index: 1030;
   position: relative;
+  /* Previne overflow horizontal causado por dropdowns */
+  overflow: visible;
+}
+
+/* Garantir que o container principal não corte dropdowns */
+body {
+  overflow-x: hidden; /* Previne scroll horizontal desnecessário */
+}
+
+.container, .container-fluid {
+  overflow: visible; /* Permite que dropdowns sejam mostrados fora do container */
 }
 
 footer {
