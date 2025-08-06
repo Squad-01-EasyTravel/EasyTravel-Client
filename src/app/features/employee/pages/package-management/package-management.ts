@@ -129,13 +129,10 @@ export class PackageManagementComponent implements OnInit {
 
   constructor(
     private service: BundleService,
-
     private deleteConfirmationService: DeleteConfirmationService,
-    private toastService: ToastService
-
+    private toastService: ToastService,
     private mediaService: MediaService,
     public imageUploadService: ImageUploadService // Tornado público para acesso no template
-
   ) {}
 
   ngOnInit(): void {
