@@ -45,6 +45,7 @@ export interface UpdateUserDto {
   cpf?: string;
   telephone?: string;
   passport?: string;
+  password?: string;
   userRole?: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
   userStatus?: 'ACTIVATED' | 'DEACTIVATED';
 }
@@ -223,7 +224,21 @@ export class UserManagementService {
       switchMap((user: UserManagement) => {
         const newStatus: 'ACTIVATED' | 'DEACTIVATED' = user.userStatus === 'ACTIVATED' ? 'DEACTIVATED' : 'ACTIVATED';
         console.log('🔄 UserManagementService - Novo status:', newStatus);
-        return this.updateUser(id, { userStatus: newStatus });
+        
+        // Enviar todos os dados do usuário com apenas o userStatus alterado
+        const updatedUser = {
+          name: user.name,
+          email: user.email,
+          cpf: user.cpf,
+          passport: user.passport || undefined,
+          password: undefined, // Não enviar senha na atualização
+          telephone: user.telephone,
+          userStatus: newStatus,
+          userRole: user.userRole
+        };
+        
+        console.log('📤 UserManagementService - Dados enviados para PUT:', updatedUser);
+        return this.updateUser(id, updatedUser);
       }),
       map(() => {
         console.log('✅ UserManagementService - Status alterado com sucesso');
