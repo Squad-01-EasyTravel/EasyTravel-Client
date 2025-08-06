@@ -5,6 +5,7 @@ import { Card } from './card/card';
 import { Filter, FilterCriteria } from './filter/filter';
 import { Navbar } from '../../../../shared/navbar/navbar';
 import { Footer } from '../../../../shared/footer/footer';
+import { CartConfirmationModal } from '../../../../shared/cart-confirmation-modal/cart-confirmation-modal';
 import { BundleService } from '../../../../shared/services/bundle-service';
 import { BundleClass } from './class/bundle-class';
 import { MediaResponse } from '../../../../shared/models/media-response.interface';
@@ -12,7 +13,7 @@ import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-bundle',
-  imports: [CommonModule, FormsModule, Card, Navbar, Footer, Filter],
+  imports: [CommonModule, FormsModule, Card, Navbar, Footer, Filter, CartConfirmationModal],
   templateUrl: './bundle.html',
   styleUrl: './bundle.css'
 })

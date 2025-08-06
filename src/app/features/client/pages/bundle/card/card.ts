@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BookingService } from '@/app/shared/services/booking.service';
 import { NotificationService } from '@/app/shared/services/notification.service';
+import { CartConfirmationService } from '@/app/shared/services/cart-confirmation.service';
+import { AuthService } from '@/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-card',
@@ -15,7 +17,9 @@ export class Card implements OnInit {
     private route: ActivatedRoute, 
     private router: Router,
     private bookingService: BookingService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cartConfirmationService: CartConfirmationService,
+    private authService: AuthService
   ) {}
 
   @Input() pacote!: any; // Aceita o objeto processado com dados da API
@@ -52,7 +56,22 @@ export class Card implements OnInit {
     console.log('🛒 CARD: Adicionando pacote ao carrinho:', this.pacote);
     console.log('🛒 CARD: Bundle ID:', this.pacote.id);
     
-    // 1. PRIMEIRO: Verificar se o usuário já possui este pacote
+    // 1. PRIMEIRO: Verificar se o usuário está logado
+    if (!this.authService.isAuthenticated()) {
+      console.log('🔐 CARD: Usuário não logado, redirecionando para login');
+      this.notificationService.showWarning(
+        'Login necessário',
+        'Você precisa estar logado para adicionar pacotes ao carrinho'
+      );
+      
+      // Redirecionar para a página de login
+      this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: this.router.url } // Salva a URL atual para retornar depois do login
+      });
+      return;
+    }
+    
+    // 2. VERIFICAR se o usuário já possui este pacote
     this.bookingService.checkIfUserHasPackage(this.pacote.id).subscribe({
       next: (hasPackage: boolean) => {
         if (hasPackage) {
@@ -65,7 +84,7 @@ export class Card implements OnInit {
           return;
         }
         
-        // 2. USUÁRIO NÃO POSSUI: Criar reserva na API
+        // 3. USUÁRIO NÃO POSSUI: Criar reserva na API
         this.createNewReservation();
       },
       error: (error: any) => {
@@ -81,14 +100,29 @@ export class Card implements OnInit {
       next: (reservationResponse: any) => {
         console.log('✅ CARD: Reserva criada com sucesso:', reservationResponse);
         
-        // Mostrar notificação de sucesso
-        this.notificationService.showSuccess(
-          'Pacote adicionado!',
-          'Pacote adicionado às suas reservas com sucesso'
-        );
-        
-        // Redirecionar para booking com dados do pacote
-        this.redirectToBooking();
+        // Buscar o título correto para exibir no modal
+        const packageTitle = this.pacote.bundleTitle || 
+                            this.pacote.title || 
+                            this.pacote.locationName || 
+                            this.pacote.bundleName || 
+                            this.pacote.destination ||
+                            'Pacote Selecionado';
+
+        // Mostrar modal de confirmação ao invés de notificação simples
+        this.cartConfirmationService.showConfirmationModal({
+          title: 'Pacote Adicionado!',
+          message: 'foi adicionado ao seu carrinho com sucesso. O que deseja fazer agora?',
+          packageName: packageTitle,
+          onGoToBookings: () => {
+            // Redirecionar para my-booking (minhas reservas) ao invés de booking
+            console.log('🛒 Redirecionando para minhas reservas...');
+            this.router.navigate(['/my-booking']);
+          },
+          onContinueShopping: () => {
+            // Não faz nada, apenas fecha o modal
+            console.log('🛒 Usuario escolheu continuar comprando');
+          }
+        });
       },
       error: (error: any) => {
         console.error('❌ CARD: Erro ao criar reserva:', error);

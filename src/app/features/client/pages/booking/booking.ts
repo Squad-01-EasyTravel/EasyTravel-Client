@@ -1395,7 +1395,7 @@ export class Booking implements OnInit {
     
     // Slots ainda disponíveis = máximo - já ocupados
     const availableSlots = Math.max(0, maxTravelers - totalOccupied);
-    
+      
     // Atualizar o currentPackage.travelers para refletir apenas os slots disponíveis
     if (this.selectedPackageData) {
       // Definir como o número atual de viajantes extras que podem ser adicionados
