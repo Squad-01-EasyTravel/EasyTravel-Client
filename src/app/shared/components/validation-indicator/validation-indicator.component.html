@@ -1,0 +1,36 @@
+<div class="validation-indicator"
+     [class.show]="shouldShowValidation"
+     [class.position-left]="position === 'left'"
+     [class.position-right]="position === 'right'">
+  <div class="validation-header" *ngIf="shouldShowValidation">
+    <span class="validation-title">Requisitos:</span>
+    <div class="validation-progress">
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          [style.width.%]="progressPercentage">
+        </div>
+      </div>
+      <span class="progress-text">
+        {{ validCount }}/{{ rules.length }}
+      </span>
+    </div>
+  </div>
+
+  <ul class="validation-rules" *ngIf="shouldShowValidation">
+    <li
+      *ngFor="let rule of rules"
+      class="validation-rule"
+      [class.valid]="rule.isValid"
+      [class.invalid]="!rule.isValid && control.value && control.value.length > 0">
+
+      <i class="validation-icon"
+         [class.bi-check-circle-fill]="rule.isValid"
+         [class.bi-x-circle-fill]="!rule.isValid && control.value && control.value.length > 0"
+         [class.bi-circle]="!rule.isValid && (!control.value || control.value.length === 0)">
+      </i>
+
+      <span class="validation-text">{{ rule.label }}</span>
+    </li>
+  </ul>
+</div>
