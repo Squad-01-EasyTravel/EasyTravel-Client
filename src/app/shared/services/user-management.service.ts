@@ -14,10 +14,10 @@ export interface UserManagement {
   passport?: string;
   password?: string;
   userStatus: 'ACTIVATED' | 'DEACTIVATED';
-  userRole: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
+  userRole: 'ADMIN' | 'EMPLOYEE' | 'USER';
   avatar?: string;
   // Propriedades derivadas para compatibilidade com o frontend
-  role?: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
+  role?: 'ADMIN' | 'EMPLOYEE' | 'USER';
   isActive?: boolean;
 }
 
@@ -36,7 +36,8 @@ export interface CreateUserDto {
   telephone: string;
   passport?: string;
   password: string;
-  userRole: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
+  userRole: 'ADMIN' | 'EMPLOYEE' | 'USER';
+  userStatus: 'ACTIVATED' | 'DEACTIVATED';
 }
 
 export interface UpdateUserDto {
@@ -45,7 +46,8 @@ export interface UpdateUserDto {
   cpf?: string;
   telephone?: string;
   passport?: string;
-  userRole?: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
+  password?: string;
+  userRole?: 'ADMIN' | 'EMPLOYEE' | 'USER';
   userStatus?: 'ACTIVATED' | 'DEACTIVATED';
 }
 
@@ -53,7 +55,7 @@ export interface UserStats {
   totalUsers: number;
   activeUsers: number;
   inactiveUsers: number;
-  clientUsers: number;
+  userUsers: number;
   employeeUsers: number;
   adminUsers: number;
 }
@@ -223,7 +225,21 @@ export class UserManagementService {
       switchMap((user: UserManagement) => {
         const newStatus: 'ACTIVATED' | 'DEACTIVATED' = user.userStatus === 'ACTIVATED' ? 'DEACTIVATED' : 'ACTIVATED';
         console.log('🔄 UserManagementService - Novo status:', newStatus);
-        return this.updateUser(id, { userStatus: newStatus });
+        
+        // Enviar todos os dados do usuário com apenas o userStatus alterado
+        const updatedUser = {
+          name: user.name,
+          email: user.email,
+          cpf: user.cpf,
+          passport: user.passport || undefined,
+          password: undefined, // Não enviar senha na atualização
+          telephone: user.telephone,
+          userStatus: newStatus,
+          userRole: user.userRole
+        };
+        
+        console.log('📤 UserManagementService - Dados enviados para PUT:', updatedUser);
+        return this.updateUser(id, updatedUser);
       }),
       map(() => {
         console.log('✅ UserManagementService - Status alterado com sucesso');
@@ -247,7 +263,7 @@ export class UserManagementService {
           totalUsers: users.length,
           activeUsers: users.filter(u => u.isActive).length,
           inactiveUsers: users.filter(u => !u.isActive).length,
-          clientUsers: users.filter(u => u.role === 'CLIENT').length,
+          userUsers: users.filter(u => u.role === 'USER').length,
           employeeUsers: users.filter(u => u.role === 'EMPLOYEE').length,
           adminUsers: users.filter(u => u.role === 'ADMIN').length,
         };

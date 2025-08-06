@@ -16,7 +16,7 @@ export class UserManagement implements OnInit {
     totalUsers: 0,
     activeUsers: 0,
     inactiveUsers: 0,
-    clientUsers: 0,
+    userUsers: 0,
     employeeUsers: 0,
     adminUsers: 0
   };
@@ -47,7 +47,7 @@ export class UserManagement implements OnInit {
     telephone: '',
     passport: '',
     password: '',
-    userRole: 'CLIENT'
+    userRole: 'USER'
   };
 
   constructor(
@@ -167,7 +167,7 @@ export class UserManagement implements OnInit {
       telephone: '',
       passport: '',
       password: '',
-      userRole: 'CLIENT'
+      userRole: 'USER'
     };
   }
 
@@ -183,7 +183,13 @@ export class UserManagement implements OnInit {
   createUser(): void {
     console.log('➕ UserManagement - Criando usuário:', this.userForm);
 
-    this.userManagementService.createUser(this.userForm)
+    // Adicionar userStatus como ACTIVATED por padrão
+    const userData = {
+      ...this.userForm,
+      userStatus: 'ACTIVATED' as 'ACTIVATED' | 'DEACTIVATED'
+    };
+
+    this.userManagementService.createUser(userData)
       .subscribe({
         next: (user) => {
           console.log('✅ UserManagement - Usuário criado:', user);
@@ -207,6 +213,11 @@ export class UserManagement implements OnInit {
     const updateData = { ...this.userForm };
     if (!updateData.password) {
       delete updateData.password;
+    }
+    
+    // Adicionar userStatus se não estiver presente (manter o status atual)
+    if (!updateData.userStatus) {
+      updateData.userStatus = this.selectedUser.userStatus;
     }
 
     this.userManagementService.updateUser(this.selectedUser.id, updateData)
@@ -291,7 +302,7 @@ export class UserManagement implements OnInit {
     const roleMap: { [key: string]: string } = {
       'ADMIN': 'Administrador',
       'EMPLOYEE': 'Funcionário',
-      'CLIENT': 'Cliente'
+      'USER': 'Usuário'
     };
     return roleMap[role] || role;
   }
@@ -390,7 +401,7 @@ export class UserManagement implements OnInit {
     const roleClasses: { [key: string]: string } = {
       'ADMIN': 'role-admin',
       'EMPLOYEE': 'role-employee',
-      'CLIENT': 'role-client'
+      'USER': 'role-user'
     };
     return roleClasses[role] || 'role-default';
   }
@@ -399,7 +410,7 @@ export class UserManagement implements OnInit {
     const roleIcons: { [key: string]: string } = {
       'ADMIN': 'fas fa-crown',
       'EMPLOYEE': 'fas fa-user-tie',
-      'CLIENT': 'fas fa-user'
+      'USER': 'fas fa-user'
     };
     return roleIcons[role] || 'fas fa-user';
   }
