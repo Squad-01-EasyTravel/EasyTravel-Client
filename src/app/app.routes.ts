@@ -15,6 +15,7 @@ import { Payment } from './features/client/pages/payment/payment';
 import { AdminDashboardContent } from './features/admin/pages/admin-dashboard-content/admin-dashboard-content';
 import { AdminDashboard } from './features/admin/pages/admin-dashboard/admin-dashboard';
 import { AuthGuard } from './shared/guards/auth.guard';
+import { UserManagement } from './features/admin/pages/user-management/user-management';
 
 
 export const routes: Routes = [
@@ -46,7 +47,8 @@ export const routes: Routes = [
     component: AdminDashboard, // layout com sidebar e router-outlet
     canActivate: [AuthGuard],
     children: [
-      { path: 'dashboard', component: AdminDashboardContent } // conteúdo do dashboard
+      { path: 'dashboard', component: AdminDashboardContent },
+      { path: 'user-management', component: UserManagement } // conteúdo do dashboard
     ]
   },
   // Rota catch-all: redireciona qualquer rota não encontrada para home
