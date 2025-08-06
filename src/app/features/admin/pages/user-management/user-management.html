@@ -39,9 +39,9 @@
                   </div>
                 </div>
                 <div class="col-3">
-                  <div class="stats-card stats-clients bg-info bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
-                    <h3 class="stats-number h2 fw-bold mb-1">{{userStats.clientUsers}}</h3>
-                    <small class="stats-label fw-semibold">Clientes</small>
+                  <div class="stats-card stats-users bg-info bg-opacity-90 text-white rounded-4 p-3 backdrop-blur">
+                    <h3 class="stats-number h2 fw-bold mb-1">{{userStats.userUsers}}</h3>
+                    <small class="stats-label fw-semibold">Usuários</small>
                   </div>
                 </div>
                 <div class="col-3">
@@ -127,7 +127,7 @@
                   <label class="search-label">Tipo de Usuário</label>
                   <select class="search-select-field" [(ngModel)]="selectedRole" (change)="onRoleFilter()">
                     <option value="">Todos os tipos</option>
-                    <option value="CLIENT">Clientes</option>
+                    <option value="USER">Usuários</option>
                     <option value="EMPLOYEE">Funcionários</option>
                     <option value="ADMIN">Administradores</option>
                   </select>
@@ -238,6 +238,13 @@
                       title="Ver Detalhes">
                 <i class="fas fa-eye"></i>
                 Ver Detalhes
+              </button>
+              
+              <button class="btn-card-action btn-edit" 
+                      (click)="openEditModal(user)"
+                      title="Editar Usuário">
+                <i class="fas fa-edit"></i>
+                Editar
               </button>
               
               <button class="btn-card-action" 
@@ -490,7 +497,7 @@
                   name="role" 
                   required>
                   <option value="">Selecione o tipo</option>
-                  <option value="CLIENT">Cliente</option>
+                  <option value="USER">Usuário</option>
                   <option value="EMPLOYEE">Funcionário</option>
                   <option value="ADMIN">Administrador</option>
                 </select>
@@ -651,16 +658,9 @@
           <span>Fechar</span>
         </button>
         <button type="button" class="btn-modal btn-secondary" (click)="closeModal(); openEditModal(selectedUser)"
-                *ngIf="selectedUser.userRole !== 'CLIENT'">
+                *ngIf="selectedUser.userRole !== 'USER'">
           <i class="fas fa-edit"></i>
           <span>Editar Usuário</span>
-        </button>
-        <button type="button" class="btn-modal" 
-                [class.btn-danger]="isUserActive(selectedUser)"
-                [class.btn-success]="!isUserActive(selectedUser)"
-                (click)="toggleUserStatus(selectedUser); closeModal()">
-          <i [class]="isUserActive(selectedUser) ? 'fas fa-user-slash' : 'fas fa-user-check'"></i>
-          <span>{{isUserActive(selectedUser) ? 'Desativar' : 'Ativar'}} Usuário</span>
         </button>
       </div>
     </div>

@@ -14,10 +14,10 @@ export interface UserManagement {
   passport?: string;
   password?: string;
   userStatus: 'ACTIVATED' | 'DEACTIVATED';
-  userRole: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
+  userRole: 'ADMIN' | 'EMPLOYEE' | 'USER';
   avatar?: string;
   // Propriedades derivadas para compatibilidade com o frontend
-  role?: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
+  role?: 'ADMIN' | 'EMPLOYEE' | 'USER';
   isActive?: boolean;
 }
 
@@ -36,7 +36,8 @@ export interface CreateUserDto {
   telephone: string;
   passport?: string;
   password: string;
-  userRole: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
+  userRole: 'ADMIN' | 'EMPLOYEE' | 'USER';
+  userStatus: 'ACTIVATED' | 'DEACTIVATED';
 }
 
 export interface UpdateUserDto {
@@ -46,7 +47,7 @@ export interface UpdateUserDto {
   telephone?: string;
   passport?: string;
   password?: string;
-  userRole?: 'ADMIN' | 'EMPLOYEE' | 'CLIENT';
+  userRole?: 'ADMIN' | 'EMPLOYEE' | 'USER';
   userStatus?: 'ACTIVATED' | 'DEACTIVATED';
 }
 
@@ -54,7 +55,7 @@ export interface UserStats {
   totalUsers: number;
   activeUsers: number;
   inactiveUsers: number;
-  clientUsers: number;
+  userUsers: number;
   employeeUsers: number;
   adminUsers: number;
 }
@@ -262,7 +263,7 @@ export class UserManagementService {
           totalUsers: users.length,
           activeUsers: users.filter(u => u.isActive).length,
           inactiveUsers: users.filter(u => !u.isActive).length,
-          clientUsers: users.filter(u => u.role === 'CLIENT').length,
+          userUsers: users.filter(u => u.role === 'USER').length,
           employeeUsers: users.filter(u => u.role === 'EMPLOYEE').length,
           adminUsers: users.filter(u => u.role === 'ADMIN').length,
         };
