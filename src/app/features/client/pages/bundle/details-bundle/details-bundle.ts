@@ -4,9 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Navbar } from '../../../../../shared/navbar/navbar';
 import { Footer } from '../../../../../shared/footer/footer';
+import { CartConfirmationModal } from '../../../../../shared/cart-confirmation-modal/cart-confirmation-modal';
 import { BundleService } from '@/app/shared/services/bundle-service';
 import { BookingService } from '@/app/shared/services/booking.service';
 import { NotificationService } from '@/app/shared/services/notification.service';
+import { CartConfirmationService } from '@/app/shared/services/cart-confirmation.service';
+import { AuthService } from '@/app/shared/services/auth.service';
 import { BundleClass } from '../class/bundle-class';
 import { MediaResponse } from '../../../../../shared/models/media-response.interface';
 import { BundleLocationResponse } from '../../../../../shared/models/bundle-location-response.interface';
@@ -45,7 +48,7 @@ interface Avaliacao {
 
 @Component({
   selector: 'app-details-bundle',
-  imports: [CommonModule, FormsModule, Navbar, Footer],
+  imports: [CommonModule, FormsModule, Navbar, Footer, CartConfirmationModal],
   templateUrl: './details-bundle.html',
   styleUrl: './details-bundle.css'
 })
@@ -56,7 +59,9 @@ export class DetailsBundle implements OnInit {
     private route: ActivatedRoute,
     private service: BundleService,
     private bookingService: BookingService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cartConfirmationService: CartConfirmationService,
+    private authService: AuthService
   ) {}
 
   // Dados do pacote (virão do back-end)
@@ -423,7 +428,22 @@ export class DetailsBundle implements OnInit {
 
     console.log('🛒 DETAILS: Realizando reserva do bundle:', this.bundleClass);
     
-    // 1. PRIMEIRO: Verificar se o usuário já possui este pacote
+    // 1. PRIMEIRO: Verificar se o usuário está logado
+    if (!this.authService.isAuthenticated()) {
+      console.log('🔐 DETAILS: Usuário não logado, redirecionando para login');
+      this.notificationService.showWarning(
+        'Login necessário',
+        'Você precisa estar logado para fazer reservas'
+      );
+      
+      // Redirecionar para a página de login
+      this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: this.router.url } // Salva a URL atual para retornar depois do login
+      });
+      return;
+    }
+    
+    // 2. VERIFICAR se o usuário já possui este pacote
     this.bookingService.checkIfUserHasPackage(this.bundleClass.id).subscribe({
       next: (hasPackage: boolean) => {
         if (hasPackage) {
@@ -436,7 +456,7 @@ export class DetailsBundle implements OnInit {
           return;
         }
         
-        // 2. USUÁRIO NÃO POSSUI: Criar reserva na API
+        // 3. USUÁRIO NÃO POSSUI: Criar reserva na API
         this.createNewReservation();
       },
       error: (error: any) => {
@@ -452,14 +472,26 @@ export class DetailsBundle implements OnInit {
       next: (reservationResponse: any) => {
         console.log('✅ DETAILS: Reserva criada com sucesso:', reservationResponse);
         
-        // Mostrar notificação de sucesso
-        this.notificationService.showSuccess(
-          'Pacote adicionado!',
-          'Pacote adicionado às suas reservas com sucesso'
-        );
-        
-        // Redirecionar para booking com dados do pacote
-        this.redirectToBooking();
+        // Buscar o título correto para exibir no modal
+        const packageTitle = this.bundleClass.bundleTitle || 
+                            this.destinationLocation || 
+                            'Pacote Selecionado';
+
+        // Mostrar modal de confirmação ao invés de notificação simples
+        this.cartConfirmationService.showConfirmationModal({
+          title: 'Reserva Confirmada!',
+          message: 'foi reservado com sucesso. O que deseja fazer agora?',
+          packageName: packageTitle,
+          onGoToBookings: () => {
+            // Redirecionar para my-booking (minhas reservas) ao invés de booking
+            console.log('🛒 Redirecionando para minhas reservas...');
+            this.router.navigate(['/my-booking']);
+          },
+          onContinueShopping: () => {
+            // Não faz nada, apenas fecha o modal
+            console.log('🛒 Usuario escolheu continuar comprando');
+          }
+        });
       },
       error: (error: any) => {
         console.error('❌ DETAILS: Erro ao criar reserva:', error);
