@@ -1949,6 +1949,149 @@ input:checked + .toggle-slider:before {
   display: inline-block;
 }
 
+/* ===== ESTADOS DE UPLOAD ===== */
+
+.upload-area.uploading {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-color: #ffc107;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.upload-loading {
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.upload-spinner {
+  position: relative;
+}
+
+.upload-loading-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #856404;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-loading-subtitle {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.upload-progress-bar {
+  width: 100%;
+  max-width: 300px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-animated {
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #28a745, #ffc107);
+  background-size: 200% 100%;
+  animation: progressBarGlow 2s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+@keyframes progressBarGlow {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ===== MELHORIAS DE PREVIEW E VALIDAÇÃO ===== */
+
+.preview-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.preview-spinner .spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+.preview-loading-text {
+  color: white;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.upload-status-text {
+  font-size: 0.75rem;
+  display: block;
+}
+
+/* Input com validação */
+.input-with-validation {
+  position: relative;
+}
+
+.input-feedback {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+.input-feedback i {
+  font-size: 1.1rem;
+}
+
+.form-control-modern.is-valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.form-control-modern.is-invalid {
+  border-color: #ffc107;
+  box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+.form-control-modern:disabled {
+  background-color: #f8f9fa;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Estados melhorados do upload */
+.upload-loading-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.upload-loading-subtitle strong {
+  color: #007bff;
+  font-weight: 600;
+}
+
 /* ===== ANIMAÇÕES ===== */
 
 @keyframes bounce {

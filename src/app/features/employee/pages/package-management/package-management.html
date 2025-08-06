@@ -719,7 +719,19 @@
                         <img [src]="selectedImagePreview || newPackage.imageUrl"
                              alt="Preview da imagem"
                              class="preview-img">
-                        <div class="image-overlay-actions">
+                        
+                        <!-- Loading overlay durante upload -->
+                        <div class="preview-loading-overlay" *ngIf="uploadingImage">
+                          <div class="preview-spinner">
+                            <div class="spinner-border text-white" role="status">
+                              <span class="visually-hidden">Enviando...</span>
+                            </div>
+                          </div>
+                          <p class="preview-loading-text">Processando...</p>
+                        </div>
+
+                        <!-- Actions overlay -->
+                        <div class="image-overlay-actions" *ngIf="!uploadingImage">
                           <button type="button" class="btn-remove-image"
                                   (click)="removeImage()"
                                   title="Remover imagem">
@@ -738,11 +750,14 @@
                     <div class="upload-area"
                          *ngIf="!newPackage.imageUrl && !selectedImagePreview"
                          [class.drag-over]="isDragOver"
-                         (click)="imageFileInput.click()"
+                         [class.uploading]="uploadingImage"
+                         (click)="!uploadingImage && imageFileInput.click()"
                          (dragover)="onDragOver($event)"
                          (dragleave)="onDragLeave($event)"
                          (drop)="onDrop($event)">
-                      <div class="upload-content">
+                      
+                      <!-- Estado normal -->
+                      <div class="upload-content" *ngIf="!uploadingImage">
                         <div class="upload-icon">
                           <i class="fas fa-cloud-upload-alt"></i>
                         </div>
@@ -751,9 +766,32 @@
                         <div class="upload-formats">
                           <small class="text-muted">
                             <i class="fas fa-info-circle me-1"></i>
-                            Formatos aceitos: JPG, PNG, WebP (máx. 5MB)
+                            Formatos aceitos: JPG, PNG, WebP, GIF (máx. 10MB)
                           </small>
                         </div>
+                      </div>
+
+                      <!-- Estado de upload -->
+                      <div class="upload-loading" *ngIf="uploadingImage">
+                        <div class="upload-spinner">
+                          <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Enviando...</span>
+                          </div>
+                        </div>
+                        <h6 class="upload-loading-title">
+                          <i class="fas fa-cloud-upload-alt me-2"></i>
+                          Fazendo Upload...
+                        </h6>
+                        <p class="upload-loading-subtitle">
+                          Processando com <strong>Cloudinary</strong> → <strong>ImgBB</strong> → <strong>Base64</strong>
+                        </p>
+                        <div class="upload-progress-bar">
+                          <div class="progress-bar-animated"></div>
+                        </div>
+                        <small class="upload-status-text text-muted mt-2">
+                          <i class="fas fa-shield-alt me-1"></i>
+                          Sistema inteligente com múltiplos provedores
+                        </small>
                       </div>
                     </div>
 
@@ -772,14 +810,30 @@
                     <i class="fas fa-link label-icon"></i>
                     OU URL da Imagem
                   </label>
-                  <input type="url" id="imageUrl" class="form-control-modern"
-                         [(ngModel)]="newPackage.imageUrl"
-                         name="imageUrl"
-                         placeholder="https://exemplo.com/imagem.jpg"
-                         (ngModelChange)="onImageUrlChange($event)">
+                  <div class="input-with-validation">
+                    <input type="url" id="imageUrl" class="form-control-modern"
+                           [(ngModel)]="newPackage.imageUrl"
+                           name="imageUrl"
+                           [class.is-invalid]="newPackage.imageUrl && !isValidImageUrl(newPackage.imageUrl)"
+                           [class.is-valid]="newPackage.imageUrl && isValidImageUrl(newPackage.imageUrl)"
+                           [disabled]="uploadingImage"
+                           placeholder="https://exemplo.com/imagem.jpg"
+                           (ngModelChange)="onImageUrlChange($event)">
+                    
+                    <!-- Indicador de URL válida -->
+                    <div class="input-feedback" *ngIf="newPackage.imageUrl">
+                      <i class="fas fa-check-circle text-success" 
+                         *ngIf="isValidImageUrl(newPackage.imageUrl)"
+                         title="URL válida"></i>
+                      <i class="fas fa-exclamation-triangle text-warning" 
+                         *ngIf="!isValidImageUrl(newPackage.imageUrl)"
+                         title="URL pode não ser válida"></i>
+                    </div>
+                  </div>
+                  
                   <small class="form-text text-muted">
                     <i class="fas fa-lightbulb me-1"></i>
-                    Cole o link direto de uma imagem da internet
+                    Cole uma URL de imagem de provedores confiáveis (Cloudinary, ImgBB, etc.)
                   </small>
                 </div>
 

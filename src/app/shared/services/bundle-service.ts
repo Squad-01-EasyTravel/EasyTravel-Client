@@ -1,5 +1,5 @@
 import { BundleClass } from '@/app/features/client/pages/bundle/class/bundle-class';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MediaResponse } from '../models/media-response.interface';
@@ -64,6 +64,62 @@ export class BundleService {
   deleteBundle(id: number): Observable<void> {
     const url = `${this.baseUrl}/${id}`;
     return this.http.delete<void>(url);
+  }
+
+  // Salvar mídia para um bundle
+  saveBundleMedia(bundleId: number, mediaUrl: string, mediaType: string = 'IMAGE'): Observable<MediaResponse> {
+    const mediaData = {
+      mediaType: mediaType.toUpperCase(), // Garantir que seja maiúsculo (IMAGE ou VIDEO)
+      mediaUrl: mediaUrl,
+      bundleId: bundleId
+    };
+    
+    // Headers específicos para requisições de mídia (sem autenticação)
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Skip-Auth': 'true' // Sinaliza para o interceptor pular autenticação
+    });
+    
+    return this.http.post<MediaResponse>(this.mediaUrl, mediaData, { headers });
+  }
+
+  // Atualizar mídia existente
+  updateBundleMedia(mediaId: number, mediaUrl: string, mediaType: string = 'IMAGE'): Observable<MediaResponse> {
+    const url = `${this.mediaUrl}/${mediaId}`;
+    const mediaData = {
+      mediaType: mediaType.toUpperCase(), // Garantir que seja maiúsculo (IMAGE ou VIDEO)
+      mediaUrl: mediaUrl
+    };
+    
+    // Headers específicos para requisições de mídia (sem autenticação)
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Skip-Auth': 'true' // Sinaliza para o interceptor pular autenticação
+    });
+    
+    return this.http.put<MediaResponse>(url, mediaData, { headers });
+  }
+
+  // Métodos de conveniência para tipos específicos de mídia
+
+  // Salvar imagem para um bundle
+  saveBundleImage(bundleId: number, imageUrl: string): Observable<MediaResponse> {
+    return this.saveBundleMedia(bundleId, imageUrl, 'IMAGE');
+  }
+
+  // Salvar vídeo para um bundle
+  saveBundleVideo(bundleId: number, videoUrl: string): Observable<MediaResponse> {
+    return this.saveBundleMedia(bundleId, videoUrl, 'VIDEO');
+  }
+
+  // Atualizar imagem existente
+  updateBundleImage(mediaId: number, imageUrl: string): Observable<MediaResponse> {
+    return this.updateBundleMedia(mediaId, imageUrl, 'IMAGE');
+  }
+
+  // Atualizar vídeo existente
+  updateBundleVideoMedia(mediaId: number, videoUrl: string): Observable<MediaResponse> {
+    return this.updateBundleMedia(mediaId, videoUrl, 'VIDEO');
   }
 
   
