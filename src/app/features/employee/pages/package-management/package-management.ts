@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BundleService } from '@/app/shared/services/bundle-service';
+import { MediaService } from '@/app/shared/services/media.service';
+import { ImageUploadService } from '@/app/shared/services/image-upload.service';
 import { BundleClass } from '@/app/features/client/pages/bundle/class/bundle-class';
 import { MediaResponse } from '@/app/shared/models/media-response.interface';
 import { Location } from '@/app/shared/models/location.interface';
@@ -116,6 +118,7 @@ export class PackageManagementComponent implements OnInit {
   selectedImageFile: File | null = null;
   selectedImagePreview: string | null = null;
   isDragOver = false;
+  uploadingImage = false; // Novo estado para loading
 
   // Propriedades para o modal de visualização
   isViewModalOpen = false;
@@ -126,8 +129,13 @@ export class PackageManagementComponent implements OnInit {
 
   constructor(
     private service: BundleService,
+
     private deleteConfirmationService: DeleteConfirmationService,
     private toastService: ToastService
+
+    private mediaService: MediaService,
+    public imageUploadService: ImageUploadService // Tornado público para acesso no template
+
   ) {}
 
   ngOnInit(): void {
@@ -195,7 +203,7 @@ export class PackageManagementComponent implements OnInit {
     console.log('🖼️ Carregando imagens dos pacotes...');
     
     this.packages.forEach((packageItem) => {
-      this.service.getBundleImage(packageItem.id).subscribe({
+      this.mediaService.getBundleMedia(packageItem.id).subscribe({
         next: (mediaResponse) => {
           console.log(`📸 Resposta de imagem para pacote ${packageItem.id}:`, mediaResponse);
           
@@ -203,9 +211,16 @@ export class PackageManagementComponent implements OnInit {
           let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
           
           if (mediaData && mediaData.mediaUrl) {
-            // Seguir o padrão da home: usar URL completa com localhost:8080
-            packageItem.imageUrl = `http://localhost:8080${mediaData.mediaUrl}`;
-            console.log(`✅ Imagem carregada para pacote ${packageItem.id}: ${packageItem.imageUrl}`);
+            // Verificar se a URL já é completa (começa com http/https) ou se é um caminho relativo
+            if (mediaData.mediaUrl.startsWith('http://') || mediaData.mediaUrl.startsWith('https://')) {
+              // URL já é completa, usar diretamente
+              packageItem.imageUrl = mediaData.mediaUrl;
+              console.log(`✅ Imagem externa carregada para pacote ${packageItem.id}: ${packageItem.imageUrl}`);
+            } else {
+              // URL relativa, adicionar localhost:8080
+              packageItem.imageUrl = `http://localhost:8080${mediaData.mediaUrl}`;
+              console.log(`✅ Imagem local carregada para pacote ${packageItem.id}: ${packageItem.imageUrl}`);
+            }
           } else {
             // Usar imagem padrão inteligente baseada no pacote
             packageItem.imageUrl = this.getDefaultImageForPackage({
@@ -837,28 +852,60 @@ export class PackageManagementComponent implements OnInit {
         next: (updatedBundle) => {
           console.log('✅ Bundle editado com sucesso:', updatedBundle);
           
-          // Atualizar na lista local
-          const index = this.packages.findIndex(p => p.id === this.selectedPackage!.id);
-          if (index !== -1) {
-            this.packages[index] = {
-              ...this.selectedPackage!,
-              ...this.newPackage,
-              id: this.selectedPackage!.id,
-              createdAt: this.selectedPackage!.createdAt,
-              bundleRank: this.mapBundleRank(updatedBundle.bundleRank), // Converter de volta para frontend
-              available: updatedBundle.bundleStatus === 'AVAILABLE',
-              bundleStatus: updatedBundle.bundleStatus
-            } as TravelPackage;
+          // Se há nova imagem para salvar/atualizar, salvar a mídia
+          if (this.newPackage.imageUrl && this.newPackage.imageUrl.trim() !== '' && 
+              this.newPackage.imageUrl !== this.selectedPackage!.imageUrl) {
+            console.log('🖼️ Salvando/atualizando imagem do bundle:', this.newPackage.imageUrl);
+            
+            // Primeiro, verificar se já existe mídia para este bundle
+            this.mediaService.getBundleMedia(updatedBundle.id).subscribe({
+              next: (existingMedia) => {
+                if (existingMedia && existingMedia.length > 0) {
+                  // Atualizar mídia existente
+                  console.log('📝 Atualizando mídia existente ID:', existingMedia[0].id);
+                  this.mediaService.updateBundleMedia(existingMedia[0].id, this.newPackage.imageUrl!, 'IMAGE').subscribe({
+                    next: (updatedMedia) => {
+                      console.log('✅ Mídia atualizada com sucesso:', updatedMedia);
+                      this.afterBundleUpdate(updatedBundle);
+                    },
+                    error: (mediaError) => {
+                      console.error('❌ Erro ao atualizar mídia:', mediaError);
+                      this.afterBundleUpdate(updatedBundle);
+                    }
+                  });
+                } else {
+                  // Criar nova mídia
+                  console.log('➕ Criando nova mídia para bundle');
+                  this.mediaService.createBundleMedia(updatedBundle.id, this.newPackage.imageUrl!, 'IMAGE').subscribe({
+                    next: (savedMedia) => {
+                      console.log('✅ Nova mídia salva com sucesso:', savedMedia);
+                      this.afterBundleUpdate(updatedBundle);
+                    },
+                    error: (mediaError) => {
+                      console.error('❌ Erro ao salvar mídia:', mediaError);
+                      this.afterBundleUpdate(updatedBundle);
+                    }
+                  });
+                }
+              },
+              error: (error) => {
+                console.log('🆕 Nenhuma mídia existente encontrada, criando nova');
+                this.mediaService.createBundleMedia(updatedBundle.id, this.newPackage.imageUrl!, 'IMAGE').subscribe({
+                  next: (savedMedia) => {
+                    console.log('✅ Nova mídia salva com sucesso:', savedMedia);
+                    this.afterBundleUpdate(updatedBundle);
+                  },
+                  error: (mediaError) => {
+                    console.error('❌ Erro ao salvar mídia:', mediaError);
+                    this.afterBundleUpdate(updatedBundle);
+                  }
+                });
+              }
+            });
+          } else {
+            // Sem imagem nova para salvar
+            this.afterBundleUpdate(updatedBundle);
           }
-          
-          this.closeModal();
-          
-          // Recarregar dados da API após salvar
-          console.log('🔄 Recarregando dados da API após edição...');
-          this.loadPackages();
-          
-          // Mostrar mensagem de sucesso
-          alert('Pacote editado com sucesso!');
         },
         error: (error) => {
           console.error('❌ Erro ao editar pacote:', error);
@@ -906,39 +953,32 @@ export class PackageManagementComponent implements OnInit {
         next: (createdBundle) => {
           console.log('✅ Bundle criado com sucesso:', createdBundle);
           
-          // Converter e adicionar na lista local
-          const newPackage: TravelPackage = {
-            id: createdBundle.id,
-            bundleTitle: createdBundle.bundleTitle,
-            bundleDescription: createdBundle.bundleDescription,
-            initialPrice: createdBundle.initialPrice,
-            bundleRank: this.mapBundleRank(createdBundle.bundleRank), // Converter de volta para frontend
-            initialDate: createdBundle.initialDate,
-            finalDate: createdBundle.finalDate,
-            quantity: createdBundle.quantity,
-            travelersNumber: createdBundle.travelersNumber,
-            bundleStatus: createdBundle.bundleStatus,
-            available: createdBundle.bundleStatus === 'AVAILABLE',
-            createdAt: new Date(),
-            imageUrl: this.newPackage.imageUrl || '/assets/imgs/fortaleza.jpg'
-          };
-          
-          this.packages.push(newPackage);
-          
-          // Resetar para primeira página se necessário
-          const totalPages = this.getTotalPages();
-          if (this.currentPage > totalPages) {
-            this.currentPage = Math.max(1, totalPages);
-          }
+          // Se há imagem para salvar, salvar a mídia
+          if (this.newPackage.imageUrl && this.newPackage.imageUrl.trim() !== '') {
+            console.log('🖼️ Salvando imagem do bundle:', this.newPackage.imageUrl);
+            
+            // Para imagens, usar 'IMAGE'
+            this.mediaService.createBundleMedia(createdBundle.id, this.newPackage.imageUrl, 'IMAGE').subscribe({
+              next: (savedMedia) => {
+                console.log('✅ Mídia salva com sucesso:', savedMedia);
+                this.afterBundleCreation(createdBundle);
+              },
+              error: (mediaError) => {
+                console.error('❌ Erro ao salvar mídia:', mediaError);
+                // Bundle foi criado, mas mídia falhou - continuar
+                console.log('⚠️ Bundle criado mas imagem não foi salva. Continuando...');
+                this.afterBundleCreation(createdBundle);
+              }
+            });
 
-          this.closeModal();
-          
-          // Recarregar dados da API após criar
-          console.log('🔄 Recarregando dados da API após criação...');
-          this.loadPackages();
-          
-          // Mostrar mensagem de sucesso
-          alert('Pacote criado com sucesso!');
+            // Exemplo para vídeos (comentado):
+            // this.mediaService.createBundleMedia(createdBundle.id, videoUrl, 'VIDEO').subscribe({...});
+            // Ou usar método específico:
+            // this.mediaService.createBundleVideo(createdBundle.id, videoUrl).subscribe({...});
+          } else {
+            // Sem imagem para salvar
+            this.afterBundleCreation(createdBundle);
+          }
         },
         error: (error) => {
           console.error('❌ Erro ao criar pacote:', error);
@@ -956,6 +996,67 @@ export class PackageManagementComponent implements OnInit {
         }
       });
     }
+  }
+
+  private afterBundleCreation(createdBundle: any): void {
+    // Converter e adicionar na lista local
+    const newPackage: TravelPackage = {
+      id: createdBundle.id,
+      bundleTitle: createdBundle.bundleTitle,
+      bundleDescription: createdBundle.bundleDescription,
+      initialPrice: createdBundle.initialPrice,
+      bundleRank: this.mapBundleRank(createdBundle.bundleRank), // Converter de volta para frontend
+      initialDate: createdBundle.initialDate,
+      finalDate: createdBundle.finalDate,
+      quantity: createdBundle.quantity,
+      travelersNumber: createdBundle.travelersNumber,
+      bundleStatus: createdBundle.bundleStatus,
+      available: createdBundle.bundleStatus === 'AVAILABLE',
+      createdAt: new Date(),
+      imageUrl: this.newPackage.imageUrl || '/assets/imgs/fortaleza.jpg'
+    };
+    
+    this.packages.push(newPackage);
+    
+    // Resetar para primeira página se necessário
+    const totalPages = this.getTotalPages();
+    if (this.currentPage > totalPages) {
+      this.currentPage = Math.max(1, totalPages);
+    }
+
+    this.closeModal();
+    
+    // Recarregar dados da API após criar
+    console.log('🔄 Recarregando dados da API após criação...');
+    this.loadPackages();
+    
+    // Mostrar mensagem de sucesso
+    alert('Pacote criado com sucesso!');
+  }
+
+  private afterBundleUpdate(updatedBundle: any): void {
+    // Atualizar na lista local
+    const index = this.packages.findIndex(p => p.id === this.selectedPackage!.id);
+    if (index !== -1) {
+      this.packages[index] = {
+        ...this.selectedPackage!,
+        ...this.newPackage,
+        id: this.selectedPackage!.id,
+        createdAt: this.selectedPackage!.createdAt,
+        bundleRank: this.mapBundleRank(updatedBundle.bundleRank), // Converter de volta para frontend
+        available: updatedBundle.bundleStatus === 'AVAILABLE',
+        bundleStatus: updatedBundle.bundleStatus
+      } as TravelPackage;
+    }
+    
+    this.closeModal();
+    
+    // Recarregar dados da API após salvar
+    console.log('🔄 Recarregando dados da API após edição...');
+    this.loadPackages();
+    
+    // Mostrar mensagem de sucesso
+    alert('Pacote editado com sucesso!');
   }
 
   deletePackage(id: number): void {
@@ -1215,19 +1316,52 @@ export class PackageManagementComponent implements OnInit {
 
   onImageSelected(event: any): void {
     const file = event.target.files[0];
-    if (file && this.isValidImageFile(file)) {
-      this.selectedImageFile = file;
-      this.createImagePreview(file);
-      // Limpa a URL se uma imagem foi selecionada
-      this.newPackage.imageUrl = '';
+    if (file) {
+      // Usar validação do serviço
+      const validation = this.imageUploadService.validateImageFile(file);
+      if (validation.valid) {
+        this.selectedImageFile = file;
+        this.uploadingImage = true;
+        
+        // Criar preview
+        this.imageUploadService.createImagePreview(file)
+          .then(preview => {
+            this.selectedImagePreview = preview;
+          })
+          .catch(error => {
+            console.error('Erro ao criar preview:', error);
+          });
+
+        // Fazer upload da imagem
+        this.imageUploadService.smartUpload(file).subscribe({
+          next: (imageUrl) => {
+            console.log('✅ Upload bem-sucedido:', imageUrl);
+            this.newPackage.imageUrl = imageUrl;
+            this.uploadingImage = false;
+          },
+          error: (error) => {
+            console.error('❌ Erro no upload:', error);
+            alert(`Erro no upload: ${error.message}`);
+            this.uploadingImage = false;
+          }
+        });
+
+        // Limpa a URL manual se uma imagem foi selecionada
+        if (this.newPackage.imageUrl && !this.newPackage.imageUrl.startsWith('data:')) {
+          this.newPackage.imageUrl = '';
+        }
+      } else {
+        alert(validation.error);
+      }
     }
   }
 
   onImageUrlChange(url: string): void {
-    if (url) {
-      // Se uma URL foi inserida, limpa a imagem selecionada
+    if (url && this.imageUploadService.isValidImageUrl(url)) {
+      // Se uma URL válida foi inserida, limpa a imagem selecionada
       this.selectedImageFile = null;
       this.selectedImagePreview = null;
+      this.uploadingImage = false;
     }
   }
 
@@ -1235,6 +1369,7 @@ export class PackageManagementComponent implements OnInit {
     this.selectedImageFile = null;
     this.selectedImagePreview = null;
     this.newPackage.imageUrl = '';
+    this.uploadingImage = false;
   }
 
   onDragOver(event: DragEvent): void {
@@ -1257,45 +1392,47 @@ export class PackageManagementComponent implements OnInit {
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       const file = files[0];
-      if (this.isValidImageFile(file)) {
+      
+      // Usar validação do serviço
+      const validation = this.imageUploadService.validateImageFile(file);
+      if (validation.valid) {
         this.selectedImageFile = file;
-        this.createImagePreview(file);
+        this.uploadingImage = true;
+        
+        // Criar preview
+        this.imageUploadService.createImagePreview(file)
+          .then(preview => {
+            this.selectedImagePreview = preview;
+          })
+          .catch(error => {
+            console.error('Erro ao criar preview:', error);
+          });
+
+        // Fazer upload da imagem
+        this.imageUploadService.smartUpload(file).subscribe({
+          next: (imageUrl) => {
+            console.log('✅ Upload bem-sucedido:', imageUrl);
+            this.newPackage.imageUrl = imageUrl;
+            this.uploadingImage = false;
+          },
+          error: (error) => {
+            console.error('❌ Erro no upload:', error);
+            alert(`Erro no upload: ${error.message}`);
+            this.uploadingImage = false;
+          }
+        });
+
         this.newPackage.imageUrl = '';
       } else {
-        alert('Arquivo inválido! Por favor, selecione uma imagem (JPG, PNG, WebP) com até 5MB.');
+        alert(validation.error);
       }
     }
-  }
-
-  private isValidImageFile(file: File): boolean {
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-
-    if (!validTypes.includes(file.type)) {
-      alert('Tipo de arquivo não suportado! Use JPG, PNG ou WebP.');
-      return false;
-    }
-
-    if (file.size > maxSize) {
-      alert('Arquivo muito grande! O tamanho máximo é 5MB.');
-      return false;
-    }
-
-    return true;
-  }
-
-  private createImagePreview(file: File): void {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.selectedImagePreview = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
   }
 
   // ===== FIM DOS MÉTODOS DE UPLOAD =====
 
   isFormValid(): boolean {
-    const hasImage = !!(this.newPackage.imageUrl || this.selectedImageFile);
+    const hasImage = this.hasValidImage();
 
     return !!(
       this.newPackage.bundleTitle &&
@@ -1307,7 +1444,25 @@ export class PackageManagementComponent implements OnInit {
       this.newPackage.finalDate &&
       this.newPackage.quantity !== undefined && 
       this.newPackage.quantity >= 0 &&
-      hasImage
+      hasImage &&
+      !this.uploadingImage // Não permitir envio durante upload
+    );
+  }
+
+  // ===== MÉTODOS AUXILIARES PARA TEMPLATE =====
+
+  // Método para validar URL de imagem (acessível pelo template)
+  isValidImageUrl(url: string): boolean {
+    if (!url) return false;
+    return this.imageUploadService.isValidImageUrl(url);
+  }
+
+  // Método para verificar se há imagem válida
+  hasValidImage(): boolean {
+    return !!(
+      (this.newPackage.imageUrl && this.isValidImageUrl(this.newPackage.imageUrl)) ||
+      this.selectedImagePreview ||
+      this.selectedImageFile
     );
   }
 
