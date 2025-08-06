@@ -8,6 +8,10 @@ import { BundleClass } from '@/app/features/client/pages/bundle/class/bundle-cla
 import { MediaResponse } from '@/app/shared/models/media-response.interface';
 import { Location } from '@/app/shared/models/location.interface';
 import { BundleLocationResponse } from '@/app/shared/models/bundle-location-response.interface';
+import { DeleteConfirmationService } from '@/app/shared/services/delete-confirmation.service';
+import { ToastService } from '@/app/shared/services/toast.service';
+import { DeleteConfirmationModal } from '@/app/shared/delete-confirmation-modal/delete-confirmation-modal';
+import { ToastContainerComponent } from '@/app/shared/toast-container/toast-container';
 
 export interface AdvancedFilterCriteria {
   tipoFiltro: string; // 'none', 'localizacao', 'preco', 'viajantes', 'data', 'categoria'
@@ -44,7 +48,7 @@ interface TravelPackage {
 @Component({
   selector: 'app-package-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DeleteConfirmationModal, ToastContainerComponent],
   templateUrl: './package-management.html',
   styleUrl: './package-management.css'
 })
@@ -125,8 +129,13 @@ export class PackageManagementComponent implements OnInit {
 
   constructor(
     private service: BundleService,
+
+    private deleteConfirmationService: DeleteConfirmationService,
+    private toastService: ToastService
+
     private mediaService: MediaService,
     public imageUploadService: ImageUploadService // Tornado público para acesso no template
+
   ) {}
 
   ngOnInit(): void {
@@ -1051,48 +1060,80 @@ export class PackageManagementComponent implements OnInit {
   }
 
   deletePackage(id: number): void {
-    if (confirm('Tem certeza que deseja excluir este pacote? Esta ação não pode ser desfeita.')) {
-      console.log('🗑️ Excluindo pacote ID:', id);
-      
-      // Fazer chamada para API de delete
-      this.service.deleteBundle(id).subscribe({
-        next: () => {
-          console.log('✅ Pacote excluído com sucesso da API');
-          
-          // Remover da lista local
-          this.packages = this.packages.filter(p => p.id !== id);
+    // Encontrar o pacote para mostrar informações no modal
+    const packageToDelete = this.packages.find(p => p.id === id);
+    const packageName = packageToDelete ? packageToDelete.bundleTitle : `Pacote ID: ${id}`;
 
-          // Ajustar página se necessário
-          const totalPages = this.getTotalPages();
-          if (this.currentPage > totalPages && totalPages > 0) {
-            this.currentPage = totalPages;
-          }
-          
-          // Recarregar dados da API para garantir sincronização
-          console.log('🔄 Recarregando dados da API após exclusão...');
-          this.loadPackages();
-          
-          // Mostrar mensagem de sucesso
-          alert('Pacote excluído com sucesso!');
-        },
-        error: (error) => {
-          console.error('❌ Erro ao excluir pacote:', error);
-          console.log('Status do erro:', error.status);
-          console.log('Mensagem do erro:', error.message);
-          
-          // Mostrar mensagem de erro
-          if (error.status === 404) {
-            alert('Pacote não encontrado. Pode já ter sido excluído.');
-            // Recarregar dados para sincronizar
+    // Mostrar modal de confirmação
+    this.deleteConfirmationService.showConfirmationModal({
+      title: 'Confirmar Exclusão',
+      message: 'Tem certeza que deseja excluir este pacote? Esta ação não pode ser desfeita.',
+      itemName: packageName,
+      itemType: 'Pacote',
+      confirmText: 'Sim, Excluir',
+      cancelText: 'Cancelar',
+      isDestructive: true
+    }).subscribe(result => {
+      if (result.confirmed) {
+        console.log('🗑️ Excluindo pacote ID:', id);
+        
+        // Fazer chamada para API de delete
+        this.service.deleteBundle(id).subscribe({
+          next: () => {
+            console.log('✅ Pacote excluído com sucesso da API');
+            
+            // Remover da lista local
+            this.packages = this.packages.filter(p => p.id !== id);
+
+            // Ajustar página se necessário
+            const totalPages = this.getTotalPages();
+            if (this.currentPage > totalPages && totalPages > 0) {
+              this.currentPage = totalPages;
+            }
+            
+            // Recarregar dados da API para garantir sincronização
+            console.log('🔄 Recarregando dados da API após exclusão...');
             this.loadPackages();
-          } else if (error.status === 403) {
-            alert('Você não tem permissão para excluir este pacote.');
-          } else {
-            alert('Erro ao excluir pacote. Tente novamente.');
+            
+            // Mostrar mensagem de sucesso
+            this.toastService.showSuccess(
+              'Pacote Excluído',
+              `O pacote "${packageName}" foi excluído com sucesso!`
+            );
+          },
+          error: (error) => {
+            console.error('❌ Erro ao excluir pacote:', error);
+            console.log('Status do erro:', error.status);
+            console.log('Mensagem do erro:', error.message);
+            
+            // Mostrar mensagem de erro específica
+            if (error.status === 404) {
+              this.toastService.showWarning(
+                'Pacote Não Encontrado',
+                'O pacote pode já ter sido excluído. Atualizando a lista...'
+              );
+              // Recarregar dados para sincronizar
+              this.loadPackages();
+            } else if (error.status === 403) {
+              this.toastService.showError(
+                'Acesso Negado',
+                'Você não tem permissão para excluir este pacote.'
+              );
+            } else if (error.status === 409) {
+              this.toastService.showError(
+                'Não é Possível Excluir',
+                'Este pacote possui reservas ativas e não pode ser excluído.'
+              );
+            } else {
+              this.toastService.showError(
+                'Erro ao Excluir',
+                'Ocorreu um erro inesperado ao tentar excluir o pacote. Tente novamente.'
+              );
+            }
           }
-        }
-      });
-    }
+        });
+      }
+    });
   }
 
   toggleAvailability(packageItem: TravelPackage): void {

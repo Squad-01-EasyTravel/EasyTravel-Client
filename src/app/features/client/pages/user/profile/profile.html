@@ -18,8 +18,8 @@
             <div class="col-lg-2 d-none d-lg-block sidebar-container">
                 <div class="sidebar-menu">
                     <p><a routerLink="/profile" class="active">Informação da Conta</a></p>
-                    <p><a routerLink="/profile/paymentinformation">Informação de Pagamento</a></p>
-                    <p><a routerLink="/profile">Histórico de Viagens</a></p>
+                    <!-- <p><a routerLink="/profile/paymentinformation">Informação de Pagamento</a></p>
+                    <p><a routerLink="/profile">Histórico de Viagens</a></p> -->
                 </div>
             </div>
 
@@ -75,132 +75,123 @@
 
                     <hr class="profile-divider-smaller">
 
-                    <div class="input-content-div">
-                        <div class="input-label">
-                            <h3><i class="bi bi-person-fill"></i> Nome Completo</h3>
-                        </div>
-                        <div class="input-fields">
-                            <div class="input-group">
-                                <label class="input-label-text required">Primeiro nome</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control input-custom"
-                                    [class.is-invalid]="isFieldInvalid('firstName')"
-                                    [class.is-valid]="isFieldValid('firstName')"
-                                    formControlName="firstName"
-                                    placeholder="Digite seu primeiro nome">
-                                <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('firstName')"></i>
-                                <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('firstName')"></i>
-                                <div class="error-message" *ngIf="isFieldInvalid('firstName')">
-                                    {{ getFieldError('firstName') }}
+                    <!-- Informações Pessoais Condensadas -->
+                    <div class="personal-info-section">
+                        <h3><i class="bi bi-person-fill"></i> Informações Pessoais</h3>
+                        
+                        <!-- Nome e E-mail na mesma linha -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group-compact">
+                                    <label class="input-label-text required">Primeiro nome</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control input-custom"
+                                        [class.is-invalid]="isFieldInvalid('firstName')"
+                                        [class.is-valid]="isFieldValid('firstName')"
+                                        formControlName="firstName"
+                                        placeholder="Digite seu primeiro nome">
+                                    <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('firstName')"></i>
+                                    <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('firstName')"></i>
+                                    <div class="error-message" *ngIf="isFieldInvalid('firstName')">
+                                        {{ getFieldError('firstName') }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="input-group">
-                                <label class="input-label-text required">Sobrenome</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control input-custom"
-                                    [class.is-invalid]="isFieldInvalid('lastName')"
-                                    [class.is-valid]="isFieldValid('lastName')"
-                                    formControlName="lastName"
-                                    placeholder="Digite seu sobrenome">
-                                <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('lastName')"></i>
-                                <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('lastName')"></i>
-                                <div class="error-message" *ngIf="isFieldInvalid('lastName')">
-                                    {{ getFieldError('lastName') }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="profile-divider-smaller">
-
-                    <div class="email-content-div">
-                        <div class="email-label">
-                            <h3><i class="bi bi-envelope-fill"></i> Endereço de E-mail</h3>
-                        </div>
-                        <div class="email-fields">
-                            <div class="input-group">
-                                <label class="input-label-text required">E-mail principal</label>
-                                <input 
-                                    type="email" 
-                                    class="form-control input-custom"
-                                    [class.is-invalid]="isFieldInvalid('email')"
-                                    [class.is-valid]="isFieldValid('email')"
-                                    formControlName="email"
-                                    placeholder="exemplo@email.com">
-                                <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('email')"></i>
-                                <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('email')"></i>
-                                <div class="error-message" *ngIf="isFieldInvalid('email')">
-                                    {{ getFieldError('email') }}
+                            <div class="col-md-6">
+                                <div class="input-group-compact">
+                                    <label class="input-label-text required">Sobrenome</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control input-custom"
+                                        [class.is-invalid]="isFieldInvalid('lastName')"
+                                        [class.is-valid]="isFieldValid('lastName')"
+                                        formControlName="lastName"
+                                        placeholder="Digite seu sobrenome">
+                                    <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('lastName')"></i>
+                                    <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('lastName')"></i>
+                                    <div class="error-message" *ngIf="isFieldInvalid('lastName')">
+                                        {{ getFieldError('lastName') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <hr class="profile-divider-smaller">
-
-                    <div class="phone-content-div">
-                        <div class="phone-label">
-                            <h3><i class="bi bi-telephone-fill"></i> Telefone</h3>
-                        </div>
-                        <div class="phone-fields">
-                            <div class="input-group">
-                                <label class="input-label-text required">Telefone Principal</label>
-                                <input 
-                                    type="tel" 
-                                    class="form-control input-custom"
-                                    [class.is-invalid]="isFieldInvalid('telephone')"
-                                    [class.is-valid]="isFieldValid('telephone')"
-                                    formControlName="telephone"
-                                    placeholder="(11) 99999-9999"
-                                    maxlength="15">
-                                <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('telephone')"></i>
-                                <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('telephone')"></i>
-                                <div class="error-message" *ngIf="isFieldInvalid('telephone')">
-                                    {{ getFieldError('telephone') }}
+                        <!-- E-mail e Telefone na mesma linha -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group-compact">
+                                    <label class="input-label-text required"><i class="bi bi-envelope"></i> E-mail</label>
+                                    <input 
+                                        type="email" 
+                                        class="form-control input-custom"
+                                        [class.is-invalid]="isFieldInvalid('email')"
+                                        [class.is-valid]="isFieldValid('email')"
+                                        formControlName="email"
+                                        placeholder="exemplo@email.com">
+                                    <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('email')"></i>
+                                    <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('email')"></i>
+                                    <div class="error-message" *ngIf="isFieldInvalid('email')">
+                                        {{ getFieldError('email') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group-compact">
+                                    <label class="input-label-text required"><i class="bi bi-telephone"></i> Telefone</label>
+                                    <input 
+                                        type="tel" 
+                                        class="form-control input-custom"
+                                        [class.is-invalid]="isFieldInvalid('telephone')"
+                                        [class.is-valid]="isFieldValid('telephone')"
+                                        formControlName="telephone"
+                                        placeholder="(11) 99999-9999"
+                                        maxlength="15">
+                                    <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('telephone')"></i>
+                                    <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('telephone')"></i>
+                                    <div class="error-message" *ngIf="isFieldInvalid('telephone')">
+                                        {{ getFieldError('telephone') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <hr class="profile-divider-smaller">
-
-                    <div class="documents-content-div">
-                        <div class="documents-label">
-                            <h3><i class="bi bi-file-earmark-text-fill"></i> Documentos</h3>
-                        </div>
-                        <div class="documents-fields">
-                            <div class="input-group">
-                                <label class="input-label-text required">CPF</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control input-custom"
-                                    [class.is-invalid]="isFieldInvalid('cpf')"
-                                    [class.is-valid]="isFieldValid('cpf')"
-                                    formControlName="cpf"
-                                    placeholder="000.000.000-00"
-                                    maxlength="14">
-                                <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('cpf')"></i>
-                                <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('cpf')"></i>
-                                <div class="error-message" *ngIf="isFieldInvalid('cpf')">
-                                    {{ getFieldError('cpf') }}
+                        <!-- CPF e Passaporte na mesma linha -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group-compact">
+                                    <label class="input-label-text required"><i class="bi bi-file-earmark-text"></i> CPF</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control input-custom"
+                                        [class.is-invalid]="isFieldInvalid('cpf')"
+                                        [class.is-valid]="isFieldValid('cpf')"
+                                        formControlName="cpf"
+                                        placeholder="000.000.000-00"
+                                        maxlength="14">
+                                    <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('cpf')"></i>
+                                    <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('cpf')"></i>
+                                    <div class="error-message" *ngIf="isFieldInvalid('cpf')">
+                                        {{ getFieldError('cpf') }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="input-group">
-                                <label class="input-label-text">Passaporte</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control input-custom"
-                                    [class.is-invalid]="isFieldInvalid('passport')"
-                                    [class.is-valid]="isFieldValid('passport')"
-                                    formControlName="passport"
-                                    placeholder="Número do passaporte (opcional)"
-                                    maxlength="10">
-                                <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('passport')"></i>
-                                <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('passport')"></i>
-                                <div class="error-message" *ngIf="isFieldInvalid('passport')">
-                                    {{ getFieldError('passport') }}
+                            <div class="col-md-6">
+                                <div class="input-group-compact">
+                                    <label class="input-label-text">Passaporte (opcional)</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control input-custom"
+                                        [class.is-invalid]="isFieldInvalid('passport')"
+                                        [class.is-valid]="isFieldValid('passport')"
+                                        formControlName="passport"
+                                        placeholder="Número do passaporte"
+                                        maxlength="10">
+                                    <i class="validation-icon check bi bi-check-circle" *ngIf="isFieldValid('passport')"></i>
+                                    <i class="validation-icon times bi bi-x-circle" *ngIf="isFieldInvalid('passport')"></i>
+                                    <div class="error-message" *ngIf="isFieldInvalid('passport')">
+                                        {{ getFieldError('passport') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
