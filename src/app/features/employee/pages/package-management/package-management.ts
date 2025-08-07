@@ -131,7 +131,7 @@ export class PackageManagementComponent implements OnInit {
     private service: BundleService,
 
     private deleteConfirmationService: DeleteConfirmationService,
-    private toastService: ToastService
+    private toastService: ToastService,
 
     private mediaService: MediaService,
     public imageUploadService: ImageUploadService // Tornado público para acesso no template
@@ -1030,8 +1030,12 @@ export class PackageManagementComponent implements OnInit {
     console.log('🔄 Recarregando dados da API após criação...');
     this.loadPackages();
     
-    // Mostrar mensagem de sucesso
-    alert('Pacote criado com sucesso!');
+    // Mostrar mensagem de sucesso estilizada
+    this.toastService.showSuccess(
+      'Pacote Criado',
+      `O pacote "${createdBundle.bundleTitle}" foi criado com sucesso!`,
+      6000
+    );
   }
 
   private afterBundleUpdate(updatedBundle: any): void {
@@ -1055,8 +1059,12 @@ export class PackageManagementComponent implements OnInit {
     console.log('🔄 Recarregando dados da API após edição...');
     this.loadPackages();
     
-    // Mostrar mensagem de sucesso
-    alert('Pacote editado com sucesso!');
+    // Mostrar mensagem de sucesso estilizada
+    this.toastService.showSuccess(
+      'Pacote Atualizado',
+      `O pacote "${updatedBundle.bundleTitle}" foi editado com sucesso!`,
+      6000
+    );
   }
 
   deletePackage(id: number): void {
@@ -1082,8 +1090,9 @@ export class PackageManagementComponent implements OnInit {
           next: () => {
             console.log('✅ Pacote excluído com sucesso da API');
             
-            // Remover da lista local
+            // Remover da lista local imediatamente
             this.packages = this.packages.filter(p => p.id !== id);
+            this.filteredPackages = this.filteredPackages.filter(p => p.id !== id);
 
             // Ajustar página se necessário
             const totalPages = this.getTotalPages();
@@ -1091,11 +1100,7 @@ export class PackageManagementComponent implements OnInit {
               this.currentPage = totalPages;
             }
             
-            // Recarregar dados da API para garantir sincronização
-            console.log('🔄 Recarregando dados da API após exclusão...');
-            this.loadPackages();
-            
-            // Mostrar mensagem de sucesso
+            // Mostrar APENAS a mensagem de sucesso - sem recarregar para evitar notificações extras
             this.toastService.showSuccess(
               'Pacote Excluído',
               `O pacote "${packageName}" foi excluído com sucesso!`
@@ -1112,7 +1117,7 @@ export class PackageManagementComponent implements OnInit {
                 'Pacote Não Encontrado',
                 'O pacote pode já ter sido excluído. Atualizando a lista...'
               );
-              // Recarregar dados para sincronizar
+              // Recarregar dados para sincronizar apenas em caso de erro
               this.loadPackages();
             } else if (error.status === 403) {
               this.toastService.showError(
