@@ -244,3 +244,234 @@ body, html {
 .login-form__link:hover {
   text-decoration: underline;
 }
+
+/* Modal de Erro de Credenciais */
+.error-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.error-modal {
+  background-color: var(--color-light-bg);
+  border-radius: 0.625rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideInUp 0.3s ease-out;
+  border: 0.0625rem solid var(--color-border);
+  font-family: "Lato", sans-serif;
+}
+
+.error-modal__header {
+  display: flex;
+  align-items: center;
+  padding: 1.875rem 1.875rem 1rem 1.875rem;
+  border-bottom: 0.0625rem solid var(--color-border);
+  position: relative;
+}
+
+.error-modal__icon {
+  width: 50px;
+  height: 50px;
+  background-color: var(--color-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.error-modal__icon i {
+  color: #FFFFFF;
+  font-size: 1.5rem;
+}
+
+.error-modal__title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.error-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-gray);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.error-modal__close:hover {
+  background-color: var(--color-light-fill);
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+.error-modal__body {
+  padding: 1.5rem 1.875rem;
+}
+
+.error-modal__message {
+  font-size: 1rem;
+  color: var(--color-text-dark);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.error-modal__suggestions {
+  background-color: var(--color-light-fill);
+  border-radius: 0.3125rem;
+  padding: 1.25rem;
+  border-left: 0.25rem solid var(--color-accent);
+  border: 0.0625rem solid var(--color-border);
+}
+
+.error-modal__suggestions h4 {
+  margin: 0 0 1rem 0;
+  color: var(--color-primary);
+  font-size: 1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.error-modal__suggestions h4::before {
+  content: "💡";
+  margin-right: 0.5rem;
+}
+
+.error-modal__suggestions ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--color-text-dark);
+}
+
+.error-modal__suggestions li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.error-modal__footer {
+  padding: 1rem 1.875rem 1.875rem 1.875rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.error-modal__button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.625rem;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.error-modal__button--secondary {
+  background-color: var(--color-gray);
+  color: #FFFFFF;
+}
+
+.error-modal__button--secondary:hover {
+  background-color: var(--color-text-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.error-modal__button--primary {
+  background-color: var(--color-secondary);
+  color: #FFFFFF;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.error-modal__button--primary:hover {
+  background-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsividade do Modal */
+@media (max-width: 768px) {
+  .error-modal {
+    margin: 1rem;
+    width: calc(100% - 2rem);
+  }
+  
+  .error-modal__header {
+    padding: 1.25rem 1.25rem 1rem 1.25rem;
+  }
+  
+  .error-modal__body {
+    padding: 1rem 1.25rem;
+  }
+  
+  .error-modal__footer {
+    padding: 1rem 1.25rem 1.25rem 1.25rem;
+    flex-direction: column;
+  }
+  
+  .error-modal__button {
+    width: 100%;
+  }
+  
+  .error-modal__title {
+    font-size: 1.2rem;
+  }
+  
+  .error-modal__suggestions {
+    padding: 1rem;
+  }
+}
