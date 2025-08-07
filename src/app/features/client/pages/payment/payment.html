@@ -25,6 +25,7 @@
            <app-payment-button 
              [paymentMethod]="selectedPaymentMethod" 
              [isFormValid]="selectedPaymentMethod === 'pix' ? isPixFormValid : selectedPaymentMethod === 'credito' ? isCreditFormValid : selectedPaymentMethod === 'boleto' ? isBoletoFormValid : true"
+             [isProcessing]="isProcessingPayment"
              (buttonClicked)="onGenerateQrCode()">
            </app-payment-button>
         </div>
@@ -80,4 +81,32 @@
           </div>
         </div>
     </div>
+</div>
+
+<!-- Modal de Carregamento -->
+<div *ngIf="showLoadingModal" class="loading-overlay">
+  <div class="loading-modal">
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      
+      <h3 class="loading-title">Processando Pagamento</h3>
+      
+      <div class="loading-steps">
+        <div class="step" 
+             *ngFor="let step of currentSteps" 
+             [class.active]="step.active" 
+             [class.completed]="step.completed">
+          <div class="step-indicator">
+            <span class="step-number">{{step.step}}</span>
+            <div class="step-check">✓</div>
+          </div>
+          <span class="step-text">{{step.text}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

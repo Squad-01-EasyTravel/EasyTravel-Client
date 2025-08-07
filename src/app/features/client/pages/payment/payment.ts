@@ -38,6 +38,28 @@ export class Payment implements OnInit {
   
   // Estados de processamento
   isProcessingPayment: boolean = false;
+  showLoadingModal: boolean = false;
+  loadingStep: number = 1;
+  currentSteps: any[] = [];
+  
+  // Etapas específicas para cada método de pagamento
+  pixSteps = [
+    { step: 1, text: 'Confirmando dados da reserva', completed: false, active: false },
+    { step: 2, text: 'Confirmando dados do usuário', completed: false, active: false },
+    { step: 3, text: 'Gerando QR Code', completed: false, active: false }
+  ];
+  
+  creditSteps = [
+    { step: 1, text: 'Confirmando dados da reserva', completed: false, active: false },
+    { step: 2, text: 'Confirmando dados do usuário', completed: false, active: false },
+    { step: 3, text: 'Pagamento aprovado', completed: false, active: false }
+  ];
+  
+  boletoSteps = [
+    { step: 1, text: 'Confirmando dados da reserva', completed: false, active: false },
+    { step: 2, text: 'Confirmando dados do usuário', completed: false, active: false },
+    { step: 3, text: 'Boleto gerado e enviado para o email', completed: false, active: false }
+  ];
 
   constructor(private router: Router, private http: HttpClient) {}
 
@@ -118,15 +140,28 @@ export class Payment implements OnInit {
     }
 
     this.isProcessingPayment = true;
+    this.showLoadingModal = true;
+    this.loadingStep = 1;
+    
+    // Definir etapas baseadas no método de pagamento
+    this.setStepsForPaymentMethod();
+    
+    console.log('🔧 DEBUG - isProcessingPayment:', this.isProcessingPayment);
+    console.log('🔧 DEBUG - showLoadingModal:', this.showLoadingModal);
+    console.log('🔧 DEBUG - loadingStep:', this.loadingStep);
+    console.log('🔧 DEBUG - currentSteps:', this.currentSteps);
 
-    // Processar pagamento baseado no método selecionado
-    if (this.selectedPaymentMethod === 'pix') {
-      this.processPixPayment();
-    } else if (this.selectedPaymentMethod === 'credito') {
-      this.processCreditPayment();
-    } else if (this.selectedPaymentMethod === 'boleto') {
-      this.processBoletoPayment();
-    }
+    // Simular delay para mostrar o loading
+    setTimeout(() => {
+      // Processar pagamento baseado no método selecionado
+      if (this.selectedPaymentMethod === 'pix') {
+        this.processPixPayment();
+      } else if (this.selectedPaymentMethod === 'credito') {
+        this.processCreditPayment();
+      } else if (this.selectedPaymentMethod === 'boleto') {
+        this.processBoletoPayment();
+      }
+    }, 300); // Reduzido de 1500ms para 300ms
   }
 
   private validateCurrentForm(): boolean {
@@ -142,7 +177,51 @@ export class Payment implements OnInit {
     }
   }
 
+  private setStepsForPaymentMethod(): void {
+    // Reset todas as etapas
+    this.pixSteps.forEach(step => { step.completed = false; step.active = false; });
+    this.creditSteps.forEach(step => { step.completed = false; step.active = false; });
+    this.boletoSteps.forEach(step => { step.completed = false; step.active = false; });
+    
+    // Definir etapas baseadas no método de pagamento
+    switch (this.selectedPaymentMethod) {
+      case 'pix':
+        this.currentSteps = [...this.pixSteps];
+        break;
+      case 'credito':
+        this.currentSteps = [...this.creditSteps];
+        break;
+      case 'boleto':
+        this.currentSteps = [...this.boletoSteps];
+        break;
+      default:
+        this.currentSteps = [...this.pixSteps];
+    }
+    
+    // Ativar primeira etapa
+    this.updateStepStatus(1);
+  }
+
+  private updateStepStatus(stepNumber: number): void {
+    this.currentSteps.forEach((step, index) => {
+      if (step.step < stepNumber) {
+        step.completed = true;
+        step.active = false;
+      } else if (step.step === stepNumber) {
+        step.completed = false;
+        step.active = true;
+      } else {
+        step.completed = false;
+        step.active = false;
+      }
+    });
+  }
+
   private processPixPayment(): void {
+    // Etapa 2: Confirmando dados do usuário
+    this.loadingStep = 2;
+    this.updateStepStatus(2);
+    
     const paymentData = {
       paymentDate: new Date().toISOString(),
       paymentMethod: 'PIX',
@@ -151,10 +230,24 @@ export class Payment implements OnInit {
     };
 
     console.log('💳 Processando pagamento PIX:', paymentData);
-    this.makePayment(paymentData);
+    
+    // Simular delay para confirmação de dados
+    setTimeout(() => {
+      // Etapa 3: Gerando QR Code
+      this.loadingStep = 3;
+      this.updateStepStatus(3);
+      
+      setTimeout(() => {
+        this.makePayment(paymentData);
+      }, 400); // Reduzido de 1500ms para 400ms
+    }, 500); // Reduzido de 2000ms para 500ms
   }
 
   private processCreditPayment(): void {
+    // Etapa 2: Confirmando dados do usuário
+    this.loadingStep = 2;
+    this.updateStepStatus(2);
+    
     // Para crédito, precisamos determinar se é crédito ou débito
     // e incluir as parcelas se for crédito
     const isCredit = this.creditFormData.formaPagamento === 'credito';
@@ -173,10 +266,24 @@ export class Payment implements OnInit {
     }
 
     console.log('💳 Processando pagamento cartão:', paymentData);
-    this.makePayment(paymentData);
+    
+    // Simular delay para confirmação de dados
+    setTimeout(() => {
+      // Etapa 3: Pagamento aprovado
+      this.loadingStep = 3;
+      this.updateStepStatus(3);
+      
+      setTimeout(() => {
+        this.makePayment(paymentData);
+      }, 400); // Reduzido de 1500ms para 400ms
+    }, 500); // Reduzido de 2000ms para 500ms
   }
 
   private processBoletoPayment(): void {
+    // Etapa 2: Confirmando dados do usuário
+    this.loadingStep = 2;
+    this.updateStepStatus(2);
+    
     const paymentData = {
       paymentDate: new Date().toISOString(),
       paymentMethod: 'BANK_SLIP',
@@ -185,7 +292,17 @@ export class Payment implements OnInit {
     };
 
     console.log('💳 Processando pagamento boleto:', paymentData);
-    this.makePayment(paymentData);
+    
+    // Simular delay para confirmação de dados
+    setTimeout(() => {
+      // Etapa 3: Boleto gerado e enviado para o email
+      this.loadingStep = 3;
+      this.updateStepStatus(3);
+      
+      setTimeout(() => {
+        this.makePayment(paymentData);
+      }, 400); // Reduzido de 1500ms para 400ms
+    }, 500); // Reduzido de 2000ms para 500ms
   }
 
   private makePayment(paymentData: any): void {
@@ -193,12 +310,23 @@ export class Payment implements OnInit {
       next: (paymentResponse) => {
         console.log('✅ Pagamento processado com sucesso:', paymentResponse);
         
+        // Completar última etapa
+        this.currentSteps.forEach(step => {
+          if (step.step === this.loadingStep) {
+            step.completed = true;
+            step.active = false;
+          }
+        });
+        
         // Após o pagamento, criar travel history
-        this.createTravelHistory(paymentResponse.id);
+        setTimeout(() => {
+          this.createTravelHistory(paymentResponse.id);
+        }, 200); // Reduzido de 1000ms para 200ms
       },
       error: (error) => {
         console.error('❌ Erro ao processar pagamento:', error);
         this.isProcessingPayment = false;
+        this.showLoadingModal = false;
         alert('Erro ao processar pagamento. Tente novamente.');
       }
     });
@@ -216,11 +344,14 @@ export class Payment implements OnInit {
         console.log('✅ Histórico de viagem criado:', travelHistoryResponse);
         
         // Após criar travel history, confirmar a reserva
-        this.confirmReservation();
+        setTimeout(() => {
+          this.confirmReservation();
+        }, 200); // Reduzido de 1000ms para 200ms
       },
       error: (error) => {
         console.error('❌ Erro ao criar histórico de viagem:', error);
         this.isProcessingPayment = false;
+        this.showLoadingModal = false;
         alert('Pagamento processado, mas erro ao criar histórico. Entre em contato com o suporte.');
       }
     });
@@ -232,14 +363,20 @@ export class Payment implements OnInit {
     this.http.patch<any>(`http://localhost:8080/api/reservations/${this.reservationId}/confirm/my`, {}).subscribe({
       next: (confirmationResponse) => {
         console.log('✅ Reserva confirmada com sucesso:', confirmationResponse);
-        this.isProcessingPayment = false;
         
-        // Mostrar modal de sucesso baseado no método de pagamento
-        this.showPaymentSuccessModal();
+        // Finalizando processo
+        setTimeout(() => {
+          this.isProcessingPayment = false;
+          this.showLoadingModal = false;
+          
+          // Mostrar modal de sucesso baseado no método de pagamento
+          this.showPaymentSuccessModal();
+        }, 500); // Reduzido de 1500ms para 500ms
       },
       error: (error) => {
         console.error('❌ Erro ao confirmar reserva:', error);
         this.isProcessingPayment = false;
+        this.showLoadingModal = false;
         alert('Pagamento processado, mas erro na confirmação. Entre em contato com o suporte.');
       }
     });

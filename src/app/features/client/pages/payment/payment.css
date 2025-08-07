@@ -246,3 +246,227 @@
     font-size: 13px;
   }
 }
+
+/* Modal de Carregamento */
+.loading-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.85) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 99999 !important;
+  backdrop-filter: blur(5px);
+}
+
+.loading-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: loadingModalAppear 0.3s ease-out;
+}
+
+@keyframes loadingModalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.loading-spinner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.spinner-ring {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border: 8px solid transparent;
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+}
+
+.spinner-ring:nth-child(1) {
+  border-top-color: #ff6b35;
+  animation-delay: 0s;
+}
+
+.spinner-ring:nth-child(2) {
+  border-right-color: #f7931e;
+  animation-delay: 0.3s;
+  width: 56px;
+  height: 56px;
+  margin: 4px;
+}
+
+.spinner-ring:nth-child(3) {
+  border-bottom-color: #ff8c42;
+  animation-delay: 0.6s;
+  width: 48px;
+  height: 48px;
+  margin: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.loading-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  text-align: left;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  transition: all 0.4s ease;
+}
+
+.step.active {
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(247, 147, 30, 0.05) 100%);
+  border: 2px solid rgba(255, 107, 53, 0.2);
+}
+
+.step.completed {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.2);
+}
+
+.step-indicator {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5e7eb;
+  transition: all 0.4s ease;
+}
+
+.step.active .step-indicator {
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+.step.completed .step-indicator {
+  background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+  color: white;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 107, 53, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
+}
+
+.step-number {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.step-check {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s ease;
+}
+
+.step.completed .step-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.step.completed .step-number {
+  opacity: 0;
+  transform: scale(0);
+}
+
+.step-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  flex: 1;
+}
+
+.step.active .step-text {
+  color: #ff6b35;
+  font-weight: 600;
+}
+
+.step.completed .step-text {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+/* Responsividade do Modal de Carregamento */
+@media (max-width: 768px) {
+  .loading-modal {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+  
+  .loading-title {
+    font-size: 20px;
+  }
+  
+  .step-text {
+    font-size: 14px;
+  }
+  
+  .step-indicator {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .step-number {
+    font-size: 14px;
+  }
+}
