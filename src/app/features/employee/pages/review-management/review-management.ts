@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal';
 
 interface ReviewComment {
   pacote: string;
@@ -10,13 +11,17 @@ interface ReviewComment {
 
 @Component({
   selector: 'app-review-management',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent],
   templateUrl: './review-management.html',
   styleUrl: './review-management.css'
 })
 export class ReviewManagement {
   comentariosAbertos = false;
   comentariosUsuarioAbertos = false;
+
+  // Modal de confirmação
+  confirmationModalOpen = false;
+  commentToDeleteIndex: number | null = null;
 
   // Paginação
   currentPage = 1;
@@ -112,9 +117,24 @@ export class ReviewManagement {
   }
 
   apagarComentario(index: number) {
-    if (this.usuarioSelecionado && confirm('Tem certeza que deseja apagar este comentário?')) {
-      this.usuarioSelecionado.comentarios.splice(index, 1);
+    this.commentToDeleteIndex = index;
+    this.confirmationModalOpen = true;
+  }
+
+  confirmarExclusaoComentario() {
+    if (this.usuarioSelecionado && this.commentToDeleteIndex !== null) {
+      this.usuarioSelecionado.comentarios.splice(this.commentToDeleteIndex, 1);
+      this.commentToDeleteIndex = null;
     }
+  }
+
+  cancelarExclusaoComentario() {
+    this.commentToDeleteIndex = null;
+  }
+
+  fecharModalConfirmacao() {
+    this.confirmationModalOpen = false;
+    this.commentToDeleteIndex = null;
   }
 
   getTotalComments(): number {
