@@ -1,0 +1,45 @@
+<!-- Modal de Confirmação Personalizado -->
+<div class="confirmation-modal-overlay" 
+     [class.show]="isOpen" 
+     [style.display]="isOpen ? 'flex' : 'none'"
+     (click)="onBackdropClick($event)"
+     *ngIf="isOpen">
+  
+  <div class="confirmation-modal-container" (click)="$event.stopPropagation()">
+    <!-- Ícone do tipo -->
+    <div class="modal-icon-section">
+      <div class="modal-icon" [ngClass]="{
+        'danger': type === 'danger',
+        'warning': type === 'warning',
+        'info': type === 'info'
+      }">
+        <i [class]="icon"></i>
+      </div>
+    </div>
+
+    <!-- Conteúdo do modal -->
+    <div class="modal-content-section">
+      <h3 class="modal-title">{{ title }}</h3>
+      <p class="modal-message">{{ message }}</p>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="modal-actions">
+      <button type="button" 
+              class="btn-cancel" 
+              (click)="cancel()">
+        {{ cancelText }}
+      </button>
+      <button type="button" 
+              class="btn-confirm" 
+              [ngClass]="{
+                'btn-danger': type === 'danger',
+                'btn-warning': type === 'warning',
+                'btn-info': type === 'info'
+              }"
+              (click)="confirm()">
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div>
