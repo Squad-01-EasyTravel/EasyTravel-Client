@@ -130,23 +130,53 @@
         </div>
       </div>
 
-      <!-- TODO: Localização no Mapa - Funcionalidade será implementada posteriormente
+      <!-- Localização no Mapa - Google Maps Integration -->
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0 fw-bold">Localização no Mapa</h5>
+          <h5 class="mb-0 fw-bold">Rota da Viagem</h5>
         </div>
         <div class="card-body">
-           Placeholder para mapa - substituir por Google Maps ou similar 
-          <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
-            <div class="text-center">
-              <i class="bi bi-geo-alt-fill fs-1 text-primary"></i>
-              <p class="mt-2 text-muted">{{ pacote?.localizacao || 'Recife - São Paulo' }}</p>
-              <small class="text-muted">Mapa será carregado aqui</small>
+          <!-- Google Maps Embed -->
+          <div class="maps-container" *ngIf="safeGoogleMapsUrl; else mapPlaceholder">
+            <iframe 
+              [src]="safeGoogleMapsUrl"
+              class="w-100 rounded"
+              style="height: 350px; border: 0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Rota da viagem">
+            </iframe>
+            <div class="mt-3 text-center">
+              <small class="text-muted">
+                <i class="bi bi-airplane me-1"></i>
+                Rota aérea de <strong>{{ departureLocation }}</strong> para <strong>{{ destinationLocation }}</strong>
+              </small>
             </div>
           </div>
+          
+          <!-- Placeholder enquanto carrega ou em caso de erro -->
+          <ng-template #mapPlaceholder>
+            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
+              <div class="text-center">
+                <div class="spinner-border text-primary mb-3" role="status" *ngIf="!departureLocation || !destinationLocation">
+                  <span class="visually-hidden">Carregando...</span>
+                </div>
+                <i class="bi bi-geo-alt-fill fs-1 text-primary" *ngIf="departureLocation && destinationLocation"></i>
+                <p class="mt-2 text-muted">
+                  <span *ngIf="!departureLocation || !destinationLocation">Carregando informações da rota...</span>
+                  <span *ngIf="departureLocation && destinationLocation">{{ departureLocation }} → {{ destinationLocation }}</span>
+                </p>
+                <small class="text-muted">
+                  <span *ngIf="!departureLocation || !destinationLocation">Por favor, aguarde...</span>
+                  <span *ngIf="departureLocation && destinationLocation">Mapa temporariamente indisponível</span>
+                </small>
+              </div>
+            </div>
+          </ng-template>
         </div>
       </div>
-      -->
+     
 
       <!-- Descrição Completa -->
       <div class="card mb-4">

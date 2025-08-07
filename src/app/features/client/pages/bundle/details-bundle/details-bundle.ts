@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Navbar } from '../../../../../shared/navbar/navbar';
 import { Footer } from '../../../../../shared/footer/footer';
 import { CartConfirmationModal } from '../../../../../shared/cart-confirmation-modal/cart-confirmation-modal';
@@ -61,7 +62,8 @@ export class DetailsBundle implements OnInit {
     private bookingService: BookingService,
     private notificationService: NotificationService,
     private cartConfirmationService: CartConfirmationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private sanitizer: DomSanitizer
   ) {}
 
   // Dados do pacote (virão do back-end)
@@ -150,6 +152,11 @@ export class DetailsBundle implements OnInit {
   // Propriedades para localização
   departureLocation: string = '';
   destinationLocation: string = '';
+  
+  // Propriedades para Google Maps
+  googleMapsEmbedUrl: string = '';
+  safeGoogleMapsUrl: SafeResourceUrl | null = null;
+  private readonly googleMapsApiKey: string = 'AIzaSyDpBEGEaO3fAaNOWHt4voCheJDGmQwRBLs';
   
   // Propriedades para datas formatadas
   formattedDepartureDate: string = '';
@@ -251,6 +258,9 @@ export class DetailsBundle implements OnInit {
               this.destinationLocation = `${location.destination.city}, ${location.destination.states} - ${location.destination.country.trim()}`;
               console.log(`🛬 Local de destino: ${this.destinationLocation}`);
             }
+            
+            // Gerar URL do Google Maps após carregar as localizações
+            this.generateGoogleMapsUrl(location);
           } else {
             console.log(`🗺️ Resposta de localização inválida ou vazia`);
             this.departureLocation = 'Local de partida não informado';
@@ -342,6 +352,53 @@ export class DetailsBundle implements OnInit {
         return (bundleId % 2 === 0) ? 4 : 5;
       default: return 3;
     }
+  }
+
+  // Método para gerar URL do Google Maps Embed API
+  private generateGoogleMapsUrl(location: BundleLocationResponse): void {
+    console.log(`🗺️ Gerando URL do Google Maps...`);
+    
+    if (!location.departure || !location.destination) {
+      console.log(`❌ Dados de localização insuficientes para gerar mapa`);
+      this.googleMapsEmbedUrl = '';
+      this.safeGoogleMapsUrl = null;
+      return;
+    }
+
+    // Formatar origem e destino para a API do Google Maps
+    const origin = this.formatLocationForMaps(location.departure.city, location.departure.states, location.departure.country);
+    const destination = this.formatLocationForMaps(location.destination.city, location.destination.states, location.destination.country);
+    
+    // Construir URL da API do Google Maps Embed
+    const baseUrl = 'https://www.google.com/maps/embed/v1/directions';
+    const params = new URLSearchParams({
+      key: this.googleMapsApiKey,
+      origin: origin,
+      destination: destination,
+      mode: 'flying',
+      units: 'metric',
+      language: 'pt-BR',
+      region: 'BR'
+    });
+
+    this.googleMapsEmbedUrl = `${baseUrl}?${params.toString()}`;
+    
+    // Sanitizar a URL para uso no iframe
+    this.safeGoogleMapsUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.googleMapsEmbedUrl);
+    
+    console.log(`🗺️ Origem: ${origin}`);
+    console.log(`🗺️ Destino: ${destination}`);
+    console.log(`🗺️ URL do Google Maps gerada: ${this.googleMapsEmbedUrl}`);
+  }
+
+  // Método auxiliar para formatar localização para a API do Google Maps
+  private formatLocationForMaps(city: string, state: string, country: string): string {
+    // Remove espaços extras do país e formata para o padrão da API
+    const cleanCountry = country.trim();
+    const countryName = cleanCountry === 'BR' ? 'Brazil' : cleanCountry;
+    
+    // Formato: "Cidade, Estado, País" com caracteres especiais codificados para URL
+    return `${city}, ${state}, ${countryName}`;
   }
 
   // Métodos de paginação
