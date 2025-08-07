@@ -85,3 +85,39 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de Erro de Credenciais -->
+<div class="error-modal-overlay" *ngIf="showErrorModal" (click)="closeErrorModal()">
+  <div class="error-modal" (click)="$event.stopPropagation()">
+    <div class="error-modal__header">
+      <div class="error-modal__icon">
+        <i class="bi bi-exclamation-triangle"></i>
+      </div>
+      <h3 class="error-modal__title">Credenciais Inválidas</h3>
+      <button type="button" class="error-modal__close" (click)="closeErrorModal()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="error-modal__body">
+      <p class="error-modal__message">
+        E-mail ou senha incorretos. Verifique seus dados e tente novamente.
+      </p>
+      
+      <div class="error-modal__suggestions">
+        <h4>Dicas:</h4>
+        <ul>
+          <li>Verifique se o e-mail está digitado corretamente</li>
+          <li>Certifique-se de que o Caps Lock não está ativado</li>
+          <li>Lembre-se de que a senha é sensível a maiúsculas e minúsculas</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="error-modal__footer">
+      <button type="button" class="error-modal__button error-modal__button--primary" (click)="closeErrorModal()">
+        Tentar Novamente
+      </button>
+    </div>
+  </div>
+</div>

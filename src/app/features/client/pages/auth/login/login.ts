@@ -17,6 +17,7 @@ export class Login {
   loginForm: FormGroup;
   error = '';
   isLoading = false;
+  showErrorModal = false; // Nova propriedade para controlar o modal
 
   constructor(
     private auth: AuthService,
@@ -41,6 +42,7 @@ export class Login {
     if (this.loginForm.valid) {
       this.isLoading = true;
       this.error = '';
+      this.showErrorModal = false; // Ocultar modal se estiver visível
 
       const data: LoginDto = {
         email: this.emailControl.value,
@@ -55,6 +57,7 @@ export class Login {
         error: (error) => {
           console.error('Erro no login:', error);
           this.error = 'E-mail ou senha inválidos. Verifique seus dados e tente novamente.';
+          this.showErrorModal = true; // Mostrar modal de erro
           this.isLoading = false;
         }
       });
@@ -69,6 +72,12 @@ export class Login {
       const control = this.loginForm.get(key);
       control?.markAsTouched();
     });
+  }
+
+  // Método para fechar o modal de erro
+  closeErrorModal() {
+    this.showErrorModal = false;
+    this.error = '';
   }
 
   getFieldValidationClass(fieldName: string): string {
