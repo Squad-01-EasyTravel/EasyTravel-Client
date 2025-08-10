@@ -122,5 +122,11 @@ export class BundleService {
     return this.updateBundleMedia(mediaId, videoUrl, 'VIDEO');
   }
 
+  // Criar relação bundle-location
+  createBundleLocation(bundleLocationData: { bundleId: number; destinationId: number; departureId: number }): Observable<BundleLocationResponse> {
+    const url = `http://localhost:8080/api/bundle-locations`;
+    return this.http.post<BundleLocationResponse>(url, bundleLocationData);
+  }
+
   
 }

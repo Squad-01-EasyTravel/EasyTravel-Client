@@ -647,6 +647,55 @@
               </div>
             </div>
 
+            <!-- Seção: Localizações -->
+            <div class="form-section">
+              <div class="form-section-header">
+                <div class="section-icon-wrapper">
+                  <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="section-title-content">
+                  <h5 class="section-title">Origem e Destino</h5>
+                  <p class="section-subtitle">Configure os locais de partida e chegada</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="origin" class="form-label-modern">
+                    <i class="fas fa-plane-departure label-icon"></i>
+                    Local de Partida
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <select id="origin" class="form-control-modern select-modern" [(ngModel)]="selectedOriginId"
+                    name="origin" required>
+                    <option value="">Selecione a origem</option>
+                    <option 
+                      *ngFor="let location of locations" 
+                      [value]="location.id">
+                      {{formatLocationForTemplate(location)}}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="destination" class="form-label-modern">
+                    <i class="fas fa-plane-arrival label-icon"></i>
+                    Local de Destino
+                    <span class="required-indicator">*</span>
+                  </label>
+                  <select id="destination" class="form-control-modern select-modern" [(ngModel)]="selectedDestinationId"
+                    name="destination" required>
+                    <option value="">Selecione o destino</option>
+                    <option 
+                      *ngFor="let location of locations" 
+                      [value]="location.id">
+                      {{formatLocationForTemplate(location)}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             <!-- Seção: Período e Capacidade -->
             <div class="form-section">
               <div class="form-section-header">
