@@ -5,6 +5,10 @@
     <div *ngIf="!showQrCode">
         <div class="payment-container">
           <h1>Pagamento</h1>
+          <div class="total-amount-box">
+            <span class="total-label">Valor total da reserva:</span>
+            <span class="total-value">R$ {{ totalAmount }}</span>
+          </div>
           <p>Escolha o método de pagamento abaixo</p>
         </div>
         <div class="payment-section">

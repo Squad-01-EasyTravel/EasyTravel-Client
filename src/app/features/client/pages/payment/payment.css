@@ -1,3 +1,35 @@
+/* Valor total da reserva */
+.total-amount-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(90deg, #fff7f0 0%, #fff3e6 100%);
+  border: 2px solid #ff6b35;
+  border-radius: 12px;
+  padding: 18px 28px;
+  margin: 18px 0 28px 0;
+  box-shadow: 0 2px 12px rgba(255, 107, 53, 0.08);
+  font-size: 1.35rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+}
+
+.total-label {
+  color: #ff6b35;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.total-value {
+  color: #222;
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 /* Container principal da página */
