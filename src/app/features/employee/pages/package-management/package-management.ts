@@ -114,6 +114,10 @@ export class PackageManagementComponent implements OnInit {
     available: true
   };
 
+  // Propriedades para localização (origem e destino)
+  selectedOriginId: number | null = null;
+  selectedDestinationId: number | null = null;
+
   // Propriedades para upload de imagem
   selectedImageFile: File | null = null;
   selectedImagePreview: string | null = null;
@@ -339,6 +343,11 @@ export class PackageManagementComponent implements OnInit {
     
     // Se nenhum existe
     return defaultText;
+  }
+
+  // Método público para formatar localização no template
+  formatLocationForTemplate(location: Location): string {
+    return `${location.city}, ${location.states}`;
   }
 
   private mapBundleRank(rank: string): 'BRONZE' | 'PRATA' | 'OURO' | 'PLATINA' | 'GOLD' | 'SILVER' {
@@ -741,6 +750,10 @@ export class PackageManagementComponent implements OnInit {
       available: true
     };
 
+    // Resetar propriedades de localização
+    this.selectedOriginId = null;
+    this.selectedDestinationId = null;
+
     // Resetar variáveis de upload
     this.selectedImageFile = null;
     this.selectedImagePreview = null;
@@ -997,6 +1010,35 @@ export class PackageManagementComponent implements OnInit {
   }
 
   private afterBundleCreation(createdBundle: any): void {
+    // Primeiro, criar o bundle-location se origem e destino foram selecionados
+    if (this.selectedOriginId && this.selectedDestinationId) {
+      console.log('🗺️ Criando bundle-location para bundle:', createdBundle.id);
+      console.log('📍 Origem ID:', this.selectedOriginId, 'Destino ID:', this.selectedDestinationId);
+      
+      const bundleLocationData = {
+        bundleId: createdBundle.id,
+        destinationId: this.selectedDestinationId,
+        departureId: this.selectedOriginId
+      };
+      
+      this.service.createBundleLocation(bundleLocationData).subscribe({
+        next: (bundleLocationResponse) => {
+          console.log('✅ Bundle-location criado com sucesso:', bundleLocationResponse);
+          this.finalizeBundleCreation(createdBundle);
+        },
+        error: (locationError) => {
+          console.error('❌ Erro ao criar bundle-location:', locationError);
+          console.log('⚠️ Bundle criado mas localização não foi associada. Continuando...');
+          this.finalizeBundleCreation(createdBundle);
+        }
+      });
+    } else {
+      console.log('⚠️ Origem ou destino não selecionados, pulando criação de bundle-location');
+      this.finalizeBundleCreation(createdBundle);
+    }
+  }
+
+  private finalizeBundleCreation(createdBundle: any): void {
     // Converter e adicionar na lista local
     const newPackage: TravelPackage = {
       id: createdBundle.id,

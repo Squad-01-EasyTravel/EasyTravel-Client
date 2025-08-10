@@ -289,174 +289,36 @@
     </div>
 
     <!-- Carousel de Avaliações -->
-    <div id="reviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+    <div *ngIf="hasReviews()" id="reviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
       <div class="carousel-inner">
-        <!-- Primeiro slide -->
-        <div class="carousel-item active">
-          <div class="row justify-content-center">
-            <!-- Card 1 -->
-            <div class="col-12 col-md-6 col-lg-4 mb-4">
-              <div class="review-card">
-                <div class="review-header">
-                  <div class="reviewer-avatar">
-                    <i class="fas fa-user-circle"></i>
-                  </div>
-                  <div class="reviewer-info">
-                    <h6 class="reviewer-name">Guilherme Israel</h6>
-                    <div class="review-rating">
-                      <span class="rating-number">4.5</span>
-                      <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+        <!-- Slides dinâmicos baseados nas reviews da API -->
+        <div class="carousel-item" 
+             *ngFor="let reviewGroup of getReviewGroups(); let i = index" 
+             [class.active]="i === 0">
+          <div class="container">
+            <div class="row justify-content-center">
+              <!-- Cards de review dinamicos -->
+              <div *ngFor="let review of reviewGroup; let j = index"
+                   class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 mb-4 d-flex justify-content-center">
+                <div class="review-card h-100" style="width: 100%; max-width: 400px;">
+                  <div class="review-header">
+                    <div class="reviewer-avatar">
+                      <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="reviewer-info">
+                      <h6 class="reviewer-name">{{review.userName}}</h6>
+                      <div class="review-rating">
+                        <span class="rating-number">{{review.ratingNumber}}</span>
+                        <div class="stars">
+                          <i *ngFor="let star of getStarsArray(review.ratingNumber)" 
+                             [class]="star === 1 ? 'fas fa-star' : star === 0.5 ? 'fas fa-star-half-alt' : 'far fa-star'"></i>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="review-content">
-                  <p>"Experiência incrível! A EasyTravel superou todas as minhas expectativas. O atendimento foi excepcional desde o primeiro contato até o retorno da viagem. Recomendo fortemente!"</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 2 - Oculto no mobile -->
-            <div class="col-12 col-md-6 col-lg-4 mb-4 d-none d-md-block">
-              <div class="review-card">
-                <div class="review-header">
-                  <div class="reviewer-avatar">
-                    <i class="fas fa-user-circle"></i>
+                  <div class="review-content">
+                    <p>"{{review.comment}}"</p>
                   </div>
-                  <div class="reviewer-info">
-                    <h6 class="reviewer-name">Ana Carolina</h6>
-                    <div class="review-rating">
-                      <span class="rating-number">5.0</span>
-                      <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="review-content">
-                  <p>"Perfeito! Consegui uma viagem dos sonhos com um preço incrível. A plataforma é muito fácil de usar e o suporte ao cliente é excelente. Já estou planejando minha próxima viagem!"</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 3 - Oculto no mobile e tablet -->
-            <div class="col-12 col-md-6 col-lg-4 mb-4 d-none d-lg-block">
-              <div class="review-card">
-                <div class="review-header">
-                  <div class="reviewer-avatar">
-                    <i class="fas fa-user-circle"></i>
-                  </div>
-                  <div class="reviewer-info">
-                    <h6 class="reviewer-name">Roberto Silva</h6>
-                    <div class="review-rating">
-                      <span class="rating-number">4.8</span>
-                      <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="review-content">
-                  <p>"Serviço de primeira qualidade! A organização da viagem foi impecável e conseguimos economizar muito. A EasyTravel realmente entende do negócio. Nota 10!"</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Segundo slide -->
-        <div class="carousel-item">
-          <div class="row justify-content-center">
-            <!-- Card 4 -->
-            <div class="col-12 col-md-6 col-lg-4 mb-4">
-              <div class="review-card">
-                <div class="review-header">
-                  <div class="reviewer-avatar">
-                    <i class="fas fa-user-circle"></i>
-                  </div>
-                  <div class="reviewer-info">
-                    <h6 class="reviewer-name">Maria Santos</h6>
-                    <div class="review-rating">
-                      <span class="rating-number">4.7</span>
-                      <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="review-content">
-                  <p>"Fantástico! Viajei em família e tudo foi perfeito. Desde a reserva até o check-out, tudo funcionou como esperado. Recomendo para quem busca qualidade e economia."</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 5 - Oculto no mobile -->
-            <div class="col-12 col-md-6 col-lg-4 mb-4 d-none d-md-block">
-              <div class="review-card">
-                <div class="review-header">
-                  <div class="reviewer-avatar">
-                    <i class="fas fa-user-circle"></i>
-                  </div>
-                  <div class="reviewer-info">
-                    <h6 class="reviewer-name">Carlos Oliveira</h6>
-                    <div class="review-rating">
-                      <span class="rating-number">4.9</span>
-                      <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="review-content">
-                  <p>"Excelente custo-benefício! A EasyTravel conseguiu me oferecer exatamente o que eu estava procurando. O processo foi simples e rápido. Super satisfeito!"</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 6 - Oculto no mobile e tablet -->
-            <div class="col-12 col-md-6 col-lg-4 mb-4 d-none d-lg-block">
-              <div class="review-card">
-                <div class="review-header">
-                  <div class="reviewer-avatar">
-                    <i class="fas fa-user-circle"></i>
-                  </div>
-                  <div class="reviewer-info">
-                    <h6 class="reviewer-name">Fernanda Costa</h6>
-                    <div class="review-rating">
-                      <span class="rating-number">5.0</span>
-                      <div class="stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="review-content">
-                  <p>"Simplesmente perfeito! Consegui realizar o sonho de conhecer a Europa com um preço que cabia no meu orçamento. Obrigada EasyTravel por tornar isso possível!"</p>
                 </div>
               </div>
             </div>
@@ -474,10 +336,23 @@
         <span class="visually-hidden">Próximo</span>
       </button>
 
-      <!-- Indicadores -->
+      <!-- Indicadores dinâmicos -->
       <div class="carousel-indicators">
-        <button type="button" data-bs-target="#reviewsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#reviewsCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button *ngFor="let group of getReviewGroups(); let i = index"
+                type="button" 
+                data-bs-target="#reviewsCarousel" 
+                [attr.data-bs-slide-to]="i" 
+                [class.active]="i === 0"
+                [attr.aria-current]="i === 0 ? 'true' : null"
+                [attr.aria-label]="'Slide ' + (i + 1)"></button>
+      </div>
+    </div>
+
+    <!-- Mensagem caso não haja reviews -->
+    <div *ngIf="!hasReviews()" class="text-center py-5">
+      <div class="alert alert-light border">
+        <i class="fas fa-star-o me-2"></i>
+        Nenhuma avaliação disponível no momento.
       </div>
     </div>
   </div>
