@@ -2,7 +2,7 @@ import {jwtDecode} from 'jwt-decode';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { CurrentUser } from '@/app/features/client/pages/booking/classe/current-user';
 
@@ -120,14 +120,44 @@ export class AuthService {
   registerClient(data: RegisterClientDto): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register/client`, data).pipe(
       tap(response => {
-        if (response && response.token && response.user) {
-          this.setToken(response.token);
-          this.setCurrentUser(response.user);
-          localStorage.setItem('jwt', response.token);
-
-        } else {
-          throw new Error('Resposta de registro inválida.');
+        console.log('📦 Resposta completa do backend:', response);
+        console.log('🔑 Token presente:', !!response?.token);
+        console.log('👤 User presente:', !!response?.user);
+        
+        // Se a resposta é null mas chegou até aqui, significa que o registro foi bem-sucedido
+        if (response === null) {
+          console.log('✅ Registro realizado com sucesso (resposta null do backend)');
+          // Não fazer nada, deixar o componente lidar com isso
+          return;
         }
+        
+        if (response) {
+          // Se há token, salvar (mesmo que não tenha user)
+          if (response.token) {
+            console.log('✅ Salvando token:', response.token);
+            this.setToken(response.token);
+            localStorage.setItem('jwt', response.token);
+          }
+          
+          // Se há user, salvar
+          if (response.user) {
+            console.log('✅ Salvando usuário:', response.user);
+            this.setCurrentUser(response.user);
+          }
+        }
+      }),
+      // Converter resposta null em um objeto válido para o componente
+      map((response: AuthResponse | null) => {
+        if (response === null) {
+          // Retornar um objeto indicando sucesso sem autenticação automática
+          return { 
+            token: null, 
+            user: null, 
+            success: true, 
+            message: 'Usuário registrado com sucesso. Faça login para continuar.' 
+          } as any;
+        }
+        return response;
       })
     );
   }
