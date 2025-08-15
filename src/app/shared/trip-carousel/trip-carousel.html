@@ -30,16 +30,33 @@
                   </small>
                 </div>
                 
-                <!-- Avaliações mockadas -->
+                <!-- Avaliações baseadas nas reviews reais dos usuários -->
                 <div class="card-rating mb-3">
                   <div class="d-flex align-items-center">
-                    <span class="rating-badge me-2">{{ getRatingFromRankConsistent(bundle.bundleRank, bundle.id) }}</span>
+                    <!-- Badge com avaliação real das reviews (mesmo valor das estrelas) -->
+                    <ng-container *ngIf="isReviewsLoaded(bundle.id); else loadingBadge">
+                      <span class="rating-badge me-2">{{ getRealRating(bundle.id) }}</span>
+                    </ng-container>
+                    <ng-template #loadingBadge>
+                      <span class="rating-badge me-2">-</span>
+                    </ng-template>
+                    <!-- Estrelas: avaliações dos usuários (reviews reais) -->
                     <div class="stars-container">
-                      <span *ngFor="let filled of getStarsArray(getRatingFromRankConsistent(bundle.bundleRank, bundle.id))"
-                            class="star"
-                            [class.filled]="filled">
-                        <i class="fas fa-star"></i>
-                      </span>
+                      <!-- Só renderiza as estrelas se já carregou as reviews do bundle -->
+                      <ng-container *ngIf="isReviewsLoaded(bundle.id); else loadingStars">
+                        <span *ngFor="let filled of getRealStarsArray(bundle.id)"
+                              class="star"
+                              [class.filled]="filled">
+                          <i class="fas fa-star"></i>
+                        </span>
+                      </ng-container>
+                      <!-- Template para quando ainda está carregando -->
+                      <ng-template #loadingStars>
+                        <!-- Estrelas vazias durante o carregamento -->
+                        <span *ngFor="let i of [1,2,3,4,5]" class="star">
+                          <i class="fas fa-star"></i>
+                        </span>
+                      </ng-template>
                     </div>
                   </div>
                 </div>

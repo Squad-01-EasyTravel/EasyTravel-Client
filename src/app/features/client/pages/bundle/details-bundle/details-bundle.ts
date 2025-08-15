@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Navbar } from '../../../../../shared/navbar/navbar';
 import { Footer } from '../../../../../shared/footer/footer';
 import { CartConfirmationModal } from '../../../../../shared/cart-confirmation-modal/cart-confirmation-modal';
@@ -14,6 +15,16 @@ import { AuthService } from '@/app/shared/services/auth.service';
 import { BundleClass } from '../class/bundle-class';
 import { MediaResponse } from '../../../../../shared/models/media-response.interface';
 import { BundleLocationResponse } from '../../../../../shared/models/bundle-location-response.interface';
+
+// Interface para review do backend
+interface ReviewResponse {
+  id: number;
+  rating: string; // 'FIVE_STARS', 'FOUR_STARS', etc.
+  comment: string;
+  avaliationDate: string;
+  travelHistoryId: number;
+  bundleId: number;
+}
 
 // Interface para tipagem do pacote
 interface Pacote {
@@ -49,7 +60,7 @@ interface Avaliacao {
 
 @Component({
   selector: 'app-details-bundle',
-  imports: [CommonModule, FormsModule, Navbar, Footer, CartConfirmationModal],
+  imports: [CommonModule, FormsModule, HttpClientModule, Navbar, Footer, CartConfirmationModal],
   templateUrl: './details-bundle.html',
   styleUrl: './details-bundle.css'
 })
@@ -63,14 +74,23 @@ export class DetailsBundle implements OnInit {
     private notificationService: NotificationService,
     private cartConfirmationService: CartConfirmationService,
     private authService: AuthService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private http: HttpClient
   ) {}
 
   // Dados do pacote (virão do back-end)
   pacote: Pacote | null = null;
   numeroPassageiros: number = 1;
+  
+  // Reviews do backend
+  reviews: ReviewResponse[] = [];
+  
+  // Carrossel de reviews
+  currentReviewIndex = 0;
+  reviewsPerPage = 3;
+  isLoadingReviews = false;
 
-  // Paginação das avaliações
+  // Paginação das avaliações (manter para compatibilidade)
   avaliacoesPaginadas: Avaliacao[] = [];
   paginaAtual: number = 1;
   itensPorPagina: number = 3;
@@ -165,8 +185,13 @@ export class DetailsBundle implements OnInit {
   // Propriedade para duração calculada
   calculatedDuration: string = '';
   
-  // Propriedade para avaliação calculada
+  // Propriedade para avaliação calculada (mockada - será substituída pela real)
   calculatedRating: number = 5;
+  
+  // Propriedades para avaliação real baseada nas reviews
+  realAverageRating: number = 0; // Média exata para exibição
+  realStarsRating: number = 0;   // Média arredondada para estrelas
+  reviewsLoaded: boolean = false; // Flag para controlar quando reviews foram carregadas
 
   ngOnInit():void {
     this.id = this.route.snapshot.paramMap.get('id') as string;
@@ -178,6 +203,7 @@ export class DetailsBundle implements OnInit {
       this.formatDates();
       this.calculateBundleDuration();
       this.calculateBundleRating();
+      this.loadBundleReviews(); // Carregar reviews do backend
     });
   }
 
@@ -469,6 +495,32 @@ export class DetailsBundle implements OnInit {
     return Array(Math.floor(finalRating)).fill(0);
   }
 
+  // === MÉTODOS PARA AVALIAÇÕES REAIS (BASEADAS EM REVIEWS) ===
+
+  // Obter avaliação real formatada para exibição
+  getRealRatingFormatted(): string {
+    if (!this.reviewsLoaded || this.realAverageRating === 0) {
+      return '0.0';
+    }
+    return this.realAverageRating.toFixed(1);
+  }
+
+  // Obter número de estrelas baseado nas reviews reais
+  getRealStarsRating(): number {
+    return this.reviewsLoaded ? this.realStarsRating : 0;
+  }
+
+  // Gerar array de estrelas baseado nas reviews reais
+  getRealStarsArray(): number[] {
+    const rating = this.getRealStarsRating();
+    return Array(rating).fill(0);
+  }
+
+  // Verificar se deve mostrar avaliação real (quando reviews estão carregadas)
+  shouldShowRealRating(): boolean {
+    return this.reviewsLoaded;
+  }
+
   // Método para calcular valor total
   calcularValorTotal(): string {
     if (!this.pacote) return '0';
@@ -620,5 +672,128 @@ export class DetailsBundle implements OnInit {
       month: '2-digit',
       year: 'numeric'
     });
+  }
+
+  // Carregar reviews do backend
+  loadBundleReviews(): void {
+    if (!this.id) return;
+    
+    this.isLoadingReviews = true;
+    const bundleId = parseInt(this.id);
+    
+    this.http.get<ReviewResponse[]>(`http://localhost:8080/api/reviews/bundle/${bundleId}`)
+      .subscribe({
+        next: (reviews) => {
+          this.reviews = reviews;
+          this.isLoadingReviews = false;
+          
+          // Calcular avaliação real baseada nas reviews
+          this.calculateRealRating();
+          
+          console.log('📝 Reviews carregadas:', reviews);
+          console.log('⭐ Avaliação real calculada:', this.realAverageRating);
+        },
+        error: (error) => {
+          console.error('❌ Erro ao carregar reviews:', error);
+          this.reviews = [];
+          this.isLoadingReviews = false;
+          
+          // Definir avaliação como 0 em caso de erro
+          this.realAverageRating = 0;
+          this.realStarsRating = 0;
+          this.reviewsLoaded = true;
+        }
+      });
+  }
+
+  // Calcular avaliação real baseada nas reviews
+  private calculateRealRating(): void {
+    if (this.reviews && this.reviews.length > 0) {
+      // Calcular a média das avaliações
+      const totalRating = this.reviews.reduce((sum, review) => sum + this.getRatingNumber(review.rating), 0);
+      const averageRating = totalRating / this.reviews.length;
+      
+      // Armazenar a média exata para exibição
+      this.realAverageRating = averageRating;
+      // Arredondar para o inteiro mais próximo para exibição das estrelas
+      this.realStarsRating = Math.round(averageRating);
+      
+      console.log(`📊 DetailBundle: ${this.reviews.length} reviews, média: ${averageRating.toFixed(1)}, estrelas: ${this.realStarsRating}`);
+    } else {
+      // Se não há reviews, define como 0
+      this.realAverageRating = 0;
+      this.realStarsRating = 0;
+      console.log('📊 DetailBundle: sem reviews, definindo avaliação como 0');
+    }
+    
+    // Marcar que as reviews foram carregadas
+    this.reviewsLoaded = true;
+  }
+
+  // Métodos do carrossel de reviews
+  get visibleReviews(): ReviewResponse[] {
+    const start = this.currentReviewIndex;
+    const end = start + this.reviewsPerPage;
+    return this.reviews.slice(start, end);
+  }
+
+  get canGoPreviousReview(): boolean {
+    return this.currentReviewIndex > 0;
+  }
+
+  get canGoNextReview(): boolean {
+    return this.currentReviewIndex + this.reviewsPerPage < this.reviews.length;
+  }
+
+  previousReviews(): void {
+    if (this.canGoPreviousReview) {
+      this.currentReviewIndex = Math.max(0, this.currentReviewIndex - this.reviewsPerPage);
+    }
+  }
+
+  nextReviews(): void {
+    if (this.canGoNextReview) {
+      this.currentReviewIndex = Math.min(
+        this.reviews.length - this.reviewsPerPage,
+        this.currentReviewIndex + this.reviewsPerPage
+      );
+    }
+  }
+
+  // Converter rating string para número
+  getRatingNumber(rating: string): number {
+    const ratingMap: { [key: string]: number } = {
+      'ONE_STAR': 1,
+      'TWO_STARS': 2,
+      'THREE_STARS': 3,
+      'FOUR_STARS': 4,
+      'FIVE_STARS': 5
+    };
+    return ratingMap[rating] || 0;
+  }
+
+  // Gerar array de estrelas para exibição
+  getStarsArrayForRating(rating: string): number[] {
+    const ratingNumber = this.getRatingNumber(rating);
+    return Array(ratingNumber).fill(0);
+  }
+
+  // Formatar data da review
+  formatReviewDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+
+  // Agrupar reviews para o carrossel (3 por slide)
+  getReviewGroups(): ReviewResponse[][] {
+    const groups: ReviewResponse[][] = [];
+    for (let i = 0; i < this.reviews.length; i += this.reviewsPerPage) {
+      groups.push(this.reviews.slice(i, i + this.reviewsPerPage));
+    }
+    return groups;
   }
 }

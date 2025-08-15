@@ -1,10 +1,21 @@
 import { Component, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { Trip } from '../models/trip.interface';
 import { PackageService } from '../services/package.service';
 import { BundleService } from '../services/bundle-service';
 import { BundleClass } from '@/app/features/client/pages/bundle/class/bundle-class';
+
+// Interface para review do backend
+interface ReviewResponse {
+  id: number;
+  rating: string; // 'FIVE_STARS', 'FOUR_STARS', etc.
+  comment: string;
+  avaliationDate: string;
+  travelHistoryId: number;
+  bundleId: number;
+}
 
 declare var bootstrap: any;
 
@@ -20,9 +31,17 @@ export class TripCarousel implements OnInit, AfterViewInit {
   groupedBundles: BundleClass[][] = [];
   private currentCardsPerSlide = 4;
 
+  // Mapa para armazenar as avaliações reais dos bundles
+  bundleRatings: Map<number, number> = new Map();
+  // Mapa para armazenar as médias exatas (com decimais) para o badge
+  bundleAverageRatings: Map<number, number> = new Map();
+  // Flag para controlar quando as reviews foram carregadas
+  reviewsLoaded: Set<number> = new Set();
+
   constructor(
     private packageService: PackageService,
     private bundleService: BundleService,
+    private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {}
@@ -82,6 +101,10 @@ export class TripCarousel implements OnInit, AfterViewInit {
     this.bundleService.getAvailableBundles().subscribe({
       next: (bundles) => {
         this.bundles = bundles;
+        
+        // Carregar reviews reais para cada bundle
+        this.loadBundleReviews();
+        
         // Buscar imagens e localizações para cada bundle
         this.loadBundleImagesAndLocations();
       },
@@ -89,6 +112,56 @@ export class TripCarousel implements OnInit, AfterViewInit {
         console.error('Erro ao carregar pacotes disponíveis:', error);
       }
     });
+  }
+
+  // Método para carregar reviews reais dos bundles
+  private loadBundleReviews(): void {
+    this.bundles.forEach(bundle => {
+      this.http.get<ReviewResponse[]>(`http://localhost:8080/api/reviews/bundle/${bundle.id}`)
+        .subscribe({
+          next: (reviews: ReviewResponse[]) => {
+            if (reviews && reviews.length > 0) {
+              // Calcular a média das avaliações
+              const totalRating = reviews.reduce((sum, review) => sum + this.getRatingNumber(review.rating), 0);
+              const averageRating = totalRating / reviews.length;
+              // Armazenar a média exata para o badge
+              this.bundleAverageRatings.set(bundle.id, averageRating);
+              // Arredondar para o inteiro mais próximo para exibição das estrelas
+              this.bundleRatings.set(bundle.id, Math.round(averageRating));
+              console.log(`📊 TripCarousel Bundle ${bundle.id}: ${reviews.length} reviews, média: ${averageRating.toFixed(1)}, badge: ${averageRating.toFixed(1)}, estrelas: ${Math.round(averageRating)}`);
+            } else {
+              // Se não há reviews, define como 0 (estrelas vazias)
+              this.bundleAverageRatings.set(bundle.id, 0);
+              this.bundleRatings.set(bundle.id, 0);
+              console.log(`📊 TripCarousel Bundle ${bundle.id}: sem reviews, badge: 0, estrelas: 0`);
+            }
+            // Marcar como carregado
+            this.reviewsLoaded.add(bundle.id);
+            this.cdr.detectChanges();
+          },
+          error: (error: any) => {
+            console.error(`❌ Erro ao carregar reviews do bundle ${bundle.id}:`, error);
+            // Em caso de erro, define como 0 (estrelas vazias)
+            this.bundleAverageRatings.set(bundle.id, 0);
+            this.bundleRatings.set(bundle.id, 0);
+            // Marcar como carregado mesmo com erro
+            this.reviewsLoaded.add(bundle.id);
+            this.cdr.detectChanges();
+          }
+        });
+    });
+  }
+
+  // Converter rating string para número
+  private getRatingNumber(rating: string): number {
+    const ratingMap: { [key: string]: number } = {
+      'ONE_STAR': 1,
+      'TWO_STARS': 2,
+      'THREE_STARS': 3,
+      'FOUR_STARS': 4,
+      'FIVE_STARS': 5
+    };
+    return ratingMap[rating] || 0;
   }
 
   handleImageError(event: Event): void {
@@ -413,6 +486,39 @@ export class TripCarousel implements OnInit, AfterViewInit {
       stars.push(i <= rating);
     }
     return stars;
+  }
+
+  // === MÉTODOS PARA AVALIAÇÕES REAIS (BASEADAS EM REVIEWS) ===
+
+  // Método para verificar se as reviews de um bundle foram carregadas
+  isReviewsLoaded(bundleId: number): boolean {
+    return this.reviewsLoaded.has(bundleId);
+  }
+
+  // Método para obter a avaliação real do bundle (baseada nas reviews) - para o badge
+  getRealRating(bundleId: number): string {
+    const averageRating = this.bundleAverageRatings.get(bundleId);
+    if (averageRating === undefined || averageRating === 0) {
+      return '0';
+    }
+    // Se a média é um número inteiro, mostra sem casas decimais
+    if (averageRating % 1 === 0) {
+      return averageRating.toString();
+    }
+    // Senão, mostra com 1 casa decimal
+    return averageRating.toFixed(1);
+  }
+
+  // Método para obter a avaliação real como número
+  getRealRatingNumber(bundleId: number): number {
+    const rating = this.bundleRatings.get(bundleId);
+    return rating || 0;
+  }
+
+  // Método específico para estrelas baseadas nas reviews reais
+  getRealStarsArray(bundleId: number): boolean[] {
+    const realRating = this.getRealRatingNumber(bundleId);
+    return this.getStarsArray(realRating);
   }
 
   // Método para navegar para detalhes do pacote
