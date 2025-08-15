@@ -46,11 +46,19 @@
           <h3 class="card-title fw-bold mb-3">{{ bundleClass.bundleTitle || 'Carregando...' }}</h3>
           <h4 class="text-primary fw-bold mb-3">R$ {{bundleClass.initialPrice}}</h4>
 
-          <!-- Avaliação -->
+          <!-- Avaliação baseada nas reviews reais -->
           <div class="d-flex align-items-center mb-4">
             <div class="me-3">
-              <i class="bi bi-star-fill text-warning" *ngFor="let star of getStarsArray()"></i>
-              <span class="ms-2 fw-bold">{{ calculatedRating }}.0</span>
+              <!-- Mostrar avaliação real quando carregada, senão mostrar carregando -->
+              <ng-container *ngIf="shouldShowRealRating(); else loadingRating">
+                <i class="bi bi-star-fill text-warning" *ngFor="let star of getRealStarsArray()"></i>
+                <span class="ms-2 fw-bold">{{ getRealRatingFormatted() }}</span>
+              </ng-container>
+              <ng-template #loadingRating>
+                <!-- Placeholder durante carregamento -->
+                <i class="bi bi-star text-muted" *ngFor="let i of [1,2,3,4,5]"></i>
+                <span class="ms-2 fw-bold text-muted">Carregando...</span>
+              </ng-template>
             </div>
           </div>
 
@@ -196,74 +204,102 @@
           <h5 class="mb-0 fw-bold">Avaliações dos Viajantes</h5>
         </div>
         <div class="card-body">
-          <!-- Resumo das avaliações -->
-          <!-- <div class="row mb-4">
-            <div class="col-12">
-              <h6 class="fw-bold mb-3">Resumo de avaliações</h6>
-              <div class="avaliacoes-resumo">
-                <div class="mb-2" *ngFor="let item of avaliacoesSumarizado">
-                  <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="avaliacao-numero">{{ item.numero }}</span>
-                    <div class="progress flex-grow-1 mx-3" style="height: 8px;">
-                      <div class="progress-bar" [style.width.%]="item.porcentagem"
-                        [class]="item.numero === 5 ? 'bg-warning' : 'bg-light-gray'">
+          <!-- Loading state -->
+          <div *ngIf="isLoadingReviews" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Carregando avaliações...</span>
+            </div>
+            <p class="mt-2 text-muted">Carregando avaliações...</p>
+          </div>
+
+          <!-- Nenhuma review encontrada -->
+          <div *ngIf="!isLoadingReviews && reviews.length === 0" class="text-center py-4">
+            <i class="bi bi-chat-dots fs-1 text-muted"></i>
+            <p class="mt-2 text-muted">Ainda não há avaliações para este pacote.</p>
+            <small class="text-muted">Seja o primeiro a compartilhar sua experiência!</small>
+          </div>
+
+          <!-- Carrossel de Reviews -->
+          <div *ngIf="!isLoadingReviews && reviews.length > 0" id="bundleReviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-inner">
+              <!-- Slides dinâmicos baseados nas reviews da API -->
+              <div class="carousel-item" 
+                   *ngFor="let reviewGroup of getReviewGroups(); let i = index" 
+                   [class.active]="i === 0">
+                <div class="container">
+                  <div class="row justify-content-center g-4">
+                    <!-- Cards de review dinâmicos -->
+                    <div *ngFor="let review of reviewGroup; let j = index"
+                         class="col-12 col-sm-6 col-lg-4">
+                      <div class="review-card">
+                        <div class="review-header">
+                          <div class="reviewer-avatar">
+                            <i class="fas fa-user-circle"></i>
+                          </div>
+                          <div class="reviewer-info">
+                            <h6 class="reviewer-name">Viajante Anônimo</h6>
+                            <div class="review-rating">
+                              <span class="rating-number">{{ getRatingNumber(review.rating) }}</span>
+                              <div class="stars">
+                                <i *ngFor="let star of getStarsArrayForRating(review.rating)" 
+                                   class="fas fa-star"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="review-content">
+                          <p>"{{ review.comment }}"</p>
+                          <small>{{ formatReviewDate(review.avaliationDate) }}</small>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div> -->
 
-          <!-- Comentários individuais -->
-          <div class="comentarios-lista">
-            <div class="comentario-item mb-4" *ngFor="let avaliacao of avaliacoesPaginadas; let last = last">
-              <div class="d-flex">
-                <img [src]="avaliacao.avatarUsuario" class="rounded-circle me-3 avatar-comentario" width="50"
-                  height="50" [alt]="avaliacao.nomeUsuario">
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="mb-0 fw-bold">{{ avaliacao.nomeUsuario }}</h6>
-                    <div class="avaliacao-nota">
-                      <i class="bi bi-star-fill text-warning" *ngFor="let star of getStarsArray(avaliacao.nota)"></i>
-                      <span class="ms-2 fw-bold">{{ avaliacao.nota }}.0</span>
-                    </div>
-                  </div>
-                  <p class="mb-0 comentario-texto">{{ avaliacao.comentario }}</p>
-                </div>
-              </div>
-              <hr *ngIf="!last" class="my-4">
+            <!-- Controles do carousel -->
+            <button *ngIf="reviews.length > reviewsPerPage" class="carousel-control-prev" type="button" data-bs-target="#bundleReviewsCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Anterior</span>
+            </button>
+            <button *ngIf="reviews.length > reviewsPerPage" class="carousel-control-next" type="button" data-bs-target="#bundleReviewsCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Próximo</span>
+            </button>
+
+            <!-- Indicadores dinâmicos -->
+            <div *ngIf="reviews.length > reviewsPerPage" class="carousel-indicators">
+              <button *ngFor="let group of getReviewGroups(); let i = index"
+                      type="button" 
+                      data-bs-target="#bundleReviewsCarousel" 
+                      [attr.data-bs-slide-to]="i" 
+                      [class.active]="i === 0"
+                      [attr.aria-current]="i === 0 ? 'true' : null"
+                      [attr.aria-label]="'Slide ' + (i + 1)"></button>
             </div>
           </div>
 
-          <!-- Paginação -->
-          <nav aria-label="Paginação das avaliações" *ngIf="totalPaginas > 1">
-            <ul class="pagination justify-content-center mb-4">
-              <li class="page-item" [class.disabled]="paginaAtual === 1">
-                <button class="page-link" (click)="paginaAnterior()" [disabled]="paginaAtual === 1">
-                  <i class="bi bi-chevron-left"></i>
-                </button>
-              </li>
-              <li class="page-item" *ngFor="let pagina of getPaginas()" [class.active]="pagina === paginaAtual">
-                <button class="page-link" (click)="irParaPagina(pagina)">{{ pagina }}</button>
-              </li>
-              <li class="page-item" [class.disabled]="paginaAtual === totalPaginas">
-                <button class="page-link" (click)="proximaPagina()" [disabled]="paginaAtual === totalPaginas">
-                  <i class="bi bi-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
-
-          <!-- Nota geral do pacote -->
-          <div class="text-center border-top pt-4">
+          <!-- Nota geral do pacote baseada nas reviews reais -->
+          <div *ngIf="shouldShowRealRating() && reviews.length > 0" class="text-center border-top pt-4 mt-4">
             <div class="nota-geral">
-               <h3 class="display-5 fw-bold text-primary mb-2">{{ calculatedRating }}.0</h3> 
+               <h3 class="display-5 fw-bold text-primary mb-2">{{ getRealRatingFormatted() }}</h3> 
               <div class="mb-2">
                  <i class="bi bi-star-fill text-warning"
-                  *ngFor="let star of getStarsArray()"></i> 
+                  *ngFor="let star of getRealStarsArray()"></i> 
               </div>
-              <!-- <p class="text-muted mb-0">{{ pacote?.totalAvaliacoes || '1000' }} COMENTÁRIOS</p> -->
+              <p class="text-muted mb-0">{{ reviews.length }} AVALIAÇÃO(ÕES)</p>
+            </div>
+          </div>
+          
+          <!-- Mostrar quando não há reviews -->
+          <div *ngIf="shouldShowRealRating() && reviews.length === 0" class="text-center border-top pt-4 mt-4">
+            <div class="nota-geral">
+               <h3 class="display-5 fw-bold text-muted mb-2">0.0</h3> 
+              <div class="mb-2">
+                 <i class="bi bi-star text-muted" *ngFor="let i of [1,2,3,4,5]"></i> 
+              </div>
+              <p class="text-muted mb-0">Nenhuma avaliação ainda</p>
             </div>
           </div>
         </div>
