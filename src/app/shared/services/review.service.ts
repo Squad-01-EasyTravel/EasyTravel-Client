@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, map, switchMap } from 'rxjs';
+import { Observable, forkJoin, map, switchMap, of, catchError } from 'rxjs';
 
 export interface Review {
   id: number;
@@ -132,6 +132,79 @@ export class ReviewService {
                 comment: review.comment,
                 avaliationDate: review.avaliationDate,
                 userName: user ? user.name : 'Usuário não encontrado',
+                ratingNumber: this.convertRatingToNumber(review.rating)
+              };
+            });
+          })
+        );
+      })
+    );
+  }
+
+  // Método para buscar reviews de um bundle específico com nomes de usuários
+  getReviewsWithUserNamesByBundle(bundleId: number): Observable<ReviewWithUser[]> {
+    console.log(`📝 ReviewService: Buscando reviews para bundle ${bundleId}`);
+    
+    return this.http.get<Review[]>(`${this.baseUrl}/reviews/bundle/${bundleId}`).pipe(
+      catchError(error => {
+        console.error(`❌ ReviewService: Erro ao buscar reviews para bundle ${bundleId}:`, error);
+        // Se der erro 404 ou qualquer outro, retornar array vazio
+        return of([]);
+      }),
+      switchMap(reviews => {
+        console.log(`📝 ReviewService: Recebidas ${reviews?.length || 0} reviews para bundle ${bundleId}`);
+        
+        if (!reviews || reviews.length === 0) {
+          console.log(`📝 ReviewService: Nenhuma review encontrada para bundle ${bundleId}`);
+          // Retornar um Observable com array vazio usando of()
+          return of([]);
+        }
+
+        // Buscar travel histories, reservations e users
+        return forkJoin({
+          travelHistories: this.getTravelHistories(),
+          reservations: this.getReservations(),
+          users: this.getUsers()
+        }).pipe(
+          map(({ travelHistories, reservations, users }) => {
+            return reviews.map(review => {
+              // Encontrar travel history pelo ID
+              const travelHistory = travelHistories.find(th => th.id === review.travelHistoryId);
+              
+              if (!travelHistory) {
+                return {
+                  id: review.id,
+                  rating: review.rating,
+                  comment: review.comment,
+                  avaliationDate: review.avaliationDate,
+                  userName: 'Viajante Anônimo',
+                  ratingNumber: this.convertRatingToNumber(review.rating)
+                };
+              }
+
+              // Encontrar reservation pelo paymentId -> reservationId
+              const reservation = reservations.find(r => r.id === travelHistory.payment.reservationId);
+              
+              if (!reservation) {
+                return {
+                  id: review.id,
+                  rating: review.rating,
+                  comment: review.comment,
+                  avaliationDate: review.avaliationDate,
+                  userName: 'Viajante Anônimo',
+                  ratingNumber: this.convertRatingToNumber(review.rating)
+                };
+              }
+
+              // Encontrar user pelo userId da reservation
+              const user = users.find(u => u.id === reservation.userId);
+              
+              return {
+                id: review.id,
+                rating: review.rating,
+                comment: review.comment,
+                avaliationDate: review.avaliationDate,
+                userName: user ? user.name : 'Viajante Anônimo',
                 ratingNumber: this.convertRatingToNumber(review.rating)
               };
             });

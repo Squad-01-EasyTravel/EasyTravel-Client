@@ -205,7 +205,7 @@
         </div>
         <div class="card-body">
           <!-- Loading state -->
-          <div *ngIf="isLoadingReviews" class="text-center py-4">
+          <div *ngIf="!shouldShowRealRating()" class="text-center py-4">
             <div class="spinner-border text-primary" role="status">
               <span class="visually-hidden">Carregando avaliações...</span>
             </div>
@@ -213,14 +213,14 @@
           </div>
 
           <!-- Nenhuma review encontrada -->
-          <div *ngIf="!isLoadingReviews && reviews.length === 0" class="text-center py-4">
+          <div *ngIf="shouldShowRealRating() && reviews.length === 0" class="text-center py-4">
             <i class="bi bi-chat-dots fs-1 text-muted"></i>
             <p class="mt-2 text-muted">Ainda não há avaliações para este pacote.</p>
             <small class="text-muted">Seja o primeiro a compartilhar sua experiência!</small>
           </div>
 
           <!-- Carrossel de Reviews -->
-          <div *ngIf="!isLoadingReviews && reviews.length > 0" id="bundleReviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+          <div *ngIf="shouldShowRealRating() && reviews.length > 0" id="bundleReviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
             <div class="carousel-inner">
               <!-- Slides dinâmicos baseados nas reviews da API -->
               <div class="carousel-item" 
@@ -237,7 +237,7 @@
                             <i class="fas fa-user-circle"></i>
                           </div>
                           <div class="reviewer-info">
-                            <h6 class="reviewer-name">Viajante Anônimo</h6>
+                            <h6 class="reviewer-name">{{ getReviewUserName(j + (i * 3)) }}</h6>
                             <div class="review-rating">
                               <span class="rating-number">{{ getRatingNumber(review.rating) }}</span>
                               <div class="stars">

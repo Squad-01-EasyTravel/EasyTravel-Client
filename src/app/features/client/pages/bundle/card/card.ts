@@ -5,10 +5,22 @@ import { BookingService } from '@/app/shared/services/booking.service';
 import { NotificationService } from '@/app/shared/services/notification.service';
 import { CartConfirmationService } from '@/app/shared/services/cart-confirmation.service';
 import { AuthService } from '@/app/shared/services/auth.service';
+import { ReviewService } from '@/app/shared/services/review.service';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+
+// Interface para review do backend
+interface ReviewResponse {
+  id: number;
+  rating: string; // 'FIVE_STARS', 'FOUR_STARS', etc.
+  comment: string;
+  avaliationDate: string;
+  travelHistoryId: number;
+  bundleId: number;
+}
 
 @Component({
   selector: 'app-card',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HttpClientModule],
   templateUrl: './card.html',
   styleUrl: './card.css'
 })
@@ -19,14 +31,27 @@ export class Card implements OnInit {
     private bookingService: BookingService,
     private notificationService: NotificationService,
     private cartConfirmationService: CartConfirmationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private reviewService: ReviewService,
+    private http: HttpClient
   ) {}
 
   @Input() pacote!: any; // Aceita o objeto processado com dados da API
 
+  // Propriedades para avaliações reais
+  realAverageRating: number = 0;
+  realStarsRating: number = 0;
+  reviewsLoaded: boolean = false;
+  reviews: ReviewResponse[] = [];
+
   ngOnInit() {
     console.log('🎴 Card inicializado com dados:', this.pacote);
     console.log('🎴 Imagem do pacote:', this.pacote?.image);
+    
+    // Carregar avaliações reais do backend
+    if (this.pacote && this.pacote.id) {
+      this.loadRealRating();
+    }
   }
 
   formatDate(dateString: string): string {
@@ -271,6 +296,100 @@ export class Card implements OnInit {
       default: 
         return 'rank-bronze';
     }
+  }
+
+  // === MÉTODOS PARA AVALIAÇÕES REAIS (BASEADAS EM REVIEWS) ===
+
+  // Carregar avaliação real do backend
+  private loadRealRating(): void {
+    if (!this.pacote?.id) return;
+    
+    const bundleId = this.pacote.id;
+    console.log(`📊 Card: Carregando avaliação real para bundle ${bundleId}...`);
+    
+    this.http.get<ReviewResponse[]>(`http://localhost:8080/api/reviews/bundle/${bundleId}`)
+      .subscribe({
+        next: (reviews) => {
+          this.reviews = reviews;
+          this.calculateRealRating();
+          console.log(`📊 Card: Bundle ${bundleId} - ${reviews.length} reviews carregadas`);
+        },
+        error: (error) => {
+          console.error(`❌ Card: Erro ao carregar reviews do bundle ${bundleId}:`, error);
+          this.realAverageRating = 0;
+          this.realStarsRating = 0;
+          this.reviewsLoaded = true;
+        }
+      });
+  }
+
+  // Calcular avaliação real baseada nas reviews
+  private calculateRealRating(): void {
+    if (this.reviews && this.reviews.length > 0) {
+      // Calcular a média das avaliações
+      const totalRating = this.reviews.reduce((sum, review) => sum + this.convertRatingToNumber(review.rating), 0);
+      const averageRating = totalRating / this.reviews.length;
+      
+      // Armazenar a média exata para exibição
+      this.realAverageRating = averageRating;
+      // Arredondar para o inteiro mais próximo para exibição das estrelas
+      this.realStarsRating = Math.round(averageRating);
+      
+      console.log(`📊 Card: Bundle ${this.pacote.id} - ${this.reviews.length} reviews, média: ${averageRating.toFixed(1)}, estrelas: ${this.realStarsRating}`);
+    } else {
+      // Se não há reviews, define como 0
+      this.realAverageRating = 0;
+      this.realStarsRating = 0;
+      console.log(`📊 Card: Bundle ${this.pacote.id} - sem reviews, avaliação = 0`);
+    }
+    
+    // Marcar que as reviews foram carregadas
+    this.reviewsLoaded = true;
+  }
+
+  // Converter rating do backend para número
+  private convertRatingToNumber(rating: string): number {
+    switch (rating) {
+      case 'ONE_STAR': return 1;
+      case 'TWO_STARS': return 2;
+      case 'THREE_STARS': return 3;
+      case 'FOUR_STARS': return 4;
+      case 'FIVE_STARS': return 5;
+      default: return 0;
+    }
+  }
+
+  // Obter avaliação real formatada para exibição
+  getRealRating(): string {
+    if (!this.reviewsLoaded || this.realAverageRating === 0) {
+      return '0';
+    }
+    // Se a média é um número inteiro, mostra sem casas decimais
+    if (this.realAverageRating % 1 === 0) {
+      return this.realAverageRating.toString();
+    }
+    // Senão, mostra com 1 casa decimal
+    return this.realAverageRating.toFixed(1);
+  }
+
+  // Obter número de estrelas baseado nas reviews reais
+  getRealStarsRating(): number {
+    return this.reviewsLoaded ? this.realStarsRating : 0;
+  }
+
+  // Gerar array de estrelas baseado nas reviews reais
+  getRealStarsArray(): boolean[] {
+    const realRating = this.getRealStarsRating();
+    const stars: boolean[] = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(i <= realRating);
+    }
+    return stars;
+  }
+
+  // Verificar se as reviews foram carregadas
+  isReviewsLoaded(): boolean {
+    return this.reviewsLoaded;
   }
 
   // Métodos de avaliação seguindo a mesma lógica da home
