@@ -95,6 +95,11 @@
                 <i class="fas fa-list me-1"></i>
                 {{totalUsers}} usuários encontrados
               </span>
+              <!-- Botão de Registro de Usuário pelo Admin -->
+              <button class="btn btn-success btn-sm ms-3 mt-3 shadow-sm" (click)="openRegisterModal()">
+                <i class="fas fa-user-plus me-2"></i>
+                Registrar Usuário
+              </button>
             </div>
           </div>
           
@@ -661,6 +666,205 @@
                 *ngIf="selectedUser.userRole !== 'USER'">
           <i class="fas fa-edit"></i>
           <span>Editar Usuário</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Registro de Usuário pelo Admin -->
+<div class="modal-overlay" *ngIf="showRegisterModal" (click)="closeRegisterModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header do Modal -->
+    <div class="modal-header-section">
+      <div class="modal-header-content">
+        <div class="modal-icon">
+          <i class="fas fa-user-plus text-success"></i>
+        </div>
+        <div class="modal-title-group">
+          <h2 class="modal-title">Registrar Novo Usuário</h2>
+          <p class="modal-subtitle">
+            Crie uma nova conta de usuário escolhendo o tipo de perfil
+          </p>
+        </div>
+      </div>
+      <button class="modal-close-btn" (click)="closeRegisterModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Corpo do Modal -->
+    <div class="modal-body-section">
+      <!-- Exibir erro se existir -->
+      <div *ngIf="error" class="error-alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{error}}</span>
+      </div>
+
+      <!-- Formulário de Registro -->
+      <div class="form-grid">
+        <!-- Nome Completo -->
+        <div class="form-group col-span-2">
+          <label for="registerName" class="form-label">
+            <i class="fas fa-user text-muted me-2"></i>
+            Nome Completo *
+          </label>
+          <input
+            id="registerName"
+            type="text"
+            class="form-control"
+            [class.is-invalid]="registerForm.name && !validateRegisterName()"
+            [(ngModel)]="registerForm.name"
+            placeholder="Digite o nome completo"
+            required
+          >
+          <div class="invalid-feedback" *ngIf="registerForm.name && !validateRegisterName()">
+            {{getRegisterFieldError('name')}}
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="registerEmail" class="form-label">
+            <i class="fas fa-envelope text-muted me-2"></i>
+            Email *
+          </label>
+          <input
+            id="registerEmail"
+            type="email"
+            class="form-control"
+            [class.is-invalid]="registerForm.email && !validateRegisterEmail()"
+            [(ngModel)]="registerForm.email"
+            placeholder="exemplo@email.com"
+            required
+          >
+          <div class="invalid-feedback" *ngIf="registerForm.email && !validateRegisterEmail()">
+            {{getRegisterFieldError('email')}}
+          </div>
+        </div>
+
+        <!-- CPF -->
+        <div class="form-group">
+          <label for="registerCpf" class="form-label">
+            <i class="fas fa-id-card text-muted me-2"></i>
+            CPF *
+          </label>
+          <input
+            id="registerCpf"
+            type="text"
+            class="form-control"
+            [class.is-invalid]="registerForm.cpf && !validateRegisterCpf()"
+            [(ngModel)]="registerForm.cpf"
+            (input)="onRegisterCpfInput($event)"
+            placeholder="000.000.000-00"
+            maxlength="14"
+            required
+          >
+          <div class="invalid-feedback" *ngIf="registerForm.cpf && !validateRegisterCpf()">
+            {{getRegisterFieldError('cpf')}}
+          </div>
+        </div>
+
+        <!-- Telefone -->
+        <div class="form-group">
+          <label for="registerTelephone" class="form-label">
+            <i class="fas fa-phone text-muted me-2"></i>
+            Telefone *
+          </label>
+          <input
+            id="registerTelephone"
+            type="tel"
+            class="form-control"
+            [class.is-invalid]="registerForm.telephone && !validateRegisterPhone()"
+            [(ngModel)]="registerForm.telephone"
+            (input)="onRegisterPhoneInput($event)"
+            placeholder="(00) 00000-0000"
+            maxlength="15"
+            required
+          >
+          <div class="invalid-feedback" *ngIf="registerForm.telephone && !validateRegisterPhone()">
+            {{getRegisterFieldError('telephone')}}
+          </div>
+        </div>
+
+        <!-- Passaporte (Opcional) -->
+        <div class="form-group">
+          <label for="registerPassport" class="form-label">
+            <i class="fas fa-passport text-muted me-2"></i>
+            Passaporte
+          </label>
+          <input
+            id="registerPassport"
+            type="text"
+            class="form-control"
+            [(ngModel)]="registerForm.passport"
+            placeholder="Número do passaporte (opcional)"
+          >
+        </div>
+
+        <!-- Senha -->
+        <div class="form-group">
+          <label for="registerPassword" class="form-label">
+            <i class="fas fa-lock text-muted me-2"></i>
+            Senha *
+          </label>
+          <input
+            id="registerPassword"
+            type="password"
+            class="form-control"
+            [class.is-invalid]="registerForm.password && !validateRegisterPassword()"
+            [(ngModel)]="registerForm.password"
+            placeholder="Digite uma senha segura"
+            required
+          >
+          <div class="invalid-feedback" *ngIf="registerForm.password && !validateRegisterPassword()">
+            {{getRegisterFieldError('password')}}
+          </div>
+          <small class="form-text text-muted" *ngIf="!registerForm.password || validateRegisterPassword()">
+            <i class="fas fa-info-circle me-1"></i>
+            Mínimo 8 caracteres com maiúscula, minúscula, número e caractere especial
+          </small>
+        </div>
+
+        <!-- Tipo de Usuário (Role) -->
+        <div class="form-group col-span-2">
+          <label for="registerRole" class="form-label">
+            <i class="fas fa-user-tag text-muted me-2"></i>
+            Tipo de Usuário *
+          </label>
+          <select
+            id="registerRole"
+            class="form-control"
+            [(ngModel)]="registerForm.role"
+            required
+          >
+            <option value="USER">👤 USER - Cliente (pode fazer reservas)</option>
+            <option value="EMPLOYEE">👔 EMPLOYEE - Funcionário (acesso administrativo básico)</option>
+            <option value="ADMIN">👑 ADMIN - Administrador (acesso total)</option>
+          </select>
+          <small class="form-text text-muted mt-2">
+            <i class="fas fa-info-circle me-1"></i>
+            Selecione o tipo de acesso que o usuário terá no sistema
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer do Modal -->
+    <div class="modal-footer-section">
+      <div class="modal-actions">
+        <button type="button" class="btn-modal btn-cancel" (click)="closeRegisterModal()">
+          <i class="fas fa-times"></i>
+          <span>Cancelar</span>
+        </button>
+        <button 
+          type="button" 
+          class="btn-modal btn-primary" 
+          (click)="registerUser()"
+          [disabled]="!isRegisterFormValid()"
+        >
+          <i class="fas fa-user-plus"></i>
+          <span>Registrar Usuário</span>
         </button>
       </div>
     </div>

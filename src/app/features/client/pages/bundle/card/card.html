@@ -15,13 +15,30 @@
     </div>
     <div class="card-rating-overlay">
       <div class="rating-stars">
-        <span *ngFor="let filled of getStarsArray(getRatingFromRankConsistent(pacote.bundleRank, pacote.id))"
-              class="star"
-              [class.filled]="filled">
-          <i class="fas fa-star"></i>
-        </span>
+        <!-- Mostrar avaliação real quando carregada, senão mostrar mockada -->
+        <ng-container *ngIf="isReviewsLoaded(); else loadingStars">
+          <span *ngFor="let filled of getRealStarsArray()"
+                class="star"
+                [class.filled]="filled">
+            <i class="fas fa-star"></i>
+          </span>
+        </ng-container>
+        <!-- Template para quando ainda está carregando -->
+        <ng-template #loadingStars>
+          <span *ngFor="let filled of getStarsArray(getRatingFromRankConsistent(pacote.bundleRank, pacote.id))"
+                class="star"
+                [class.filled]="filled">
+            <i class="fas fa-star"></i>
+          </span>
+        </ng-template>
       </div>
-      <span class="rating-number">{{ getRatingFromRankConsistent(pacote.bundleRank, pacote.id) }}</span>
+      <!-- Mostrar rating real quando carregado, senão mostrar mockado -->
+      <ng-container *ngIf="isReviewsLoaded(); else loadingRating">
+        <span class="rating-number">{{ getRealRating() }}</span>
+      </ng-container>
+      <ng-template #loadingRating>
+        <span class="rating-number">{{ getRatingFromRankConsistent(pacote.bundleRank, pacote.id) }}</span>
+      </ng-template>
     </div>
   </div>
 

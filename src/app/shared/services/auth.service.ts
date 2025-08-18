@@ -1,3 +1,4 @@
+// Teste de alteração no código - funcionalidade de registro de admin
 import {jwtDecode} from 'jwt-decode';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -24,7 +25,17 @@ export interface RegisterClientDto {
   password: string;
   telephone: string;
   role? : string;
+}
 
+// Interface para registro de usuário pelo admin
+export interface RegisterAdminDto {
+  name: string;
+  email: string;
+  cpf: string;
+  passport?: string;
+  password: string;
+  telephone: string;
+  role: 'USER' | 'EMPLOYEE' | 'ADMIN';
 }
 
 export interface User {
@@ -158,6 +169,15 @@ export class AuthService {
           } as any;
         }
         return response;
+      })
+    );
+  }
+
+  // Método para registro de usuário pelo admin
+  registerUserByAdmin(data: RegisterAdminDto): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register/admin`, data).pipe(
+      tap(response => {
+        console.log('✅ Usuário criado pelo admin:', response);
       })
     );
   }

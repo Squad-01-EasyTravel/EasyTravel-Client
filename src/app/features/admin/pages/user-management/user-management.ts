@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../shared/services/auth.service';
 import { UserManagementService, UserManagement as User, UserStats } from '../../../../shared/services/user-management.service';
+import { ValidationService } from '../../../../shared/services/validation.service';
 
 @Component({
   selector: 'app-user-management',
@@ -33,6 +34,7 @@ export class UserManagement implements OnInit {
   // Controle de modais
   showUserModal: boolean = false;
   showDeleteModal: boolean = false;
+  showRegisterModal: boolean = false; // Novo modal para registro pelo admin
   isEditMode: boolean = false;
   selectedUser: User | null = null;
   userToDelete: User | null = null;
@@ -48,6 +50,17 @@ export class UserManagement implements OnInit {
     passport: '',
     password: '',
     userRole: 'USER'
+  };
+
+  // Dados do formulário de registro pelo admin
+  registerForm: any = {
+    name: '',
+    email: '',
+    cpf: '',
+    telephone: '',
+    passport: '',
+    password: '',
+    role: 'USER'
   };
 
   constructor(
@@ -450,5 +463,187 @@ export class UserManagement implements OnInit {
   // Getter para Math (usado no template)
   get Math() {
     return Math;
+  }
+
+  // === MÉTODOS PARA MODAL DE REGISTRO PELO ADMIN ===
+
+  // Formatação automática dos campos (igual à página de registro)
+  onRegisterCpfInput(event: any): void {
+    const value = event.target.value;
+    const formatted = ValidationService.formatCPF(value);
+    this.registerForm.cpf = formatted;
+  }
+
+  onRegisterPhoneInput(event: any): void {
+    const value = event.target.value;
+    const formatted = ValidationService.formatPhone(value);
+    this.registerForm.telephone = formatted;
+  }
+
+  // Métodos para limpar formatação antes de enviar ao backend
+  private cleanCpf(cpf: string): string {
+    return cpf ? cpf.replace(/\D/g, '') : '';
+  }
+
+  private cleanPhone(phone: string): string {
+    return phone ? phone.replace(/\D/g, '') : '';
+  }
+
+  // Validações específicas para o formulário de registro
+  validateRegisterName(): boolean {
+    const name = this.registerForm.name;
+    return !!(name && name.trim().length >= 2 && /^[a-zA-ZÀ-ÿ\s]+$/.test(name));
+  }
+
+  validateRegisterEmail(): boolean {
+    const email = this.registerForm.email;
+    return !!(email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  }
+
+  validateRegisterCpf(): boolean {
+    const cpf = this.registerForm.cpf;
+    return !!(cpf && ValidationService.validateCPF(cpf));
+  }
+
+  validateRegisterPhone(): boolean {
+    const phone = this.registerForm.telephone;
+    return !!(phone && /^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(phone));
+  }
+
+  validateRegisterPassword(): boolean {
+    const password = this.registerForm.password;
+    if (!password) return false;
+    
+    // Mesmas validações da página de registro
+    return password.length >= 8 &&
+           /[A-Z]/.test(password) &&
+           /[a-z]/.test(password) &&
+           /\d/.test(password) &&
+           /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+  }
+
+  // Obter mensagens de erro específicas
+  getRegisterFieldError(field: string): string {
+    switch(field) {
+      case 'name':
+        if (!this.registerForm.name) return 'Nome é obrigatório';
+        if (this.registerForm.name.length < 2) return 'Nome deve ter pelo menos 2 caracteres';
+        if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(this.registerForm.name)) return 'Nome deve conter apenas letras';
+        return '';
+      
+      case 'email':
+        if (!this.registerForm.email) return 'Email é obrigatório';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.registerForm.email)) return 'Email inválido';
+        return '';
+      
+      case 'cpf':
+        if (!this.registerForm.cpf) return 'CPF é obrigatório';
+        if (!ValidationService.validateCPF(this.registerForm.cpf)) return 'CPF inválido';
+        return '';
+      
+      case 'telephone':
+        if (!this.registerForm.telephone) return 'Telefone é obrigatório';
+        if (!/^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(this.registerForm.telephone)) return 'Formato: (00) 00000-0000';
+        return '';
+      
+      case 'password':
+        if (!this.registerForm.password) return 'Senha é obrigatória';
+        if (this.registerForm.password.length < 8) return 'Senha deve ter pelo menos 8 caracteres';
+        if (!/[A-Z]/.test(this.registerForm.password)) return 'Senha deve ter pelo menos 1 letra maiúscula';
+        if (!/[a-z]/.test(this.registerForm.password)) return 'Senha deve ter pelo menos 1 letra minúscula';
+        if (!/\d/.test(this.registerForm.password)) return 'Senha deve ter pelo menos 1 número';
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.registerForm.password)) return 'Senha deve ter pelo menos 1 caractere especial';
+        return '';
+      
+      default:
+        return '';
+    }
+  }
+
+  // Abrir modal de registro
+  openRegisterModal(): void {
+    this.showRegisterModal = true;
+    this.resetRegisterForm();
+    this.error = null;
+  }
+
+  // Fechar modal de registro
+  closeRegisterModal(): void {
+    this.showRegisterModal = false;
+    this.resetRegisterForm();
+    this.error = null;
+  }
+
+  // Resetar formulário de registro
+  resetRegisterForm(): void {
+    this.registerForm = {
+      name: '',
+      email: '',
+      cpf: '',
+      telephone: '',
+      passport: '',
+      password: '',
+      role: 'USER'
+    };
+  }
+
+  // Validação do formulário de registro (melhorada)
+  isRegisterFormValid(): boolean {
+    return this.validateRegisterName() && 
+           this.validateRegisterEmail() && 
+           this.validateRegisterCpf() && 
+           this.validateRegisterPhone() && 
+           this.validateRegisterPassword() && 
+           !!this.registerForm.role;
+  }
+
+  // Registrar usuário pelo admin
+  registerUser(): void {
+    if (!this.isRegisterFormValid()) {
+      this.error = 'Preencha todos os campos obrigatórios corretamente.';
+      return;
+    }
+
+    // Preparar dados com formatação limpa (igual à página de registro)
+    const registerData = {
+      name: this.registerForm.name.trim(),
+      email: this.registerForm.email.trim(),
+      cpf: this.cleanCpf(this.registerForm.cpf), // Remove formatação
+      telephone: this.cleanPhone(this.registerForm.telephone), // Remove formatação
+      passport: this.registerForm.passport?.trim() || '',
+      password: this.registerForm.password,
+      role: this.registerForm.role
+    };
+
+    console.log('📝 Registrando novo usuário pelo admin:', registerData);
+
+    this.authService.registerUserByAdmin(registerData)
+      .subscribe({
+        next: (response) => {
+          console.log('✅ Usuário registrado com sucesso pelo admin:', response);
+          this.closeRegisterModal();
+          this.loadUsers(); // Recarregar lista de usuários
+          this.loadUserStats(); // Recarregar estatísticas
+          
+          // Limpar mensagem de erro
+          this.error = null;
+          
+          // Mostrar mensagem de sucesso
+          console.log('✅ Usuário criado com sucesso!');
+        },
+        error: (error) => {
+          console.error('❌ Erro ao registrar usuário:', error);
+          
+          if (error.status === 400) {
+            this.error = 'Dados inválidos. Verifique os campos preenchidos.';
+          } else if (error.status === 409) {
+            this.error = 'Email ou CPF já cadastrado.';
+          } else if (error.status === 403) {
+            this.error = 'Você não tem permissão para criar usuários.';
+          } else {
+            this.error = 'Erro ao criar usuário. Tente novamente.';
+          }
+        }
+      });
   }
 }

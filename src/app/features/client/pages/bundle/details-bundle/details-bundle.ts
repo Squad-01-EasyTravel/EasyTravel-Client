@@ -12,6 +12,7 @@ import { BookingService } from '@/app/shared/services/booking.service';
 import { NotificationService } from '@/app/shared/services/notification.service';
 import { CartConfirmationService } from '@/app/shared/services/cart-confirmation.service';
 import { AuthService } from '@/app/shared/services/auth.service';
+import { ReviewService, ReviewWithUser } from '@/app/shared/services/review.service';
 import { BundleClass } from '../class/bundle-class';
 import { MediaResponse } from '../../../../../shared/models/media-response.interface';
 import { BundleLocationResponse } from '../../../../../shared/models/bundle-location-response.interface';
@@ -74,6 +75,7 @@ export class DetailsBundle implements OnInit {
     private notificationService: NotificationService,
     private cartConfirmationService: CartConfirmationService,
     private authService: AuthService,
+    private reviewService: ReviewService,
     private sanitizer: DomSanitizer,
     private http: HttpClient
   ) {}
@@ -84,6 +86,7 @@ export class DetailsBundle implements OnInit {
   
   // Reviews do backend
   reviews: ReviewResponse[] = [];
+  reviewsWithUsers: ReviewWithUser[] = []; // Nova propriedade para reviews com nomes de usuários
   
   // Carrossel de reviews
   currentReviewIndex = 0;
@@ -674,34 +677,63 @@ export class DetailsBundle implements OnInit {
     });
   }
 
-  // Carregar reviews do backend
+  // Carregar reviews do backend com nomes de usuários
   loadBundleReviews(): void {
-    if (!this.id) return;
+    if (!this.id) {
+      console.warn('📝 loadBundleReviews: ID do bundle não está disponível');
+      return;
+    }
     
     this.isLoadingReviews = true;
     const bundleId = parseInt(this.id);
+    console.log(`📝 loadBundleReviews: Iniciando carregamento para bundle ${bundleId}`);
     
-    this.http.get<ReviewResponse[]>(`http://localhost:8080/api/reviews/bundle/${bundleId}`)
+    // Usar o ReviewService para buscar reviews com nomes de usuários
+    this.reviewService.getReviewsWithUserNamesByBundle(bundleId)
       .subscribe({
-        next: (reviews) => {
-          this.reviews = reviews;
+        next: (reviewsWithUsers) => {
+          console.log(`📝 loadBundleReviews: Recebidas ${reviewsWithUsers.length} reviews para bundle ${bundleId}`);
+          
+          this.reviewsWithUsers = reviewsWithUsers;
+          
+          // Manter compatibilidade com o código existente
+          this.reviews = reviewsWithUsers.map(review => ({
+            id: review.id,
+            rating: review.rating,
+            comment: review.comment,
+            avaliationDate: review.avaliationDate,
+            travelHistoryId: 0, // Não usado mais
+            bundleId: bundleId
+          }));
+          
           this.isLoadingReviews = false;
           
           // Calcular avaliação real baseada nas reviews
           this.calculateRealRating();
           
-          console.log('📝 Reviews carregadas:', reviews);
+          console.log('📝 Reviews com usuários carregadas:', reviewsWithUsers);
           console.log('⭐ Avaliação real calculada:', this.realAverageRating);
+          console.log('🏁 loadBundleReviews: Carregamento finalizado com sucesso');
+          
+          // Garantir que reviewsLoaded seja true mesmo se não há reviews
+          if (reviewsWithUsers.length === 0) {
+            console.log('📝 Nenhuma review encontrada para este bundle');
+          }
         },
         error: (error) => {
-          console.error('❌ Erro ao carregar reviews:', error);
+          console.error('❌ Erro ao carregar reviews com usuários:', error);
+          console.error('❌ Detalhes do erro:', error.message || 'Erro desconhecido');
+          
           this.reviews = [];
+          this.reviewsWithUsers = [];
           this.isLoadingReviews = false;
           
           // Definir avaliação como 0 em caso de erro
           this.realAverageRating = 0;
           this.realStarsRating = 0;
           this.reviewsLoaded = true;
+          
+          console.log('🏁 loadBundleReviews: Carregamento finalizado com erro');
         }
       });
   }
@@ -795,5 +827,13 @@ export class DetailsBundle implements OnInit {
       groups.push(this.reviews.slice(i, i + this.reviewsPerPage));
     }
     return groups;
+  }
+
+  // Obter nome do usuário da review baseado no índice
+  getReviewUserName(index: number): string {
+    if (index >= 0 && index < this.reviewsWithUsers.length) {
+      return this.reviewsWithUsers[index].userName || 'Viajante Anônimo';
+    }
+    return 'Viajante Anônimo';
   }
 }
